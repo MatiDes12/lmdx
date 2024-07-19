@@ -1,0 +1,8 @@
+{
+  "python.analysis.extraPaths": [
+    "./scripts",
+    "./app/routes",
+    "./app/models_",
+    "./app/models_"
+  ]
+}

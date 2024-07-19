@@ -1,0 +1,210 @@
+{% extends 'doctors/dashboard.html' %}
+
+{% block title %}Image Analytics{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h1 class="text-3xl font-bold">Image Analytics</h1>
+            <p>Utilize advanced AI to analyze medical images for early detection of diseases.</p>
+        </div>
+    </div>
+
+    <!-- Folders for different image types and Action Buttons -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+                <div class="bg-blue-100 p-4 rounded-lg">
+                    <svg class="w-8 h-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
+                    </svg>
+                </div>
+                <span>CT Scan</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="bg-green-100 p-4 rounded-lg">
+                    <svg class="w-8 h-8 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
+                    </svg>
+                </div>
+                <span>X-Ray</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="bg-red-100 p-4 rounded-lg">
+                    <svg class="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
+                    </svg>
+                </div>
+                <span>MRI</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="bg-yellow-100 p-4 rounded-lg">
+                    <svg class="w-8 h-8 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
+                    </svg>
+                </div>
+                <span>Ultrasound</span>
+            </div>
+        </div>
+        <div class="flex overflow-hidden bg-white border divide-x rounded-lg rtl:flex-row-reverse dark:bg-gray-900 dark:border-gray-700 dark:divide-gray-700">
+          <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-200 sm:text-base sm:px-6 dark:hover:bg-gray-800 dark:text-gray-300 gap-x-3 hover:bg-gray-100">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+      
+              <span>Upload</span>
+          </button>
+      
+          <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-200 sm:text-base sm:px-6 dark:hover:bg-gray-800 dark:text-gray-300 gap-x-3 hover:bg-gray-100">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+              </svg>
+      
+              <span>Drift</span>
+          </button>
+      
+          <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-200 sm:text-base sm:px-6 dark:hover:bg-gray-800 dark:text-gray-300 gap-x-3 hover:bg-gray-100">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+      
+              <span>View</span>
+          </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Upload Section -->
+        <div class="bg-white border rounded-lg shadow-md p-4 w-full md:w-1/2">
+            <h2 class="text-xl font-semibold mb-4">Upload Medical Image</h2>
+            <form id="upload-form" action="{{ url_for('dashboard.image_analysis') }}" method="post" enctype="multipart/form-data">
+                <div id="upload-box" class="border-2 border-dotted border-blue-400 rounded-lg p-6 flex justify-center items-center flex-col cursor-pointer">
+                    <svg class="w-12 h-12 text-gray-500 mb-3" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M4 3H3C2.44772 3 2 3.44772 2 4V16C2 16.5523 2.44772 17 3 17H16C16.5523 17 17 16.5523 17 16V15H5C4.44772 15 4 14.5523 4 14V3Z" />
+                        <path d="M8 1H12C12.5523 1 13 1.44772 13 2V13C13 13.5523 12.5523 14 12 14H8C7.44772 14 7 13.5523 7 13V2C7 1.44772 7.44772 1 8 1Z" />
+                    </svg>
+                    <p class="text-gray-500 mb-3">Drag and drop files, or <span class="text-blue-500">Browse</span></p>
+                    <input type="file" name="image" class="hidden">
+                </div>
+                <p id="file-name" class="mt-2 text-sm text-gray-600"></p>
+                
+              <!-- Analysis Options inside the Upload Section -->
+              <div class="bg-white border rounded-lg shadow-md p-4 mt-6">
+                <h3 class="text-md font-semibold mb-2">Analysis Options</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <select name="image_type" class="w-full py-2 px-3 pr-6 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>Select Image Type</option>
+                            <option value="ct">CT Scan</option>
+                            <option value="xray">X-Ray</option>
+                            <option value="mri">MRI</option>
+                            <option value="ultrasound">Ultrasound</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select name="analysis_type" class="w-full py-2 px-3 pr-6 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>Analysis Type</option>
+                            <option value="detection">Disease Detection</option>
+                            <option value="segmentation">Segmentation</option>
+                            <option value="classification">Classification</option>
+                        </select>
+                    </div>
+                </div>
+              </div>
+                <button type="submit" class="mt-4 w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg">Analyze Image</button>
+            </form>
+        </div>
+        
+
+<!-- Uploaded Image Section -->
+<div class="bg-white border rounded-lg shadow-md p-4 w-full md:w-1/2 relative">
+  <h2 class="text-xl font-semibold mb-4">Uploaded Image</h2>
+  <div class="flex justify-between items-start mb-4">
+      <div class="w-1/2 h-48 border-2 border-dotted border-gray-300 flex items-center justify-center">
+          {% if results %}
+              <img src="{{ url_for('static', filename=results['image_url']) }}" alt="Uploaded Image" class="w-full h-full object-cover">
+          {% else %}
+              <p class="text-gray-500">No image uploaded yet.</p>
+          {% endif %}
+      </div>
+      <div class="w-1/2 pl-4">
+          <div class="h-48 border-2 border-dotted border-gray-300 p-4 flex justify-center items-center">
+              {% if results %}
+                  <p class="text-gray-700">{{ results['analysis'] }}</p>
+              {% else %}
+                  <p class="text-gray-500">No analysis results yet.</p>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+  <div class="flex justify-between mt-5">
+      <p class="text-sm text-gray-600">{% if results %}File Name: {{ results['filename'] | truncate(20, True) }}{% else %}File Name: {% endif %}</p>
+      <p class="text-sm text-gray-600 m-6">{% if results %}File Size: {{ results['filesize'] }} KB{% else %}File Size: {% endif %}</p>
+  </div>
+  <div class="flex gap-4">
+    <button class="flex items-center gap-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onclick="showImageDetails()">
+        <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v1.5M12 9v.01M6 6h.01M6 18h.01M18 18h.01M18 6h.01M8.59 15.41L16.17 7.83M7.83 7.83L15.41 15.41" />
+        </svg>
+        View Details
+    </button>
+    <button class="flex items-center gap-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onclick="applyEnhancements()">
+        <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v1.5M12 9v.01M6 6h.01M6 18h.01M18 18h.01M18 6h.01M8.59 15.41L16.17 7.83M7.83 7.83L15.41 15.41" />
+        </svg>
+        Enhance Image
+    </button>
+    <button class="flex items-center gap-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onclick="generateReport()">
+        <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v1.5M12 9v.01M6 6h.01M6 18h.01M18 18h.01M18 6h.01M8.59 15.41L16.17 7.83M7.83 7.83L15.41 15.41" />
+        </svg>
+        Generate Report
+    </button>
+</div>
+</div>
+
+<!-- Flash message container -->
+<div id="flash-message-container" class="fixed top-32 right-10 z-50"></div>
+
+<!-- JavaScript to handle file upload click and flash messages -->
+<script>
+document.querySelector('#upload-box').addEventListener('click', function() {
+  document.querySelector('input[type="file"]').click();
+});
+
+document.querySelector('input[type="file"]').addEventListener('change', function() {
+  const fileName = this.files[0].name;
+  document.getElementById('file-name').textContent = `Selected file: ${fileName}`;
+});
+
+function showFlashMessage(message, category) {
+  const flashMessageContainer = document.getElementById('flash-message-container');
+  const flashMessage = document.createElement('div');
+  flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;
+  flashMessage.innerHTML = `
+      <div class="flex items-center justify-center w-12 bg-${category}-500">
+          <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
+      </svg>
+      </div>
+      <div class="px-4 py-2 -mx-3">
+          <div class="mx-3">
+              <span class="font-semibold text-${category}-500 dark:text-${category}-400">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+              <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
+          </div>
+      </div>
+  `;
+  flashMessageContainer.appendChild(flashMessage);
+
+  setTimeout(() => {
+      flashMessage.remove();
+  }, 5000);
+}
+
+function hideLoading() {
+  // Implement logic to hide loading spinner or message
+}
+</script>
+
+{% endblock %}

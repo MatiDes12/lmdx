@@ -1,0 +1,230 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Patients{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<section class="container px-1 mx-auto">
+    <div class="flex items-center gap-x-3 mb-4">
+        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Patients</h2>
+        <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">{{ pagination.total }} patients</span>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <form method="GET" action="{{ url_for('dashboard.patients') }}" class="flex flex-col md:flex-row items-center gap-4 mb-4 p-6 bg-white rounded-lg shadow-md">
+        <div class="relative flex-grow">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search patients..." 
+                value="{{ request.args.get('search', '') }}" 
+                class="w-full py-3 px-4 pr-10 text-gray-700 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-300"
+            >
+            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        
+        <!-- Status Filter Dropdown -->
+        <div x-data="{ isOpen: false, selectedStatus: '{{ request.args.get('status', 'All') }}' }" class="relative">
+            <button 
+                @click="isOpen = !isOpen" 
+                type="button" 
+                class="relative z-10 block py-3 px-4 text-gray-700 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-300 w-48"
+            >
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center">
+                        <span :class="{
+                            'bg-gray-500': selectedStatus === 'All',
+                            'bg-green-500': selectedStatus === 'Active',
+                            'bg-yellow-500': selectedStatus === 'Inactive',
+                            'bg-red-500': selectedStatus === 'Discharged',
+                            'bg-blue-500': selectedStatus === 'Admitted',
+                            'bg-purple-500': selectedStatus === 'In Treatment',
+                            'bg-orange-500': selectedStatus === 'Pending',
+                            'bg-teal-500': selectedStatus === 'Follow-Up',
+                            'bg-indigo-500': selectedStatus === 'Recovered',
+                            'bg-pink-500': selectedStatus === 'Critical',
+                            'bg-gray-500': selectedStatus === 'Transferred'
+                        }" class="inline-block w-2.5 h-2.5 mr-2 rounded-full"></span>
+                        <span x-text="selectedStatus"></span>
+                    </span>
+                    <svg class="w-5 h-5 text-gray-800 dark:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </button>
+    
+            <div 
+                x-show="isOpen" 
+                @click.away="isOpen = false"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="opacity-0 scale-90"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-90" 
+                class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800"
+            >
+                <a @click="selectedStatus = 'All'; isOpen = false" href="{{ url_for('dashboard.patients') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-gray-500 rounded-full"></span>All
+                </a>
+                <a @click="selectedStatus = 'Active'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-green-500 rounded-full"></span>Active
+                </a>
+                <a @click="selectedStatus = 'Inactive'; isOpen = false" href="{{ url_for('dashboard.patients', status='Inactive') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-yellow-500 rounded-full"></span>Inactive
+                </a>
+                <a @click="selectedStatus = 'Discharged'; isOpen = false" href="{{ url_for('dashboard.patients', status='Discharged') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-red-500 rounded-full"></span>Discharged
+                </a>
+                <a @click="selectedStatus = 'Admitted'; isOpen = false" href="{{ url_for('dashboard.patients', status='Admitted') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-blue-500 rounded-full"></span>Admitted
+                </a>
+                <a @click="selectedStatus = 'In Treatment'; isOpen = false" href="{{ url_for('dashboard.patients', status='In Treatment') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-purple-500 rounded-full"></span>In Treatment
+                </a>
+                <a @click="selectedStatus = 'Pending'; isOpen = false" href="{{ url_for('dashboard.patients', status='Pending') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-orange-500 rounded-full"></span>Pending
+                </a>
+                <a @click="selectedStatus = 'Follow-Up'; isOpen = false" href="{{ url_for('dashboard.patients', status='Follow-Up') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-teal-500 rounded-full"></span>Follow-Up
+                </a>
+                <a @click="selectedStatus = 'Recovered'; isOpen = false" href="{{ url_for('dashboard.patients', status='Recovered') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-indigo-500 rounded-full"></span>Recovered
+                </a>
+                <a @click="selectedStatus = 'Critical'; isOpen = false" href="{{ url_for('dashboard.patients', status='Critical') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-pink-500 rounded-full"></span>Critical
+                </a>
+                <a @click="selectedStatus = 'Transferred'; isOpen = false" href="{{ url_for('dashboard.patients', status='Transferred') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-gray-500 rounded-full"></span>Transferred
+                </a>
+            </div>
+        </div>
+        
+        <button 
+            type="submit" 
+            class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 flex items-center justify-center"
+        >
+            <span>Filter</span>
+            <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+              </svg>
+        </button>
+    </form>
+    
+    <!-- Patients Table -->
+    <div class="flex flex-col mt-6">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800">
+                            <tr>
+                                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    <div class="flex items-center gap-x-3">
+                                        <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
+                                        <span>Patient Name</span>
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    Age
+                                </th>
+                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    Gender
+                                </th>
+                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    Doctor
+                                </th>
+                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    Status
+                                </th>
+                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                            {% for patient in patients %}
+                            <tr>
+                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-x-3">
+                                        <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
+                                        <div class="flex items-center gap-x-2">
+                                            <img class="object-cover w-10 h-10 rounded-full" src="https://i.pravatar.cc/300?u={{ patient.name }}" alt="{{ patient.name }}">
+                                            <div>
+                                                <h2 class="font-medium text-gray-800 dark:text-white ">{{ patient.name }}</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                    {{ patient.age }}
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                    {{ patient.gender }}
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                    {{ patient.doctor.name }}
+                                </td>
+                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 {% if patient.status == 'Active' %}bg-green-100/60 dark:bg-gray-800{% elif patient.status == 'Inactive' %}bg-yellow-100/60 dark:bg-gray-800{% elif patient.status == 'Discharged' %}bg-red-100/60 dark:bg-gray-800{% elif patient.status == 'Admitted' %}bg-blue-100/60 dark:bg-gray-800{% elif patient.status == 'In Treatment' %}bg-purple-100/60 dark:bg-gray-800{% elif patient.status == 'Pending' %}bg-orange-100/60 dark:bg-gray-800{% elif patient.status == 'Follow-Up' %}bg-teal-100/60 dark:bg-gray-800{% elif patient.status == 'Recovered' %}bg-indigo-100/60 dark:bg-gray-800{% elif patient.status == 'Critical' %}bg-pink-100/60 dark:bg-gray-800{% elif patient.status == 'Transferred' %}bg-gray-100/60 dark:bg-gray-800{% else %}bg-gray-100/60 dark:bg-gray-800{% endif %}">
+                                        <span class="h-1.5 w-1.5 rounded-full {% if patient.status == 'Active' %}bg-green-500{% elif patient.status == 'Inactive' %}bg-yellow-500{% elif patient.status == 'Discharged' %}bg-red-500{% elif patient.status == 'Admitted' %}bg-blue-500{% elif patient.status == 'In Treatment' %}bg-purple-500{% elif patient.status == 'Pending' %}bg-orange-500{% elif patient.status == 'Follow-Up' %}bg-teal-500{% elif patient.status == 'Recovered' %}bg-indigo-500{% elif patient.status == 'Critical' %}bg-pink-500{% elif patient.status == 'Transferred' %}bg-gray-500{% else %}bg-gray-500{% endif %}"></span>
+                                        <h2 class="text-sm font-normal {% if patient.status == 'Active' %}text-green-500{% elif patient.status == 'Inactive' %}text-yellow-500{% elif patient.status == 'Discharged' %}text-red-500{% elif patient.status == 'Admitted' %}text-blue-500{% elif patient.status == 'In Treatment' %}text-purple-500{% elif patient.status == 'Pending' %}text-orange-500{% elif patient.status == 'Follow-Up' %}text-teal-500{% elif patient.status == 'Recovered' %}text-indigo-500{% elif patient.status == 'Critical' %}text-pink-500{% elif patient.status == 'Transferred' %}text-gray-500{% else %}text-gray-500{% endif %}">{{ patient.status }}</h2>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm whitespace-nowrap">
+                                    <div class="flex items-center space-x-3">
+                                        <a href="{{ url_for('dashboard.patient_profile', patient_id=patient.id) }}" class="text-gray-500 transition-colors duration-200 dark:hover:text-indigo-500 dark:text-gray-300 hover:text-indigo-500 focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                            </svg>
+                                        </a>
+                                        <a href="{{ url_for('dashboard.send_message_page', patient_id=patient.id) }}" class="text-gray-500 transition-colors duration-200 dark:hover:text-indigo-500 dark:text-gray-300 hover:text-indigo-500 focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+                                                <path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between mt-6">
+        <a href="{{ url_for('dashboard.patients', page=pagination.prev_num, search=search_query, status=status_filter) }}" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+            </svg>
+            <span>Previous</span>
+        </a>
+        <div class="items-center hidden lg:flex gap-x-3">
+            {% for page_num in pagination.iter_pages() %}
+            {% if page_num %}
+            <a href="{{ url_for('dashboard.patients', page=page_num, search=search_query, status=status_filter) }}" class="px-2 py-1 text-sm text-blue-500 rounded-md dark:bg-gray-800 bg-blue-100/60">{{ page_num }}</a>
+            {% else %}
+            <span class="px-2 py-1 text-sm text-gray-500 rounded-md dark:bg-gray-800 bg-gray-100/60">...</span>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <a href="{{ url_for('dashboard.patients', page=pagination.next_num, search=search_query, status=status_filter) }}" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+            <span>Next</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+            </svg>
+        </a>
+    </div>
+</section>
+{% endblock %}

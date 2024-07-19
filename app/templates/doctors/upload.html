@@ -1,0 +1,159 @@
+{% extends 'doctors/base.html' %}
+
+{% block navbar %}
+  {% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-5">
+    <h1 class="mb-4">Advanced Medical Image Upload & Analysis</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upload Medical Images</h5>
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        <div class="mb-3">
+                            <label for="patientId" class="form-label">Patient ID</label>
+                            <input type="text" class="form-control" id="patientId" name="patientId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageType" class="form-label">Image Type</label>
+                            <select class="form-select" id="imageType" name="imageType" required>
+                                <option value="">Select image type</option>
+                                <option value="xray">X-Ray</option>
+                                <option value="ct">CT Scan</option>
+                                <option value="mri">MRI</option>
+                                <option value="ultrasound">Ultrasound</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Choose medical image(s)</label>
+                            <input class="form-control" type="file" id="file" name="file" multiple accept="image/*,.dcm" required>
+                        </div>
+                        <div id="dropZone" class="p-5 mb-3 bg-light rounded text-center">
+                            <p>Drag and drop files here</p>
+                        </div>
+                        <div id="previewZone" class="mb-3 d-flex flex-wrap"></div>
+                        <button type="submit" class="btn btn-primary">Upload and Analyze</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upload Status</h5>
+                    <div id="uploadStatus"></div>
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div id="uploadProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <div id="analysisResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('file');
+    const previewZone = document.getElementById('previewZone');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const analysisResults = document.getElementById('analysisResults');
+
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropZone.classList.add('bg-info');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('bg-info');
+    }
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        fileInput.files = files;
+        updatePreview(files);
+    }
+
+    fileInput.addEventListener('change', function() {
+        updatePreview(this.files);
+    });
+
+    function updatePreview(files) {
+        previewZone.innerHTML = '';
+        for (let file of files) {
+            if (file.type.startsWith('image/')) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail m-1';
+                    img.style.maxWidth = '100px';
+                    img.style.maxHeight = '100px';
+                    previewZone.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            } else {
+                let div = document.createElement('div');
+                div.className = 'badge bg-secondary m-1';
+                div.textContent = file.name;
+                previewZone.appendChild(div);
+            }
+        }
+    }
+
+    // Form submission and progress tracking
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+
+        uploadStatus.innerHTML = '<p class="text-info">Uploading...</p>';
+        uploadProgress.style.width = '0%';
+        uploadProgress.textContent = '0%';
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            uploadStatus.innerHTML = '<p class="text-success">Upload complete!</p>';
+            uploadProgress.style.width = '100%';
+            uploadProgress.textContent = '100%';
+            analysisResults.innerHTML = `<h6>AI Analysis Results:</h6><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        })
+        .catch(error => {
+            uploadStatus.innerHTML = '<p class="text-danger">Upload failed. Please try again.</p>';
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+{% endblock %}

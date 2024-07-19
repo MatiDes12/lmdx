@@ -1,0 +1,205 @@
+{% extends 'doctors/dashboard.html' %}
+
+{% block title %}Predictive Analytics{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-4">Predictive Analytics</h1>
+  <p class="mb-4">Analyze patient data to predict outcomes and improve healthcare services.</p>
+
+  <div x-data="{ activeTab: 'data-input' }">
+    <!-- Tab Navigation -->
+    <div class="flex space-x-4 mb-4">
+      <button @click="activeTab = 'data-input'" :class="{ 'text-blue-600 border-blue-600': activeTab === 'data-input' }" class="py-2 px-4 border-b-2 focus:outline-none">
+        Data Input
+      </button>
+      <button @click="activeTab = 'predictions'" :class="{ 'text-blue-600 border-blue-600': activeTab === 'predictions' }" class="py-2 px-4 border-b-2 focus:outline-none">
+        Predictions
+      </button>
+      <button @click="activeTab = 'visualizations'" :class="{ 'text-blue-600 border-blue-600': activeTab === 'visualizations' }" class="py-2 px-4 border-b-2 focus:outline-none">
+        Visualizations
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div x-show="activeTab === 'data-input'" class="bg-white border rounded-lg shadow-md p-4">
+      <h2 class="text-2xl font-semibold mb-4">Data Input</h2>
+      <form id="data-input-form" action="{{ url_for('dashboard.predictive_analytics') }}" method="post" enctype="multipart/form-data">
+        <div class="grid grid-cols-1 gap-4 mb-4">
+          <div>
+            <label for="patient-select" class="block text-gray-700">Select Patient</label>
+            <select id="patient-select" name="patient_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <option value="" disabled selected>Select Patient</option>
+              {% for patient in patients %}
+                <option value="{{ patient.id }}">{{ patient.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="patient-age" class="block text-gray-700">Patient Age</label>
+            <input type="number" id="patient-age" name="patient_age" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div>
+            <label for="patient-weight" class="block text-gray-700">Patient Weight (kg)</label>
+            <input type="number" id="patient-weight" name="patient_weight" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div>
+            <label for="patient-height" class="block text-gray-700">Patient Height (cm)</label>
+            <input type="number" id="patient-height" name="patient_height" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div>
+            <label for="patient-medical-history" class="block text-gray-700">Medical History</label>
+            <textarea id="patient-medical-history" name="patient_medical_history" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+          </div>
+        </div>
+        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg">Submit Data</button>
+      </form>
+    </div>
+
+    <div x-show="activeTab === 'predictions'" class="bg-white border rounded-lg shadow-md p-4">
+      <h2 class="text-2xl font-semibold mb-4">Predictions</h2>
+      <div id="predictions" class="bg-gray-100 p-4 rounded-lg">
+        <p class="text-gray-500">No predictions yet.</p>
+      </div>
+    </div>
+
+    <div x-show="activeTab === 'visualizations'" class="bg-white border rounded-lg shadow-md p-4">
+      <h2 class="text-2xl font-semibold mb-4">Visualizations</h2>
+      <div id="charts" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-xl font-semibold mb-2">Patient Age Distribution</h3>
+          <canvas id="age-distribution-chart"></canvas>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-xl font-semibold mb-2">Weight vs. Height Scatter Plot</h3>
+          <canvas id="weight-height-chart"></canvas>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-xl font-semibold mb-2">BMI Distribution</h3>
+          <canvas id="bmi-distribution-chart"></canvas>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-xl font-semibold mb-2">Condition Prediction</h3>
+          <canvas id="condition-prediction-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('data-input-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    // Handle form submission and data processing here
+    document.getElementById('predictions').innerHTML = '<p class="text-gray-700">Predictions will be displayed here.</p>';
+    document.getElementById('results').innerHTML = '<p class="text-gray-700">Results will be displayed here.</p>';
+  });
+
+  // Sample chart setup using Chart.js (include Chart.js library in your template or project)
+  const ageDistributionCtx = document.getElementById('age-distribution-chart').getContext('2d');
+  const weightHeightCtx = document.getElementById('weight-height-chart').getContext('2d');
+  const bmiDistributionCtx = document.getElementById('bmi-distribution-chart').getContext('2d');
+  const conditionPredictionCtx = document.getElementById('condition-prediction-chart').getContext('2d');
+
+  new Chart(ageDistributionCtx, {
+    type: 'bar',
+    data: {
+      labels: ['0-18', '19-35', '36-50', '51-65', '65+'],
+      datasets: [{
+        label: 'Number of Patients',
+        data: [5, 10, 15, 20, 25],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  new Chart(weightHeightCtx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Weight vs. Height',
+        data: [
+          { x: 160, y: 60 },
+          { x: 170, y: 70 },
+          { x: 180, y: 80 },
+          { x: 190, y: 90 },
+        ],
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  new Chart(bmiDistributionCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Underweight', 'Normal weight', 'Overweight', 'Obesity'],
+      datasets: [{
+        label: 'BMI Distribution',
+        data: [5, 15, 10, 7],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(255, 99, 132, 0.2)'
+        ],
+        borderColor: [
+          'rgba(75, 192, 192, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(255, 99, 132, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  new Chart(conditionPredictionCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Condition A', 'Condition B', 'Condition C'],
+      datasets: [{
+        label: 'Condition Prediction',
+        data: [10, 5, 3],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+/* Ensuring the body takes full viewport height */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* Flex container */
+.flex {
+    display: flex;
+    
+}
+

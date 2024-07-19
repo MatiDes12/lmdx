@@ -1,0 +1,375 @@
+.navbar {
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+
+.navbar-brand {
+  margin-right: 50px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  color: white;
+  /* Ensures text color is white */
+  display: inline-flex;
+  /* Aligns items inline and centers them */
+  align-items: center;
+  /* Vertical alignment */
+  justify-content: center;
+  /* Horizontal alignment */
+  cursor: pointer;
+}
+
+.navbar-brand img {
+  margin-right: 5px;
+  /* filter: invert(27%) sepia(99%) saturate(6497%) hue-rotate(211deg) brightness(91%) contrast(92%); */
+}
+
+.btn-primary img {
+  margin-left: 8px;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg)
+    brightness(100%) contrast(100%);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.feature-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 25%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.feature-icon img {
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg)
+    brightness(100%) contrast(100%);
+}
+
+.icon-link .chevron {
+  vertical-align: sub;
+  width: 17px;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%)
+    contrast(100%);
+}
+
+/* .card-cover {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+} */
+
+.card:hover {
+  transform: scale(1.05);
+  /* Slightly enlarge the card */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Smooth transition for scale and shadow */
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+  /* Increase shadow size */
+}
+
+/* Ensure the card's content scales properly */
+.card-cover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Apply smooth transition for hover effects */
+}
+
+.footer-container {
+  bottom: 0;
+  width: 100%;
+  height: 10%;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10%;
+}
+
+.footer a {
+  color: #333;
+  text-decoration: none;
+}
+
+#chatArea {
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 10px;
+  overflow-y: auto;
+  height: 600px;
+}
+
+.modal-custom-width {
+  max-width: 700px; /* Customize this value */
+}
+
+.message {
+  padding: 8px 12px;
+  border-radius: 18px;
+  margin-bottom: 10px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.sent {
+  background-color: #007bff;
+  color: white;
+  margin-left: auto;
+  border-bottom-right-radius: 2px;
+}
+
+.received {
+  background-color: #e9ecef;
+  color: black;
+  margin-right: auto;
+  border-bottom-left-radius: 2px;
+}
+
+.dot-flashing {
+  float: left;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  margin: 0 3px;
+  background-color: #007bff;
+  border-radius: 50%;
+  display: inline-block;
+  /* Animation */
+  animation: dotFlashing 1.5s infinite linear;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ---------- */
+/* Modal Background */
+/* main.css */
+
+/* Custom backdrop for modals */
+.modal-backdrop {
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.7
+  ) !important; /* Adjust the color and opacity */
+}
+
+/* Additional custom modal styles */
+.modal-custom-width .modal-dialog {
+  max-width: 80%; /* Adjust the width as needed */
+}
+
+.modal-header {
+  background-color: #021529; /* Dark header background */
+  color: #fff; /* Header text color */
+}
+
+.modal-body {
+  background-color: #f8f9fa; /* Light body background */
+}
+
+.modal-footer {
+  background-color: #343a40; /* Dark footer background */
+  color: #fff; /* Footer text color */
+}
+
+.custom-close-btn {
+  filter: invert(1);
+}
+
+.custom-close-btn:hover,
+.custom-close-btn:focus {
+  filter: invert(1);
+  opacity: 1;
+}
+
+@keyframes dotFlashing {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.modal-footer .btn img {
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.message ol {
+  padding-left: 20px; /* Indent items */
+  margin: 0; /* Remove default margin */
+}
+
+.message li {
+  margin-bottom: 5px; /* Space between items */
+}
+
+/* ----------------------------------- */
+.sidebar {
+  color: white;
+  height: 90vh;
+  padding: 15px;
+  border-right: 1px solid #dee2e6;
+}
+
+.sidebar .nav-link {
+  color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  border: 1px solid transparent;
+}
+
+.sidebar .nav-link.active {
+  border-color: #087df3;
+}
+
+.sidebar .nav-link:hover {
+  border-color: #087df3;
+}
+
+/* New rule for the Home link */
+.sidebar .nav-link[href="#home"] {
+  background-color: #087df3;
+  border-color: #087df3;
+  color: white;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.table-responsive {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+/* ------------------------------- */
+    .appointments-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
+        background-color: #343a40; /* Dark background */
+        color: #fff; /* White text */
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    .appointments-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Spacing between appointment rows */
+        margin-top: 20px;
+    }
+
+    .appointment {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
+        align-items: center;
+        padding: 10px;
+        background-color: #ffffff; /* Light background for each appointment */
+        border: 1px solid #dee2e6; /* Light border */
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 0 10px rgba(0,0,0,0.05); /* Light shadow */
+    }
+
+    .appointment-item {
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    .patient-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .status-badge {
+        border-radius: 20px;
+        padding: 6px 12px;
+    }
+
+    .btn {
+        margin-right: 5px;
+    }
+
+    /* ------------------------- */
+
+    .patients-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 2fr 3fr;
+        background-color: #343a40; /* Dark background */
+        color: #fff; /* White text */
+        padding: 10px;
+        font-weight: bold;
+        border-radius: 10px;
+    }
+
+    .patients-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Spacing between patient rows */
+        margin-top: 20px;
+    }
+
+    .patient {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 2fr 3fr;
+        align-items: center;
+        padding: 10px;
+        background-color: #ffffff; /* Light background for each patient */
+        border: 1px solid #dee2e6; /* Light border */
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 0 10px rgba(0,0,0,0.05); /* Light shadow */
+    }
+
+    .patient-item {
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    .status-badge {
+        border-radius: 20px;
+        padding: 6px 12px;
+    }
+
+    .actions .btn {
+        margin-right: 5px;
+    }
+
+
+

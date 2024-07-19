@@ -1,0 +1,148 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Edit Appointment{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<section class="container px-4 mx-auto">
+    <div class="mb-8">
+        <div class="flex items-center gap-x-3">
+            <img src="https://i.pravatar.cc/150?u={{ appointment.patient.name }}" alt="{{ appointment.patient.name }}" class="w-16 h-16 rounded-full">
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{appointment.patient.name}}</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Patient ID: {{ appointment.patient.id }}</p>
+            </div>
+        </div>
+    </div>
+        <!-- Header with Short Description -->
+    <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Appointment Details</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Use this form to edit the appointment details. Please ensure the information is accurate and up-to-date.</p>
+    </div>
+    <form method="POST" action="{{ url_for('dashboard.edit_appointment', appointment_id=appointment.id) }}" class="mt-6 bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="mb-4">
+                <label for="patient_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient Name</label>
+                <input type="text" id="patient_name" value="{{ appointment.patient.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+            </div>
+
+            <div class="mb-4">
+                <label for="doctor_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Doctor</label>
+                <input type="text" id="doctor_name" value="{{ appointment.doctor.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+            </div>
+
+            <div class="mb-4">
+                <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                <input type="text" id="date" value="{{ appointment.date.strftime('%B %d, %Y') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+            </div>
+
+            <div class="mb-4">
+                <label for="time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+                <input type="text" id="time" value="{{ appointment.time.strftime('%I:%M %p') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+            </div>
+
+            <div class="mb-4 relative" x-data="{ isOpen: false, selectedStatus: '{{ appointment.status }}' }">
+                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                <input type="hidden" name="status" :value="selectedStatus">
+                <button 
+                    @click="isOpen = !isOpen" 
+                    type="button" 
+                    class="relative z-10 block w-full py-2 px-3 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                    <span class="flex items-center">
+                        <span :class="{
+                            'bg-blue-500': selectedStatus === 'Scheduled',
+                            'bg-yellow-500': selectedStatus === 'Pending',
+                            'bg-green-500': selectedStatus === 'Completed',
+                            'bg-red-500': selectedStatus === 'Cancelled'
+                        }" class="inline-block w-2.5 h-2.5 mr-2 rounded-full"></span>
+                        <span x-text="selectedStatus"></span>
+                        <svg class="w-5 h-5 ml-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                </button>
+                <div 
+                    x-show="isOpen" 
+                    @click.away="isOpen = false"
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="opacity-0 scale-90"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-90" 
+                    class="absolute right-0 z-20 w-full py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800"
+                >
+                    <a @click="selectedStatus = 'Scheduled'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <span class="inline-block w-2.5 h-2.5 mr-2 bg-blue-500 rounded-full"></span>Scheduled
+                    </a>
+                    <a @click="selectedStatus = 'Pending'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <span class="inline-block w-2.5 h-2.5 mr-2 bg-yellow-500 rounded-full"></span>Pending
+                    </a>
+                    <a @click="selectedStatus = 'Completed'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <span class="inline-block w-2.5 h-2.5 mr-2 bg-green-500 rounded-full"></span>Completed
+                    </a>
+                    <a @click="selectedStatus = 'Cancelled'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                        <span class="inline-block w-2.5 h-2.5 mr-2 bg-red-500 rounded-full"></span>Cancelled
+                    </a>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="last_visit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Visit</label>
+                <input type="text" id="last_visit" value="{{ last_visit }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+            </div>
+
+            <div class="mb-4">
+                <label for="medical_history" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Medical History</label>
+                <textarea id="medical_history" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="4" readonly>{{ medical_history }}</textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                <textarea id="notes" name="notes" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="4">{{ appointment.notes }}</textarea>
+            </div>
+        </div>
+
+        <div class="flex justify-end mt-6">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Save Changes</button>
+        </div>
+    </form>
+</section>
+
+<!-- Flash message container -->
+<div id="flash-message-container" class="fixed top-32 right-10 z-50"></div>
+
+<!-- JavaScript to handle flash messages -->
+<script>
+function showFlashMessage(message, category) {
+    const flashMessageContainer = document.getElementById('flash-message-container');
+    const flashMessage = document.createElement('div');
+    flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;
+    flashMessage.innerHTML = `
+        <div class="flex items-center justify-center w-12 bg-${category}-500">
+            <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
+            </svg>
+        </div>
+        <div class="px-4 py-2 -mx-3">
+            <div class="mx-3">
+                <span class="font-semibold text-${category}-500 dark:text-${category}-400">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
+            </div>
+        </div>
+    `;
+    flashMessageContainer.appendChild(flashMessage);
+
+    setTimeout(() => {
+        flashMessage.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}

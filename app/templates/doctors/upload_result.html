@@ -1,0 +1,18 @@
+{% extends 'doctors/base.html' %}
+
+{% block navbar %}
+  {% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Analysis Result</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Image Analysis</h5>
+            <p class="card-text">{{ result }}</p>
+            <a href="{{ url_for('upload.upload_file') }}" class="btn btn-primary">Upload Another Image</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

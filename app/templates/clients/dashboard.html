@@ -1,0 +1,102 @@
+{% extends 'clients/base.html' %}
+{% block navbar %}
+    {% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
+    <div class="container mx-auto px-4 sm:px-8">
+        <div class="container mx-auto px-4 sm:px-8">
+            <div class="py-8">
+                <div>
+                    <h2 class="text-2xl font-semibold leading-tight">Dashboard</h2>
+                </div>
+                <div class="my-4">
+                    <!-- Dashboard Grid -->
+                    <div class="grid gap-4 mb-4 md:grid-cols-2 xl:grid-cols-4">
+                        <!-- Appointments Card -->
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-800">
+                            <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+                                <svg fill="none" viewBox="0 0 24 24" class="w-5 h-5">
+                                    <!-- SVG icon code -->
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    Upcoming Appointments
+                                </p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                    5 Appointments
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Messages Card -->
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-800">
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    Recent Messages
+                                </p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                    3 New Messages
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Billing Card -->
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-800">
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    Billing Overview
+                                </p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                    Current Balance: $250
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Test Results Card -->
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-800">
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    Latest Test Results
+                                </p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                    4 New Results
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container mx-auto px-4 sm:px-8">
+                    <div class="flex flex-col mt-6">
+                        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                                <div class="overflow-hidden shadow-md sm:rounded-lg">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Name
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Specialization
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Schedule
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Time
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                
+{% endblock %}

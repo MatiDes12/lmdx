@@ -1,0 +1,30 @@
+{% extends 'clients/base.html' %}
+{% block navbar %}
+{% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
+<h2>Make an Appointment</h2>
+<form method="post" action="{{ url_for('client.make_appointment') }}">
+    <div>
+        <label for="doctor">Select Doctor:</label>
+        <select name="doctor_id" id="doctor" required>
+            {% for doctor in doctors %}
+                <option value="{{ doctor.id }}">{{ doctor.name }} - {{ doctor.specialization }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="date">Appointment Date:</label>
+        <input type="date" id="date" name="date" required>
+    </div>
+    <div>
+        <label for="time">Appointment Time:</label>
+        <input type="time" id="time" name="time" required>
+    </div>
+    <div>
+        <label for="notes">Notes:</label>
+        <textarea id="notes" name="notes"></textarea>
+    </div>
+    <button type="submit">Make Appointment</button>
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'clients/base.html' %}
+{% block navbar %}
+{% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
+<h1>Send a Message to {{ doctor.name }}</h1>
+<form method="POST">
+    <label for="content">Message:</label>
+    <textarea name="content" required></textarea><br>
+    <button type="submit">Send</button>
+</form>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'doctors/base.html' %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/auth.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="main">
+  <section class="sign-in">
+    <div class="container">
+      <div class="signin-content">
+        <div class="signin-image">
+          <figure>
+            <img src="{{ url_for('static', filename='images/signin-image.jpg') }}" alt="sign up image" />
+          </figure>
+          <select onchange="location = this.value;">
+            <option value="">Create an account as...</option>
+            <option value="{{ url_for('auth.signup', type='client') }}">Client</option>
+            <option value="{{ url_for('auth.signup', type='doctor') }}">Doctor</option>
+          </select>
+        </div>
+        <div class="signin-form">
+          <h2 class="form-title"><span class="lmdx">L</span>uminamedix</h2>
+          <form method="POST" action="{{ url_for('auth.signin') }}" class="register-form" id="login-form">
+            <div class="form-group">
+              <label for="your_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+              <input type="email" name="email" id="your_name" placeholder="Your Email" required />
+            </div>
+            <div class="form-group">
+              <label for="your_pass"><i class="zmdi zmdi-lock"></i></label>
+              <input type="password" name="pass" id="your_pass" placeholder="Password" required />
+            </div>
+            <div class="form-group">
+              <input type="checkbox" name="remember-me" id="remember-me" class="agree-term" />
+              <label for="remember-me" class="label-agree-term"><span><span></span></span>Remember me</label>
+              <a href="{{ url_for('auth.forgot_password') }}" class="forgot-pass">Forgot your password?</a>
+            </div>
+            <div class="form-group form-button">
+              <input type="submit" name="signin" id="signin" class="form-submit" value="Log in" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+
+
+

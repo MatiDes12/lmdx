@@ -1,0 +1,92 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Doctor Profile{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<section class="container px-6 py-8 mx-auto">
+    <!-- Header with Title -->
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-3xl font-semibold text-gray-800 dark:text-white">Doctor Profile</h2>
+    </div>
+
+    <!-- Header with Short Description -->
+    <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Doctor Profile</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Below is detailed information about the doctor, including their specialization, contact information, biography, and recent appointments.</p>
+    </div>
+    
+    <!-- Doctor Profile Container -->
+    <div class="bg-white p-8 rounded-lg shadow-lg dark:bg-gray-800 flex flex-col md:flex-row gap-6">
+        <!-- Doctor Info -->
+        <div class="flex-1">
+            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                <img class="w-40 h-40 rounded-full object-cover" src="https://i.pravatar.cc/300?img={{ doctor.id }}" alt="{{ doctor.name }}">
+                <div>
+                    <h3 class="text-2xl font-medium text-gray-800 dark:text-white flex items-center">{{ doctor.name }} 
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#4285F4" class="ml-2">
+                            <path d="m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm34-102 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Zm-42 142 226-226-56-58-170 170-86-84-56 56 142 142Z"/>
+                        </svg>
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ doctor.specialization }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ doctor.email }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ doctor.phone_number }}</p>
+                </div>
+            </div>
+            <div class="mb-6">
+                <h4 class="text-xl font-medium text-gray-800 dark:text-white">Appointments</h4>
+                <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+                    {% for appointment in doctor.appointments %}
+                    <li>{{ appointment.date.strftime('%B %d, %Y') }} - {{ appointment.patient.name }} ({{ appointment.status }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- Doctor Schedule -->
+        <div class="flex-1">
+            <h4 class="text-xl font-medium text-gray-800 dark:text-white mb-4">Schedule</h4>
+            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Day</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Working</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% set days = {'M': 'Mon', 'TU': 'Tue', 'W': 'Wed', 'TH': 'Thu', 'F': 'Fri'} %}
+                        {% set schedule_days = doctor.schedule.split('-') %}
+                        {% for day, day_full in days.items() %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ day_full }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                {% if day in schedule_days %}
+                                    <span class="inline-block w-2.5 h-2.5 bg-green-500 rounded-full"></span>
+                                {% else %}
+                                    <span class="inline-block w-2.5 h-2.5 bg-gray-300 rounded-full"></span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                {% if day in schedule_days %}
+                                    {{ doctor.time }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <a href="{{ url_for('dashboard.message_doctor', doctor_id=doctor.id) }}" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Message</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

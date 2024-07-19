@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='dashboard.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/material-design-iconic-font.min.css') }}"
+    />
+    <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    rel="stylesheet"
+    integrity="sha384-dyH6mxrFvKDbAFOkzZZRJgohWo6PZ2i5P9BQpCnU9aNiv7v8y+29AAKZjjGVzjT2"
+    crossorigin="anonymous"
+  />
+</head>
+<body>
+  
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/"><img class="w-auto h-7" src="{{ url_for('static', filename='images/logo.png') }}" alt="LuminaMedix Logo"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/#home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/#imaging">Imaging</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/#services">Services</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/#pricing">Pricing</a>
+        </li>
+      </ul>
+      <a href="{{ url_for('auth.signin') }}" class="btn btn-outline-primary">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<div id="home" class="container col-xxl-8 px-4 py-5">
+  <header class="bg-white dark:bg-gray-900">
+    <div class="lg:flex">
+        <div class="flex items-center justify-center w-full px-6 py-8 lg:h-[32rem] lg:w-1/2">
+            <div class="max-w-xl">
+                <h2 class="text-3xl font-semibold text-gray-800 dark:text-white lg:text-4xl">AI-Enhanced Health Innovations</h2>
+                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400 lg:text-base">
+                    LuminaMedix (LMDX) leverages advanced AI technologies, including deep learning and machine learning, to revolutionize healthcare. Our solutions empower medical professionals with predictive analytics and image analysis capabilities for early disease detection and personalized patient care.
+                </p>
+                <div class="flex flex-col mt-6 space-y-3 lg:space-y-0 lg:flex-row">
+                    <button
+                        type="button"
+                        class="px-5 py-2 text-sm font-medium tracking-wider text-center text-white transition-colors duration-300 transform bg-gray-900 rounded-md hover:bg-gray-700"
+                        data-bs-toggle="modal"
+                        data-bs-target="#demoModal"
+                    >Request a Demo</button>
+                    <a href="#" class="px-5 py-2 text-sm font-medium tracking-wider text-center text-gray-700 transition-colors duration-300 transform bg-gray-200 rounded-md lg:mx-4 hover:bg-gray-300">Contact Us</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full h-64 lg:w-1/2 lg:h-auto">
+            <img src="{{ url_for('static', filename='images/docters.png') }}" alt="Healthcare Technology" class="w-full h-full object-cover">
+        </div>
+    </div>
+</header>
+</div>
+
+<div
+  class="modal fade"
+  id="demoModal"
+  tabindex="-1"
+  aria-labelledby="demoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="demoModalLabel">
+          Exclusive AI Consultation Request
+        </h5>
+        <button
+          type="button"
+          class="btn-close close custom-close-btn"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="demoRequestForm" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="fullName"
+              placeholder="Enter your full name"
+              required
+            />
+            <div class="invalid-feedback">Please enter your full name.</div>
+          </div>
+          <div class="mb-3">
+            <label for="emailAddress" class="form-label">Email Address</label>
+            <input
+              type="email"
+              class="form-control"
+              id="emailAddress"
+              placeholder="Enter your email address"
+              required
+            />
+            <div class="invalid-feedback">
+              Please enter a valid email address.
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="organizationName" class="form-label"
+              >Organization</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="organizationName"
+              placeholder="Enter your organization name"
+              required
+            />
+            <div class="invalid-feedback">
+              Please enter your organization name.
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="userRole" class="form-label">Your Role</label>
+            <select class="form-select" id="userRole" required>
+              <option value="">Select your role</option>
+              <option value="Physician">Physician</option>
+              <option value="Radiologist">Radiologist</option>
+              <option value="Administrator">Hospital Administrator</option>
+              <option value="ITManager">IT Manager</option>
+              <option value="Consultant">Healthcare Consultant</option>
+              <option value="Nurse">Nurse</option>
+              <option value="Researcher">Medical Researcher</option>
+              <option value="Other">Other Healthcare Professional</option>
+            </select>
+            <div class="invalid-feedback">Please select your role.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Areas of Interest</label>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="diagnosticAI"
+                id="diagnosticAI"
+              />
+              <label class="form-check-label" for="diagnosticAI"
+                >Diagnostic AI</label
+              >
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="predictiveAnalytics"
+                id="predictiveAnalytics"
+              />
+              <label class="form-check-label" for="predictiveAnalytics"
+                >Predictive Analytics</label
+              >
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="clinicalSupport"
+                id="clinicalSupport"
+              />
+              <label class="form-check-label" for="clinicalSupport"
+                >Clinical Decision Support</label
+              >
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="patientEngagement"
+                id="patientEngagement"
+              />
+              <label class="form-check-label" for="patientEngagement"
+                >Patient Engagement</label
+              >
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="additionalNotes" class="form-label"
+              >Additional Notes</label
+            >
+            <textarea
+              class="form-control"
+              id="additionalNotes"
+              rows="3"
+              placeholder="Any specific requests or notes"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            Request Demo
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Form validation
+  (function () {
+    "use strict";
+    var forms = document.querySelectorAll(".needs-validation");
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener(
+        "submit",
+        function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false
+      );
+    });
+  })();
+</script>
+
+<div id="imaging" class="container px-4 py-5" id="custom-cards">
+  <h2 class="pb-2 border-bottom">Medical Image Analysis Services</h2>
+
+  <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+    <div class="col">
+      <div
+        class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg"
+        style="background-image: url({{ url_for('static', filename='images/system_high.png') }});"
+      >
+        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+          <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+            Pneumonia Classification
+          </h3>
+          <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+              <img
+                src="{{ url_for('static', filename='images/doctor1.png') }}"
+                alt="Doctor Profile"
+                width="32"
+                height="32"
+                class="rounded-circle border border-white"
+              />
+            </li>
+            <li class="d-flex align-items-center me-3">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#geo-fill"></use>
+              </svg>
+              <small>Pneumonia Imaging</small>
+            </li>
+            <li class="d-flex align-items-center">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#calendar3"></use>
+              </svg>
+              <small>2d</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div
+        class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg"
+        style="background-image: url({{ url_for('static', filename='images/system_high.png') }});"
+      >
+        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+          <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+            Cardiac Detection
+          </h3>
+          <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+              <img
+                src="{{ url_for('static', filename='images/doctor2.png') }}"
+                alt="Doctor Profile"
+                width="32"
+                height="32"
+                class="rounded-circle border border-white"
+              />
+            </li>
+            <li class="d-flex align-items-center me-3">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#geo-fill"></use>
+              </svg>
+              <small>Cardiac Imaging</small>
+            </li>
+            <li class="d-flex align-items-center">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#calendar3"></use>
+              </svg>
+              <small>3d</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div
+        class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg"
+        style="background-image: url({{ url_for('static', filename='images/system_high.png') }});"
+      >
+        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+          <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+            Atrium Segmentation
+          </h3>
+          <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+              <img
+                src="{{ url_for('static', filename='images/doctor3.png') }}"
+                alt="Doctor Profile"
+                width="32"
+                height="32"
+                class="rounded-circle border border-white"
+              />
+            </li>
+            <li class="d-flex align-items-center me-3">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#geo-fill"></use>
+              </svg>
+              <small>Atrium Imaging</small>
+            </li>
+            <li class="d-flex align-items-center">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#calendar3"></use>
+              </svg>
+              <small>4d</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div
+        class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg"
+        style="background-image: url({{ url_for('static', filename='images/system_high.png') }});"
+      >
+        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+          <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+            Lung Tumor Segmentation
+          </h3>
+          <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+              <img
+                src="{{ url_for('static', filename='images/doctor4.png') }}"
+                alt="Doctor Profile"
+                width="32"
+                height="32"
+                class="rounded-circle border border-white"
+              />
+            </li>
+            <li class="d-flex align-items-center me-3">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#geo-fill"></use>
+              </svg>
+              <small>Lung Tumor Imaging</small>
+            </li>
+            <li class="d-flex align-items-center">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#calendar3"></use>
+              </svg>
+              <small>5d</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div
+        class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg"
+        style="background-image: url({{ url_for('static', filename='images/system_high.png') }});"
+      >
+        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+          <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+            Liver Tumor Segmentation
+          </h3>
+          <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+              <img
+                src="{{ url_for('static', filename='images/doctor5.png') }}"
+                alt="Doctor Profile"
+                width="32"
+                height="32"
+                class="rounded-circle border border-white"
+              />
+            </li>
+            <li class="d-flex align-items-center me-3">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#geo-fill"></use>
+              </svg>
+              <small>Liver Tumor Imaging</small>
+            </li>
+            <li class="d-flex align-items-center">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#calendar3"></use>
+              </svg>
+              <small>6d</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div
+        class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg"
+        style="background-image: url('{{ url_for('static', filename='images/system_high.png') }}');"
+      >
+        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+          <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+            Medical Image Analysis Summary
+          </h3>
+          <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+              <img
+                src="{{ url_for('static', filename='images/doctor6.png') }}"
+                alt="Doctor Profile"
+                width="32"
+                height="32"
+                class="rounded-circle border border-white"
+              />
+            </li>
+            <li class="d-flex align-items-center me-3">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#geo-fill"></use>
+              </svg>
+              <small>Medical Imaging</small>
+            </li>
+            <li class="d-flex align-items-center">
+              <svg class="bi me-2" width="1em" height="1em">
+                <use xlink:href="#calendar3"></use>
+              </svg>
+              <small>7d</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="services" class="container px-4 py-5" id="featured-3">
+  <h2 class="pb-2 border-bottom">Our Services</h2>
+  <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+    <div class="feature col">
+      <div
+        class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3"
+      >
+        <img
+          src="{{ url_for('static', filename='images/cpu-fill.svg') }}"
+          width="25"
+          alt="cpu-fill"
+        />
+      </div>
+      <h3 class="fs-2 text-body-emphasis">AI-Powered Predictive Analytics</h3>
+      <p>
+        Utilize our AI-driven predictive analytics to forecast patient outcomes,
+        optimize treatment plans, and enhance preventive care strategies,
+        ensuring better health management.
+      </p>
+      <a href="#" class="icon-link">
+        Learn More
+        <img
+          src="{{ url_for('static', filename='images/chevron-compact-right.svg') }}"
+          width="25"
+          alt="chevron"
+          class="chevron"
+        />
+      </a>
+    </div>
+    <div class="feature col">
+      <div
+        class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3"
+      >
+        <img
+          src="{{ url_for('static', filename='images/people.svg') }}"
+          width="25"
+          alt="people"
+        />
+      </div>
+      <h3 class="fs-2 text-body-emphasis">Enhanced Patient Engagement</h3>
+      <p>
+        Boost patient engagement with our AI-enhanced communication tools,
+        including personalized health tips, automated follow-ups, and
+        multilingual support for diverse patient populations.
+      </p>
+      <a href="#" class="icon-link">
+        Contact Us
+        <img
+          src="{{ url_for('static', filename='images/chevron-compact-right.svg') }}"
+          width="25"
+          alt="chevron"
+          class="chevron"
+        />
+      </a>
+    </div>
+    <div class="feature col">
+      <div
+        class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3"
+      >
+        <img
+          src="{{ url_for('static', filename='images/calendar.svg') }}"
+          width="25"
+          alt="calendar"
+        />
+      </div>
+      <h3 class="fs-2 text-body-emphasis">Smart Appointment Management</h3>
+      <p>
+        Revolutionize your scheduling with our AI-powered system that not only
+        books appointments but also predicts patient no-shows and optimizes
+        clinic workflows for maximum efficiency.
+      </p>
+      <a href="#" class="icon-link">
+        Schedule Now
+        <img
+          src="{{ url_for('static', filename='images/chevron-compact-right.svg') }}"
+          width="25"
+          alt="chevron"
+          class="chevron"
+        />
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- pricing -->
+<div id="pricing" class="container py-3">
+  <div
+    class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom"
+  ></div>
+  <section class="bg-white dark:bg-gray-900">
+    <div class="container px-6 py-8 mx-auto">
+        <div class="sm:flex sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 lg:text-3xl dark:text-gray-100">Simple, transparent pricing</h2>
+                <p class="mt-4 text-gray-500 dark:text-gray-400">No Contracts. No surorise fees.</p>
+            </div>
+
+            <div class="overflow-hidden p-0.5 mt-6 border rounded-lg dark:border-gray-700">
+                <div class="sm:-mx-0.5 flex">
+                    <button class=" focus:outline-none px-3 w-1/2 sm:w-auto py-1 sm:mx-0.5 text-white bg-blue-500 rounded-lg">Monthly</button>
+                    <button class=" focus:outline-none px-3 w-1/2 sm:w-auto py-1 sm:mx-0.5 text-gray-800 dark:text-gray-200 dark:hover:bg-gray-800 bg-transparent rounded-lg hover:bg-gray-200">Yearly</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-6 mt-16 -mx-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="px-6 py-4 transition-colors duration-300 transform rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                <p class="text-lg font-medium text-gray-800 dark:text-gray-100">Intro</p>
+
+                <h4 class="mt-2 text-3xl font-semibold text-gray-800 dark:text-gray-100">$19 <span class="text-base font-normal text-gray-600 dark:text-gray-400">/ Month</span></h4>
+                
+                <p class="mt-4 text-gray-500 dark:text-gray-300">For most businesses that want to optimaize web queries.</p>
+
+                <div class="mt-8 space-y-8">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">All limited links</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Own analytics platform</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Chat support</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Optimize hashtags</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Unlimited users</span>
+                    </div>
+                </div>
+
+                <button class="w-full px-4 py-2 mt-10 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                    Choose plan
+                </button>
+            </div>
+
+            <div class="px-6 py-4 transition-colors duration-300 transform rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                <p class="text-lg font-medium text-gray-800 dark:text-gray-100">Base</p>
+                
+                <h4 class="mt-2 text-3xl font-semibold text-gray-800 dark:text-gray-100">$39 <span class="text-base font-normal text-gray-600 dark:text-gray-400">/ Month</span></h4>
+                
+                <p class="mt-4 text-gray-500 dark:text-gray-300">For most businesses that want to optimaize web queries.</p>
+
+                <div class="mt-8 space-y-8">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">All limited links</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Own analytics platform</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Chat support</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Optimize hashtags</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Unlimited users</span>
+                    </div>
+                </div>
+
+                <button class="w-full px-4 py-2 mt-10 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                    Choose plan
+                </button>
+            </div>
+
+            <div class="px-6 py-4 transition-colors duration-300 transform bg-gray-700 rounded-lg dark:bg-gray-800">
+                <p class="text-lg font-medium text-gray-100">Popular</p>
+                
+                <h4 class="mt-2 text-3xl font-semibold text-gray-100">$99 <span class="text-base font-normal text-gray-400">/ Month</span></h4>
+                
+                <p class="mt-4 text-gray-300">For most businesses that want to optimaize web queries.</p>
+
+                <div class="mt-8 space-y-8">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-300">All limited links</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-300">Own analytics platform</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-300">Chat support</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-300">Optimize hashtags</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-300">Unlimited users</span>
+                    </div>
+                </div>
+
+                <button class="w-full px-4 py-2 mt-10 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                    Choose plan
+                </button>
+            </div>
+
+            <div class="px-6 py-4 transition-colors duration-300 transform rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                <p class="text-lg font-medium text-gray-800 dark:text-gray-100">Exterprise</p>
+                
+                <h4 class="mt-2 text-3xl font-semibold text-gray-800 dark:text-gray-100">$199 <span class="text-base font-normal text-gray-600 dark:text-gray-400">/ Month</span></h4>
+                
+                <p class="mt-4 text-gray-500 dark:text-gray-300">For most businesses that want to optimaize web queries.</p>
+
+                <div class="mt-8 space-y-8">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">All limited links</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Own analytics platform</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Chat support</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Optimize hashtags</span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+
+                        <span class="mx-4 text-gray-700 dark:text-gray-300">Unlimited users</span>
+                    </div>
+                </div>
+
+                <button class="w-full px-4 py-2 mt-10 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                    Choose plan
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+<!--  -->
+
+<div class="container px-4 py-5" id="hanging-icons">
+  <section class="bg-white dark:bg-gray-900">
+    <div class="container px-6 py-10 mx-auto">
+        <h1 class="text-2xl font-semibold text-center text-gray-800 capitalize lg:text-3xl dark:text-white">explore our <br> awesome <span class="text-blue-500">Components</span></h1>
+
+        <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3">
+            <div class="flex flex-col items-center p-6 space-y-3 text-center bg-gray-100 rounded-xl dark:bg-gray-800">
+                <span class="inline-block p-3 text-blue-500 bg-blue-100 rounded-full dark:text-white dark:bg-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </span>
+
+                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">Copy & paste components</h1>
+
+                <p class="text-gray-500 dark:text-gray-300">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Provident ab nulla quod dignissimos vel non corrupti doloribus voluptatum eveniet
+                </p>
+
+                <a href="#" class="flex items-center -mx-1 text-sm text-blue-500 capitalize transition-colors duration-300 transform dark:text-blue-400 hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                    <span class="mx-1">read more</span>
+                    <svg class="w-4 h-4 mx-1 rtl:-scale-x-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </a>
+            </div>
+
+            <div class="flex flex-col items-center p-6 space-y-3 text-center bg-gray-100 rounded-xl dark:bg-gray-800">
+                <span class="inline-block p-3 text-blue-500 bg-blue-100 rounded-full dark:text-white dark:bg-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                </span>
+
+                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">Zero Configuration</h1>
+
+                <p class="text-gray-500 dark:text-gray-300">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Provident ab nulla quod dignissimos vel non corrupti doloribus voluptatum eveniet
+                </p>
+
+                <a href="#" class="flex items-center -mx-1 text-sm text-blue-500 capitalize transition-colors duration-300 transform dark:text-blue-400 hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                    <span class="mx-1">read more</span>
+                    <svg class="w-4 h-4 mx-1 rtl:-scale-x-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </a>
+            </div>
+
+            <div class="flex flex-col items-center p-6 space-y-3 text-center bg-gray-100 rounded-xl dark:bg-gray-800">
+                <span class="inline-block p-3 text-blue-500 bg-blue-100 rounded-full dark:text-white dark:bg-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                </span>
+
+                <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">Simple & clean designs</h1>
+
+                <p class="text-gray-500 dark:text-gray-300">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Provident ab nulla quod dignissimos vel non corrupti doloribus voluptatum eveniet
+                </p>
+
+                <a href="#" class="flex items-center -mx-1 text-sm text-blue-500 capitalize transition-colors duration-300 transform dark:text-blue-400 hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                    <span class="mx-1">read more</span>
+                    <svg class="w-4 h-4 mx-1 rtl:-scale-x-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+
+<div class="container py-3">
+  <div
+  class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom"
+></div>
+  <footer class="bg-white dark:bg-gray-900">
+    <div class="container px-6 py-12 mx-auto">
+        <div class="md:flex md:-mx-3 md:items-center md:justify-between">
+            <h1 class="text-xl font-semibold tracking-tight text-gray-800 md:mx-3 xl:text-2xl dark:text-white">Subscribe our newsletter to get update.</h1>
+            
+            <div class="mt-6 md:mx-3 shrink-0 md:mt-0 md:w-auto">
+                <a href="#" class="inline-flex items-center justify-center w-full px-4 py-2 text-sm text-white duration-300 bg-gray-800 rounded-lg gap-x-3 hover:bg-gray-700 focus:ring focus:ring-gray-300 focus:ring-opacity-80">
+                    <span>Sign Up Now</span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+        
+        <hr class="my-6 border-gray-200 md:my-10 dark:border-gray-700">
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div>
+                <p class="font-semibold text-gray-800 dark:text-white">Quick Link</p>
+
+                <div class="flex flex-col items-start mt-5 space-y-2">
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Home</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Who We Are</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Our Philosophy</a>
+                </div>
+            </div>
+
+            <div>
+                <p class="font-semibold text-gray-800 dark:text-white">Industries</p>
+
+                <div class="flex flex-col items-start mt-5 space-y-2">
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Retail & E-Commerce</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Information Technology</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Finance & Insurance</a>
+                </div>
+            </div>
+
+            <div>
+                <p class="font-semibold text-gray-800 dark:text-white">Services</p>
+
+                <div class="flex flex-col items-start mt-5 space-y-2">
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Translation</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Proofreading & Editing</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">Content Creation</a>
+                </div>
+            </div>
+
+            <div>
+                <p class="font-semibold text-gray-800 dark:text-white">Contact Us</p>
+
+                <div class="flex flex-col items-start mt-5 space-y-2">
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">+880 768 473 4978</a>
+                    <a href="#" class="text-gray-600 transition-colors duration-300 dark:text-gray-300 dark:hover:text-blue-400 hover:underline hover:text-blue-500">info@merakiui.com</a>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-6 border-gray-200 md:my-10 dark:border-gray-700">
+        
+        <div class="flex flex-col items-center justify-between sm:flex-row">
+            <a href="#">
+                <img class="w-auto h-7" src="https://merakiui.com/images/full-logo.svg" alt="">
+            </a>
+
+            <p class="mt-4 text-sm text-gray-500 sm:mt-0 dark:text-gray-300">© Copyright 2021. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+</div>
+
+</body>
+</html>

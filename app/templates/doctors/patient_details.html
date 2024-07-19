@@ -1,0 +1,43 @@
+{% extends 'doctors/dashboard.html' %}
+
+{% block title %}Patient Details{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">Patient Details</h1>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">{{ patient.name }}</h2>
+        <p><strong>Age:</strong> {{ patient.age }}</p>
+        <p><strong>Gender:</strong> {{ patient.gender }}</p>
+        <p><strong>Phone:</strong> {{ patient.phone_number }}</p>
+        <p><strong>Email:</strong> {{ patient.email }}</p>
+        <p><strong>Address:</strong> {{ patient.address }}</p>
+        <p><strong>Blood Type:</strong> {{ patient.blood_type }}</p>
+        <p><strong>Height:</strong> {{ patient.height }} cm</p>
+        <p><strong>Weight:</strong> {{ patient.weight }} kg</p>
+        <p><strong>Allergies:</strong> {{ patient.allergies }}</p>
+        <p><strong>Chronic Conditions:</strong> {{ patient.chronic_conditions }}</p>
+        <p><strong>Family Medical History:</strong> {{ patient.family_medical_history }}</p>
+
+        <!-- Send Message Form -->
+        <div class="mt-6">
+            <h3 class="text-xl font-semibold mb-4">Send Message</h3>
+            <form action="{{ url_for('dashboard.send_message') }}" method="POST">
+                <input type="hidden" name="patient_id" value="{{ patient.id }}">
+                <div class="mb-4">
+                    <label for="message_type" class="block text-gray-700">Message Type</label>
+                    <select id="message_type" name="message_type" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="content" class="block text-gray-700">Message Content</label>
+                    <textarea id="content" name="content" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg">Send Message</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
