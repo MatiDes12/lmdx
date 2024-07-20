@@ -196,6 +196,8 @@ def check_verification():
     if 'user_id_token' not in session or 'user_type' not in session:
         return redirect(url_for('auth.signin'))
 
+    print("Session Data: ", session.get('user_data'))  # Add this line to debug
+
     try:
         id_token = session['user_id_token']
         user_type = session['user_type']
@@ -240,12 +242,25 @@ def check_verification():
                     # Send special email notification to the personal email
                     personal_email = user_data['personal_email']
                     send_special_email_notification(personal_email, special_email)
-                    flash(f'Please use your new email {special_email} for future logins.', 'success')
+                    flash('Please use your new email for future logins.', 'success')
                 else:
                     flash('Could not generate a valid special email.', 'danger')
-            return redirect(url_for('auth.signin'))
+            return render_template('auth/check_verification.html')
         else:
             return render_template('auth/check_verification.html')
     except Exception as e:
         flash('An error occurred while checking email verification: ' + str(e), 'danger')
-        return redirect(url_for('auth.signin'))
+        return render_template('auth/check_verification.html')
+
+
+@bp.route('/resend-verification-email', methods=['POST'])
+def resend_verification_email():
+    if 'user_id_token' not in session:
+        return {'status': 'error', 'message': 'User not logged in'}, 401
+
+    try:
+        id_token = session['user_id_token']
+        firebase.auth().send_email_verification(id_token)
+        return {'status': 'success', 'message': 'Verification email sent'}
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}, 400
