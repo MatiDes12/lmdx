@@ -3,10 +3,22 @@
 {% include 'clients/navbar.html' %}
 {% endblock %}
 {% block content %}
-<h1>Send a Message to {{ doctor.name }}</h1>
-<form method="POST">
-    <label for="content">Message:</label>
-    <textarea name="content" required></textarea><br>
-    <button type="submit">Send</button>
+<h1>Send a Message to a Doctor</h1>
+
+<form method="POST" action="{{ url_for('client.send_message') }}">
+    <div class="form-group">
+        <label for="doctor">Select Doctor:</label>
+        <select name="doctor_id" id="doctor" class="form-control" required>
+            {% for doctor in doctors %}
+                <option value="{{ doctor.id }}">{{ doctor.full_name }} - {{ doctor.specialization }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="content">Message Content:</label>
+        <textarea name="content" id="content" class="form-control" rows="5" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Message</button>
 </form>
+
 {% endblock %}
