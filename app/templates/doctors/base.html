@@ -23,7 +23,7 @@
       {% block sidebar %}{% endblock %}
       <div class="flex-1">
         {% block navbar %}{% endblock %}
-        <div class="p-4">
+        <div>
           {% with messages = get_flashed_messages(with_categories=true) %} {% if
           messages %}
           <div class="flash-container">
