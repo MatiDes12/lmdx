@@ -1,6 +1,28 @@
 from datetime import datetime
 from . import sqlalchemy_db as db
 
+class DoctorAccounts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    special_email = db.Column(db.String(120), unique=True, nullable=False)
+    organization = db.Column(db.String(120), nullable=False)
+    phone_number = db.Column(db.String(20), nullable=True)  # Optional phone number
+
+    def __repr__(self):
+        return f'<Doctor {self.full_name} | Email: {self.email} | Special Email: {self.special_email} | Organization: {self.organization} | Phone: {self.phone_number}>'
+
+class ClientAccounts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    phone_number = db.Column(db.String(20), nullable=True)  # Optional phone number
+
+    def __repr__(self):
+        return f'<Client {self.first_name} {self.last_name} | Email: {self.email} | Phone: {self.phone_number}>'
+
+
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)

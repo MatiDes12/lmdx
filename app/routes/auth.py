@@ -5,6 +5,8 @@ from firebase_admin import auth
 from app.config import Config
 from app import mail
 import requests
+from ..models_db import ClientAccounts, DoctorAccounts
+from app import mail, sqlalchemy_db as db
 
 bp = Blueprint('auth', __name__)
 
@@ -62,14 +64,14 @@ def signup():
             special_email = generate_special_email(name)
             if special_email is None:
                 error = 'Could not generate a valid special email.'
-            user_data = {'full_name': name, 'email': special_email, 'specialization': org_name, 'personal_email': email}
+            user_data = {'full_name': name, 'email': special_email, 'organization': org_name, 'phone_number': phone_number, 'personal_email': email}
 
         else:
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
             if not first_name or not last_name or len(first_name) < 2 or len(last_name) < 2:
                 error = 'Both first name and last name are required for clients and must be at least 2 characters long.'
-            user_data = {'first_name': first_name, 'last_name': last_name, 'email': email}
+            user_data = {'first_name': first_name, 'last_name': last_name, 'email': email, 'phone_number': phone_number}
 
         if error is None:
             try:
@@ -86,30 +88,55 @@ def signup():
                     user = firebase.auth().create_user_with_email_and_password(email, password)
                     id_token = user['idToken']
                     refresh_token = user['refreshToken']
+                    
+                    # Send email verification
                     firebase.auth().send_email_verification(id_token)
 
-                    # Store user data in Firebase Database
-                    firebase_db.child(f"{user_type.capitalize()}Accounts").child(user['localId']).set(user_data, token=id_token)
+                    # Save additional data to the Firebase database based on user type
+                    if user_type == 'doctor':
+                        firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token)
+                        
+                        # Create a new Doctor record in SQLAlchemy
+                        new_doctor = DoctorAccounts(
+                            full_name=name,
+                            email=email,
+                            special_email=special_email,
+                            organization=org_name,
+                            phone_number=phone_number
+                        )
+                        db.session.add(new_doctor)
+                    else:
+                        firebase_db.child("ClientAccounts").child(user['localId']).set(user_data, token=id_token)
+                        
+                        # Create a new Client record in SQLAlchemy
+                        new_client = ClientAccounts(
+                            first_name=first_name,
+                            last_name=last_name,
+                            email=email,
+                            phone_number=phone_number
+                        )
+                        db.session.add(new_client)
+
+                    db.session.commit()
 
                     session['user_type'] = user_type
                     session['user_id_token'] = id_token
                     session['refresh_token'] = refresh_token
                     session['local_id'] = user['localId']
                     session['user_data'] = user_data
-                    return redirect(url_for('auth.check_verification'))
+                    return redirect(url_for('auth.check_verification'))  # Redirect to verification check
 
             except Exception as e:
+                db.session.rollback()
                 error = str(e)
-                print(f"Sign-up error: {e}")
-
+                
     return render_template('auth/signup.html', error=error, user_type=user_type)
-
 
 @bp.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['pass']
+        password = request.form['password']
         try:
             # Attempt to sign in with the provided email and password
             user = firebase.auth().sign_in_with_email_and_password(email, password)

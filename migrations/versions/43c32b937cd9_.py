@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 4c7c787b12f5
+Revision ID: 43c32b937cd9
 Revises: 
-Create Date: 2024-07-19 19:43:19.485737
+Create Date: 2024-07-20 16:55:09.189306
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4c7c787b12f5'
+revision = '43c32b937cd9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +23,7 @@ def upgrade():
     sa.Column('first_name', sa.String(length=50), nullable=False),
     sa.Column('last_name', sa.String(length=50), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('phone_number', sa.String(length=20), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -40,7 +41,8 @@ def upgrade():
     sa.Column('full_name', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('special_email', sa.String(length=120), nullable=False),
-    sa.Column('specialization', sa.String(length=120), nullable=False),
+    sa.Column('organization', sa.String(length=120), nullable=False),
+    sa.Column('phone_number', sa.String(length=20), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('special_email')
@@ -85,18 +87,6 @@ def upgrade():
     sa.Column('time', sa.Time(), nullable=False),
     sa.Column('status', sa.String(length=50), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['doctor_id'], ['doctor.id'], ),
-    sa.ForeignKeyConstraint(['patient_id'], ['patient.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('client_messages',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('patient_id', sa.Integer(), nullable=False),
-    sa.Column('doctor_id', sa.Integer(), nullable=False),
-    sa.Column('message_type', sa.String(length=10), nullable=False),
-    sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctor.id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patient.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -165,7 +155,6 @@ def downgrade():
     op.drop_table('message')
     op.drop_table('medication')
     op.drop_table('lab_result')
-    op.drop_table('client_messages')
     op.drop_table('appointment')
     op.drop_table('patient')
     op.drop_table('user')
