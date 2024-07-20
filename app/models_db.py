@@ -1,27 +1,6 @@
 from datetime import datetime
 from . import sqlalchemy_db as db
 
-class Patient(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    blood_type = db.Column(db.String(3))
-    height = db.Column(db.Float)
-    weight = db.Column(db.Float)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'))
-    admission_date = db.Column(db.DateTime, default=datetime.utcnow)
-    last_visit = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(20))
-    email = db.Column(db.String(120), unique=True)
-    medical_history = db.Column(db.Text)
-    phone_number = db.Column(db.String(20))
-
-    appointments = db.relationship('Appointment', backref='patient', lazy=True)
-
-    def __repr__(self):
-        return f'<Patient {self.name}>'
-
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -47,6 +26,29 @@ class Appointment(db.Model):
 
     def __repr__(self):
         return f'<Appointment {self.id}>'
+    
+    
+class Patient(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    gender = db.Column(db.String(10), nullable=False)
+    blood_type = db.Column(db.String(3))
+    height = db.Column(db.Float)
+    weight = db.Column(db.Float)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'))
+    admission_date = db.Column(db.DateTime, default=datetime.utcnow)
+    last_visit = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20))
+    email = db.Column(db.String(120), unique=True)
+    medical_history = db.Column(db.Text)
+    phone_number = db.Column(db.String(20))
+
+    appointments = db.relationship('Appointment', backref='patient', lazy=True)
+
+    def __repr__(self):
+        return f'<Patient {self.name}>'
+
 
 
 class Message(db.Model):

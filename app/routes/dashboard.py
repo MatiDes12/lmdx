@@ -1,6 +1,9 @@
 import os
 from flask import Blueprint, flash, jsonify, render_template, request, session, redirect, url_for
 import requests
+import pyrebase
+from app.config import Config
+from app.routes.auth import firebase_db
 from ..models_db import Patient, Doctor, Appointment, Message
 from .. import sqlalchemy_db as db
 from datetime import datetime
@@ -35,25 +38,51 @@ def doctor_dashboard():
     if 'user' not in session or session.get('user_type') != 'doctor':
         return redirect(url_for('auth.signin'))
 
-    patients = Patient.query.all()
-    doctors = Doctor.query.all()
-    appointments = Appointment.query.all()
+    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
+    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
 
-    total_patients = len(patients)
-    total_doctors = len(doctors)
-    total_appointments = len(appointments)
+    try:
+        # Fetch doctor data from Firebase
+        doctor_data = firebase_db.child("DoctorAccounts").child(user_id).get(token=id_token).val()
+        if doctor_data:
+            doctor_name = doctor_data.get('name')
+            total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
+            total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
 
-    return render_template('doctors/dashboard.html',
-                           total_patients=total_patients,
-                           total_doctors=total_doctors,
-                           total_appointments=total_appointments)
+            return render_template('doctors/dashboard.html',
+                                   doctor_name=doctor_name,
+                                   total_patients=total_patients,
+                                   total_appointments=total_appointments)
+        else:
+            flash('Unable to fetch doctor details.', 'error')
+            return redirect(url_for('auth.signin'))
+    except Exception as e:
+        flash('Error accessing doctor information.', 'error')
+        print(f"Firebase fetch error: {e}")
+        return redirect(url_for('auth.signin'))
 
 @bp.route('/client')
 def client_dashboard():
     if 'user' not in session or session.get('user_type') != 'client':
         return redirect(url_for('auth.signin'))
-
-    return render_template('clients/dashboard.html')
+    
+    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
+    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
+    
+    try:
+        # Fetch user data from Firebase
+        user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
+        if user_data:
+            first_name = user_data.get('first_name')
+            last_name = user_data.get('last_name')
+            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
+        else:
+            flash('Unable to fetch user details.', 'error')
+            return redirect(url_for('auth.signin'))
+    except Exception as e:
+        flash('Error accessing user information.', 'error')
+        print(f"Firebase fetch error: {e}")
+        return redirect(url_for('auth.signin'))
 
 
 
@@ -242,9 +271,8 @@ def doctors():
     
     return render_template('doctors/doctors.html', doctors=doctors, search_query=search_query, specialization_filter=specialization_filter, status_filter=status_filter, pagination=pagination, specializations=specializations)
 
-@bp.route('/dashboard/message_doctor/<int:doctor_id>', methods=['GET', 'POST'])
-def message_doctor(doctor_id):
-    doctor = Doctor.query.get_or_404(doctor_id)
+
+    ery.get_or_404(doctor_id)
     if request.method == 'POST':
         # Add your message handling logic here
         pass
@@ -395,17 +423,18 @@ def reports():
 
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
-    if 'user' not in session:
+    if 'user' not in session or session.get('user_type') != 'doctor':
         return redirect(url_for('auth.signin'))
 
     search_query = request.args.get('search', '')
     status_filter = request.args.get('status', '')
     page = request.args.get('page', 1, type=int)
 
-    appointments_query = Appointment.query.join(Patient).join(Doctor)
+    doctor_id = session.get('user_id')
+    appointments_query = Appointment.query.filter_by(doctor_id=doctor_id).join(Patient).join(Doctor)
 
     if search_query:
-        search_pattern = f'{search_query}%'  # Only match names that start with the search query
+        search_pattern = f'%{search_query}%'
         appointments_query = appointments_query.filter(
             (Patient.name.ilike(search_pattern)) |
             (Doctor.name.ilike(search_pattern))
