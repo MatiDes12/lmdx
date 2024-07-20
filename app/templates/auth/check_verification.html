@@ -1,26 +1,64 @@
-{% extends 'doctors/base.html' %}
-{% block content %}
-<div class="container mx-auto">
-    <h2 class="text-center">Verify Your Email</h2>
-    <div class="flex justify-center">
-        <div class="flex w-full max-w-lg overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
-            <div class="flex items-center justify-center w-12 bg-blue-500">
-                <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM21.6667 28.3333H18.3334V25H21.6667V28.3333ZM21.6667 21.6666H18.3334V11.6666H21.6667V21.6666Z" />
-                </svg>
-            </div>
-            <div class="px-4 py-2 -mx-3">
-                <div class="mx-3">
-                    <span class="font-semibold text-blue-500 dark:text-blue-400">Info</span>
-                    <p>Once verified, <a href="{{ url_for('auth.check_verification') }}"><button class="px-6 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
-                        click here</button></a> to continue.</p>
-                </div>
+<section class="max-w-2xl px-6 py-8 mx-auto bg-white dark:bg-gray-900">
+    <header>
+        <a href="#">
+            <img class="w-auto h-8 sm:h-10" src="{{ url_for('static', filename='images/logo.png') }}" alt="LuminaMedix Logo">
+        </a>
+    </header>
+
+    <main class="mt-8">
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Email Verification Sent</h2>
+
+        <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+            Hi {{ user_name }},
+        </p>
+
+        <p class="mt-2 leading-loose text-gray-600 dark:text-gray-300">
+            We have sent an email verification link to your email address. Please check your inbox and click the verification link to verify your email address.
+        </p>
+        
+        <p class="mt-4 text-gray-600 dark:text-gray-300">
+            If you did not receive the email, please check your spam folder or click the button below to resend the verification email.
+        </p>
+        
+        <button onclick="window.location.href='https://mail.google.com'" class="px-6 py-2 mt-8 text-sm font-medium tracking-wider text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
+            Go to Gmail
+        </button>
+        
+        <button onclick="resendVerificationEmail()" class="px-6 py-2 mt-4 text-sm font-medium tracking-wider text-white capitalize transition-colors duration-300 transform bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-80">
+            Resend Verification Email
+        </button>
+    </main>
+
+    <footer class="mt-8">
+        <p class="text-gray-500 dark:text-gray-400">
+            If you need further assistance, please contact our support team.
+        </p>
+
+        <p class="mt-3 text-gray-500 dark:text-gray-400">© {{ new Date().getFullYear() }} LuminaMedix. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Success Popup -->
+    <div id="successPopup" class="hidden fixed bottom-5 right-5 flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <div class="flex items-center justify-center w-12 bg-emerald-500">
+            <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
+            </svg>
+        </div>
+        <div class="px-4 py-2 -mx-3">
+            <div class="mx-3">
+                <span class="font-semibold text-emerald-500 dark:text-emerald-400">Success</span>
+                <p class="text-sm text-gray-600 dark:text-gray-200">Email verification link sent successfully!</p>
             </div>
         </div>
     </div>
+</section>
 
-    {% if message %}
-        <div class="alert alert-info text-center">{{ message }}</div>
-    {% endif %}
-</div>
-{% endblock %}
+<script>
+    function resendVerificationEmail() {
+        // Show success popup
+        document.getElementById('successPopup').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('successPopup').classList.add('hidden');
+        }, 3000);
+    }
+</script>

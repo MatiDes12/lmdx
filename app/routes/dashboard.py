@@ -30,7 +30,6 @@ def index():
         return redirect(url_for('client.client_dashboard'))
     return redirect(url_for('auth.signin'))
 
-
 @bp.route('/doctor')
 def doctor_dashboard():
     if 'user' not in session or session.get('user_type') != 'doctor':

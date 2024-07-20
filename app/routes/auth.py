@@ -42,39 +42,34 @@ def refresh_id_token(refresh_token):
 
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-    user_type = request.args.get('type', 'client')  # Default to 'client' if not specified
+    user_type = request.args.get('type', 'patient')  # Default to 'patient' if not specified
     error = None
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['pass']
-        re_password = request.form['re_pass']
-        agree_terms = request.form.get('agree-term')
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        phone_number = request.form['phone_number']
 
-        if not agree_terms:
-            error = 'You must agree to the Terms of Service.'
-        elif password != re_password:
+        if password != confirm_password:
             error = 'Passwords do not match.'
         elif len(password) < 8:
             error = 'Password must be at least 8 characters long.'
 
-        # Collecting name based on user type
         if user_type == 'doctor':
-            name = request.form.get('name')  # For doctors, use 'name'
-            org_name = request.form.get('org_name')
+            name = request.form['name']
+            org_name = request.form['org_name']
             if not name or len(name) < 6:
-                error = 'Username must be at least 6 characters long for doctors.'
+                error = 'Full name must be at least 6 characters long for doctors.'
         else:
-            first_name = request.form.get('first_name')  # For clients, use 'first_name'
-            last_name = request.form.get('last_name')
+            first_name = request.form['first_name']
+            last_name = request.form['last_name']
             if not first_name or not last_name or len(first_name) < 2 or len(last_name) < 2:
-                error = 'Both first name and last name are required for clients and must be at least 2 characters long.'
+                error = 'Both first name and last name are required for patients and must be at least 2 characters long.'
 
         if error is None:
             try:
                 # Create user in Firebase Authentication
                 user = firebase.auth().create_user_with_email_and_password(email, password)
-                
-                # Get the user's ID token and refresh token
                 id_token = user['idToken']
                 refresh_token = user['refreshToken']
                 
@@ -82,7 +77,7 @@ def signup():
                 firebase.auth().send_email_verification(id_token)
 
                 # Save additional data to the database based on user type
-                user_data = {'email': email}
+                user_data = {'email': email, 'phone_number': phone_number}
                 if user_type == 'doctor':
                     user_data.update({'name': name, 'org_name': org_name})
                     firebase_db.child("doctors").child(user['localId']).set(user_data, token=id_token)
@@ -90,20 +85,29 @@ def signup():
                     # Create a new Doctor record in SQLAlchemy
                     new_doctor = Doctor(
                         name=name,
-                        specialization=org_name,  # Assuming specialization is the same as org_name here
-                        status='active'  # Set any default value as needed
+                        specialization=org_name,
+                        status='active'
                     )
                     db.session.add(new_doctor)
                 else:
                     user_data.update({'first_name': first_name, 'last_name': last_name})
-                    firebase_db.child("clients").child(user['localId']).set(user_data, token=id_token)
+                    firebase_db.child("patients").child(user['localId']).set(user_data, token=id_token)
                     
+                    # Create a new Patient record in SQLAlchemy
+                    new_patient = Patient(
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        phone_number=phone_number,
+                        status='active'
+                    )
+                    db.session.add(new_patient)
 
                 db.session.commit()
 
                 session['user_type'] = user_type
                 session['user_id_token'] = id_token
-                session['refresh_token'] = refresh_token  # Store refresh token in session
+                session['refresh_token'] = refresh_token
                 session['local_id'] = user['localId']
                 session['user_data'] = user_data
                 return redirect(url_for('auth.check_verification'))  # Redirect to verification check

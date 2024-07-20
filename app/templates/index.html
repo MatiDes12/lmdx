@@ -5,92 +5,526 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LuminaMedix</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <style>
-    @keyframes fadeInScale {
-      0% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+    .nav-link {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-radius: 9999px; /* Full rounded */
+      margin-left: 0.5rem; /* Margin between links */
+      margin-right: 0.5rem; /* Margin between links */
     }
-    
-    .ai-effect {
-      animation: fadeInScale 1s ease-out forwards;
-    }
-    
-    </style>
-</head>
 
-  
+    .glass-effect {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .underline-effect {
+      position: relative;
+    }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+  @keyframes breathingGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(30, 144, 255, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(30, 144, 255, 1);
+  }
+}
+
+.ai-effect {
+  animation: breathingGlow 4s infinite ease-in-out;
+}
+
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
 <body class="bg-gray-100">
 
-<header class="sticky top-0 z-50 bg-white shadow dark:bg-gray-800">
-  <nav x-data="{ isOpen: false }" class="container px-6 py-4 mx-auto">
-    <div class="flex justify-between items-center">
-      <a href="#">
-        <img class="w-auto h-6 sm:h-7" src="{{ url_for('static', filename='images/logo.png') }}" alt="LuminaMedix Logo">
-      </a>
-      
-      <!-- Centered Navigation Links -->
-      <div class="flex-1 flex justify-center items-center space-x-4">
-        <a href="#home" class="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md">Home</a>
-        <a href="#services" class="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md">Services</a>
-        <a href="#about" class="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md">About Us</a>
-        <a href="#contact" class="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>
+  <header class="fixed top-0 z-50 w-full shadow-lg glass-effect dark:bg-gray-800 rounded-full mx-4 my-2 p-2">
+    <nav x-data="{ isOpen: false }" class="container px-6 py-2 mx-auto">
+      <div class="flex justify-between items-center">
+        <a href="#">
+          <img class="w-auto h-6 sm:h-7" src="{{ url_for('static', filename='images/logo.png') }}" alt="LuminaMedix Logo">
+        </a>
+        
+        <div class="flex-1 flex justify-center items-center space-x-1">
+          <a href="#home" class="text-black-600 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 nav-link font-medium underline-effect">Home</a>
+          <a href="#services" class="text-black-600 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 nav-link font-medium">Services</a>
+          <a href="#whyus" class="text-black-600 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 nav-link font-medium">Why Us?</a>
+          <a href="{{ url_for('main.contact') }}" class="text-black-600 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 nav-link font-medium">Contact</a>
+
+        </div>
+    
+        <a href="{{ url_for('auth.signin') }}" class="ml-6 text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black px-5 py-2 rounded-full text-sm shadow-sm font-bold">Join Now</a>
+    
+        <div class="flex lg:hidden">
+          <button @click="isOpen = !isOpen" type="button" class="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400" aria-label="toggle menu">
+            <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16" />
+            </svg>
+            <svg x-show="isOpen" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    
+      <div x-cloak :class="{ 'block': isOpen, 'hidden': !isOpen }" class="lg:hidden">
+        <a href="#home" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3 font-bold nav-link underline-effect">Home</a>
+        <a href="#services" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3 font-bold nav-link">Services</a>
+        <a href="#whyus" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3 font-bold nav-link">Why Us?</a>
+        <a @click.prevent="showModal = true" href="#" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3 font-bold nav-link">Contact</a>
+        <a href="{{ url_for('auth.signin') }}" class="block bg-black text-white p-3 rounded-full hover:bg-gray-900 font-bold">Join Now</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="text-gray-700 body-font dark:text-white" id="home">
+    <div class="lg:flex">
+      <div class="flex items-center justify-center w-full px-6 py-8 lg:h-[32rem] lg:w-1/2">
+          <div class="max-w-xl">
+            <h2 class="text-3xl font-semibold text-gray-800 dark:text-white lg:text-5xl">
+              Next-Gen Health <span class="text-blue-600 dark:text-blue-400 ai-effect">AI</span> 
+          </h2>
+              <p class="mt-4 text-sm text-gray-500 dark:text-gray-400 lg:text-base">
+                  LuminaMedix (LMDX) leverages advanced AI technologies, including deep learning and machine learning, to revolutionize healthcare. Our solutions empower medical professionals with predictive analytics and image analysis capabilities for early disease detection and personalized patient care.
+              </p>
+              <div class="flex flex-col mt-6 space-y-3 lg:space-y-0 lg:flex-row">
+                  <button
+                      type="button"
+                      class="px-5 py-2 text-sm font-medium tracking-wider text-center text-white transition-colors duration-300 transform bg-gray-900 rounded-full hover:bg-gray-700"
+                      data-bs-toggle="modal"
+                      onclick="showDemoModal()"
+                  >Request a Demo</button>
+                  <a href="#" class="px-5 py-2 text-sm font-medium tracking-wider text-center text-gray-700 transition-colors duration-300 transform bg-gray-200 rounded-full lg:mx-4 hover:bg-gray-300">Contact Us</a>
+              </div>
+          </div>
+      </div>
+      <div class="w-full h-64 lg:w-1/2 lg:h-auto">
+        <img src="{{ url_for('static', filename='images/docterimage.png') }}" alt="Updated Healthcare Technology" class="w-full h-full object-cover" style="width: 87%; height: auto;">
+    </div>
+  </div>
+  </section>
+
+  <!-- Modal for Request a Demo -->
+<div id="demoModal" class="modal-bg flex">
+  <div class="modal-content relative">
+    <h2 class="text-2xl font-semibold mb-4">Request a Demo</h2>
+    <button type="button" onclick="hideDemoModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <form action="#" method="POST">
+      <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+        <div>
+          <label for="first-name" class="block text-sm font-semibold leading-6 text-gray-900">First name</label>
+          <div class="mt-2.5">
+            <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+        <div>
+          <label for="last-name" class="block text-sm font-semibold leading-6 text-gray-900">Last name</label>
+          <div class="mt-2.5">
+            <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="company" class="block text-sm font-semibold leading-6 text-gray-900">Company</label>
+          <div class="mt-2.5">
+            <input type="text" name="company" id="company" autocomplete="organization" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-semibold leading-6 text-gray-900">Email</label>
+          <div class="mt-2.5">
+            <input type="email" name="email" id="email" autocomplete="email" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+        <div>
+          <label for="phone-number" class="block text-sm font-semibold leading-6 text-gray-900">Phone number</label>
+          <div class="relative mt-2.5">
+            <div class="absolute inset-y-0 left-0 flex items-center">
+              <label for="country" class="sr-only">Country</label>
+              <select id="country" name="country" class="h-full rounded-md border-0 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm">
+                <option>US</option>
+                <option>CA</option>
+                <option>EU</option>
+              </select>
+              <svg class="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <input type="tel" name="phone-number" id="phone-number" autocomplete="tel" class="block w-full rounded-md border-0 px-3.5 py-2 pl-20 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="message" class="block text-sm font-semibold leading-6 text-gray-900">Message</label>
+          <div class="mt-2.5">
+            <textarea name="message" id="message" rows="4" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button type="button" onclick="hideDemoModal()" class="px-5 py-2 text-sm font-medium tracking-wider text-center text-gray-700 transition-colors duration-300 transform bg-gray-200 rounded-full hover:bg-gray-300 mr-3">Cancel</button>
+        <button type="submit" class="px-5 py-2 text-sm font-medium tracking-wider text-center text-white transition-colors duration-300 transform bg-indigo-600 rounded-full hover:bg-indigo-500">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!--  Modal -->
+<section class="bg-gray-100 dark:bg-gray-900" id="services">
+  <hr class="my-8 border-gray-200 dark:border-gray-700">
+  <div class="container px-6 py-10 mx-auto">
+      <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-semibold text-gray-500 capitalize lg:text-2xl dark:text-white">Medical Image Analysis Services</h1>
       </div>
 
-      <!-- Join Now Button -->
-      <a href="{{ url_for('auth.signin') }}" class="ml-20 text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black px-10 py-2 rounded-full text-sm shadow-sm">Join Now</a>
+      <hr class="my-8 border-gray-100 dark:border-gray-700">
 
-      <!-- Mobile menu button -->
-      <div class="flex lg:hidden">
-        <button @click="isOpen = !isOpen" type="button" class="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400" aria-label="toggle menu">
-          <!-- Icons here -->
-        </button>
-      </div>
-    </div>
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+        <!-- First Post -->
+        <div>
+            <img class="object-cover object-center w-full h-64 rounded-lg lg:h-80" src="{{ url_for('static', filename='images/circulatory.png') }}" alt="Cardiac Detection Imaging">
 
-    <!-- Mobile Menu -->
-    <div x-cloak :class="{ 'block': isOpen, 'hidden': !isOpen }" class="lg:hidden">
-      <a href="#home" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3">Home</a>
-      <a href="#services" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3">Services</a>
-      <a href="#about" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3">About Us</a>
-      <a href="#contact" class="block text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-3">Contact</a>
-      <a href="{{ url_for('auth.signin') }}" class="block bg-black text-white p-3 rounded hover:bg-gray-900">Join Now</a>
-    </div>
-  </nav>
-</header>
+            <div class="mt-8">
+                <span class="text-blue-500 uppercase">Cardiac Detection</span>
 
-<section class="text-gray-700 body-font">
-  <div class="lg:flex">
-    <div class="flex items-center justify-center w-full px-6 py-8 lg:h-[32rem] lg:w-1/2">
-        <div class="max-w-xl">
-          <h2 class="text-3xl font-semibold text-gray-800 dark:text-white lg:text-5xl">
-            Next-Gen Health <span class="text-blue-600 dark:text-blue-400 ai-pulse">AI</span>
-        </h2>
-            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400 lg:text-base">
-                LuminaMedix (LMDX) leverages advanced AI technologies, including deep learning and machine learning, to revolutionize healthcare. Our solutions empower medical professionals with predictive analytics and image analysis capabilities for early disease detection and personalized patient care.
-            </p>
-            <div class="flex flex-col mt-6 space-y-3 lg:space-y-0 lg:flex-row">
-                <button
-                    type="button"
-                    class="px-5 py-2 text-sm font-medium tracking-wider text-center text-white transition-colors duration-300 transform bg-gray-900 rounded-full hover:bg-gray-700"
-                    data-bs-toggle="modal"
-                    data-bs-target="#demoModal"
-                >Request a Demo</button>
-                <a href="#" class="px-5 py-2 text-sm font-medium tracking-wider text-center text-gray-700 transition-colors duration-300 transform bg-gray-200 rounded-full lg:mx-4 hover:bg-gray-300">Contact Us</a>
+                <h1 class="mt-4 text-xl font-semibold text-gray-800 dark:text-white">
+                    Advanced Cardiac Imaging Analysis
+                </h1>
+
+                <p class="mt-2 text-gray-500 dark:text-gray-400">
+                    Discover our advanced cardiac detection systems that enhance diagnostic accuracy, enabling early identification and intervention strategies for cardiovascular conditions.
+                </p>
+
+                <div class="flex items-center justify-between mt-4">
+                    <a href="#" class="inline-block text-blue-500 underline hover:text-blue-400">Read more</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Post -->
+        <div>
+            <img class="object-cover object-center w-full h-64 rounded-lg lg:h-80" src="{{ url_for('static', filename='images/lung.png') }}" alt="Lung Tumor Segmentation">
+
+            <div class="mt-8">
+                <span class="text-blue-500 uppercase">Lung Tumor Segmentation</span>
+
+                <h1 class="mt-4 text-xl font-semibold text-gray-800 dark:text-white">
+                    Precision Lung Tumor Segmentation
+                </h1>
+
+                <p class="mt-2 text-gray-500 dark:text-gray-400">
+                    Our lung tumor segmentation tools use the latest in AI technology to provide detailed and precise imaging, facilitating targeted treatments and improved patient outcomes.
+                </p>
+
+                <div class="flex items-center justify-between mt-4">
+                    <a href="#" class="inline-block text-blue-500 underline hover:text-blue-400">Read more</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Post -->
+        <div>
+            <img class="object-cover object-center w-full h-64 rounded-lg lg:h-80" src="{{ url_for('static', filename='images/liver.png') }}" alt="Medical Image Analysis">
+
+            <div class="mt-8">
+                <span class="text-blue-500 uppercase">Medical Image Analysis</span>
+
+                <h1 class="mt-4 text-xl font-semibold text-gray-800 dark:text-white">
+                    Comprehensive Medical Image Analysis
+                </h1>
+
+                <p class="mt-2 text-gray-500 dark:text-gray-400">
+                    Leverage our comprehensive medical image analysis service to gain deeper insights into patient imaging data, enhancing diagnostic precision and facilitating effective treatment plans.
+                </p>
+
+                <div class="flex items-center justify-between mt-4">
+                    <a href="#" class="inline-block text-blue-500 underline hover:text-blue-400">Read more</a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="w-full h-64 lg:w-1/2 lg:h-auto">
-      <img src="{{ url_for('static', filename='images/docterimage.png') }}" alt="Updated Healthcare Technology" class="w-full h-full object-cover" style="width: 87%; height: auto;">
+  </div>
+</section>
 
+<!-- About Us Section -->
+<section class="bg-gray-100 dark:bg-gray-900">
+  <hr class="my-8 border-gray-200 dark:border-gray-700">
+  <div class="container px-6 py-10 mx-auto">
+      <h1 class="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">Discover Our <br> Cutting-Edge <span class="text-blue-600 dark:text-blue-400 ai-effect">AI Solutions</span></h1>
+
+      <p class="mt-4 text-gray-500 xl:mt-6 dark:text-gray-300">
+          Explore our innovative AI solutions that revolutionize healthcare by enhancing patient care, streamlining diagnostics, and improving overall health outcomes.
+      </p>
+
+      <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-12 md:grid-cols-2 xl:grid-cols-3">
+          <!-- First Component: AI-Powered Patient Portal -->
+          <div class="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl">
+              <span class="inline-block text-blue-500 dark:text-blue-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                  </svg>
+              </span>
+              <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">AI-Powered Patient Portal</h1>
+              <p class="text-gray-500 dark:text-gray-300">
+                  Streamline patient interactions with our AI-powered portal, providing automated appointment scheduling, patient history, and real-time health monitoring.
+              </p>
+              <a href="#" class="inline-flex p-2 text-blue-500 capitalize transition-colors duration-300 transform bg-blue-100 rounded-full rtl:-scale-x-100 dark:bg-blue-500 dark:text-white hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+              </a>
+          </div>
+
+          <!-- Second Component: Diagnostic AI Tools -->
+          <div class="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl">
+              <span class="inline-block text-blue-500 dark:text-blue-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                  </svg>
+              </span>
+              <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">Diagnostic AI Tools</h1>
+              <p class="text-gray-500 dark:text-gray-300">
+                  Enhance diagnostic accuracy with our AI tools, capable of complex image processing and data analysis to support early disease detection.
+              </p>
+              <a href="#" class="inline-flex p-2 text-blue-500 capitalize transition-colors duration-300 transform bg-blue-100 rounded-full rtl:-scale-x-100 dark:bg-blue-500 dark:text-white hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+              </a>
+          </div>
+
+          <!-- Third Component: AI-Enhanced Health Records -->
+          <div class="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl">
+              <span class="inline-block text-blue-500 dark:text-blue-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+              </span>
+              <h1 class="text-xl font-semibold text-gray-700 capitalize dark:text-white">AI-Enhanced Health Records</h1>
+              <p class="text-gray-500 dark:text-gray-300">
+                  Access AI-enhanced health records that provide comprehensive, up-to-date information to facilitate personalized patient care and treatment planning.
+              </p>
+              <a href="#" class="inline-flex p-2 text-blue-500 capitalize transition-colors duration-300 transform bg-blue-100 rounded-full rtl:-scale-x-100 dark:bg-blue-500 dark:text-white hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+              </a>
+          </div>
+      </div>
+  </div>
+</section>
+
+<!-- Why Us Section -->
+ <section class="bg-gray-100 dark:bg-gray-900 " id="whyus">
+  <hr class="my-8 border-gray-200 dark:border-gray-700">
+    <div class="container flex flex-col px-6 py-10 mx-auto space-y-6 lg:h-[32rem] lg:py-16 lg:flex-row lg:items-center">
+        <div class="w-full lg:w-1/2">
+            <div class="lg:max-w-lg">
+                <h1 class="text-3xl font-semibold tracking-wide text-gray-800 dark:text-white lg:text-3xl">Why Choose <span class="text-blue-600 dark:text-blue-400 ai-effect">LuminaMedix?</span></h1>
+                <p class="mt-4 text-gray-600 dark:text-gray-300">At LuminaMedix, we leverage cutting-edge AI technologies to revolutionize healthcare, ensuring superior patient outcomes and advanced diagnostic capabilities.</p>
+                <div class="grid gap-6 mt-8 sm:grid-cols-2">
+                    <div class="flex items-center text-gray-800 -px-3 dark:text-gray-200">
+                        <svg class="w-5 h-5 mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+
+                        <span class="mx-3">Advanced AI Diagnostics</span>
+                    </div>
+
+                    <div class="flex items-center text-gray-800 -px-3 dark:text-gray-200">
+                        <svg class="w-5 h-5 mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+
+                        <span class="mx-3">Personalized Patient Care</span>
+                    </div>
+
+                    <div class="flex items-center text-gray-800 -px-3 dark:text-gray-200">
+                        <svg class="w-5 h-5 mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+
+                        <span class="mx-3">Comprehensive Health Records</span>
+                    </div>
+
+                    <div class="flex items-center text-gray-800 -px-3 dark:text-gray-200">
+                        <svg class="w-5 h-5 mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+
+                        <span class="mx-3">Secure Data Management</span>
+                    </div>
+
+                    <div class="flex items-center text-gray-800 -px-3 dark:text-gray-200">
+                        <svg class="w-5 h-5 mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+
+                        <span class="mx-3">Expert Medical Team</span>
+                    </div>
+
+                    <div class="flex items-center text-gray-800 -px-3 dark:text-gray-200">
+                        <svg class="w-5 h-5 mx-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+
+                        <span class="mx-3">24/7 Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:w-1/2 lg:h-auto">
+          <img src="{{ url_for('static', filename='images/why_us_image.png') }}" alt="Updated Healthcare Technology" class="w-full h-full object-cover" style="width: 100%; height: auto;">
+      </div>
+    </div>                                            
+</section>
+
+
+<!-- New Section -->
+<section class="bg-gray-100 py-24 sm:py-32">
+ <hr class="my-8 border-gray-200 dark:border-gray-700">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:text-center">
+      <h2 class="text-base font-semibold leading-7 text-indigo-600">Transforming Healthcare</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl">Innovative Solutions for Modern Medicine</p>
+      <p class="mt-6 text-lg leading-8 text-gray-600">Discover how our AI-driven solutions enhance patient care and streamline medical processes, ensuring the highest standards of healthcare.</p>
+    </div>
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+            </div>
+            AI-Driven Diagnostics
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">Leverage our advanced AI algorithms to diagnose medical conditions with unmatched accuracy and speed.</dd>
+        </div>
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+            </div>
+            Secure Patient Data
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">Our robust data encryption ensures that all patient information remains confidential and secure.</dd>
+        </div>
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </div>
+            Real-Time Monitoring
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">Our systems provide real-time monitoring of patient vitals, ensuring timely interventions and improved outcomes.</dd>
+        </div>
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold leading-7 text-gray-900">
+            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33" />
+              </svg>
+            </div>
+            Personalized Care Plans
+          </dt>
+          <dd class="mt-2 text-base leading-7 text-gray-600">Utilize AI to develop personalized care plans tailored to each patient's unique medical history and needs.</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section>
+<div class="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+      <div class="max-w-xl lg:max-w-lg">
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Subscribe to our newsletter.</h2>
+        <p class="mt-4 text-lg leading-8 text-gray-300">Stay updated with the latest advancements in healthcare AI and how we're transforming patient care.</p>
+        <div class="mt-6 flex max-w-md gap-x-4">
+          <label for="email-address" class="sr-only">Email address</label>
+          <input id="email-address" name="email" type="email" autocomplete="email" required class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6" placeholder="Enter your email">
+          <button type="submit" class="flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Subscribe</button>
+        </div>
+      </div>
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2">
+        <div class="flex flex-col items-start">
+          <div class="rounded-md bg-white/5 p-2 ring-1 ring-white/10">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+            </svg>
+          </div>
+          <dt class="mt-4 font-semibold text-white">AI-Powered Insights</dt>
+          <dd class="mt-2 leading-7 text-gray-400">Discover how AI is transforming healthcare through our weekly insights and updates.</dd>
+        </div>
+        <div class="flex flex-col items-start">
+          <div class="rounded-md bg-white/5 p-2 ring-1 ring-white/10">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.471 1.575 1.575 0 10-2.228-2.228 3.818 3.818 0 00-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0116.35 15m.002 0h-.002" />
+            </svg>
+          </div>
+          <dt class="mt-4 font-semibold text-white">Privacy Guaranteed</dt>
+          <dd class="mt-2 leading-7 text-gray-400">We ensure your data privacy with the highest standards of data protection and security.</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+  <div class="absolute left-1/2 top-0 -z-10 -translate-x-1/2 blur-3xl xl:-top-6" aria-hidden="true">
+    <div class="aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
   </div>
 </div>
 </section>
 
+<script>
+  function showDemoModal() {
+    document.getElementById('demoModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hideDemoModal() {
+    document.getElementById('demoModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+</script>
 </body>
 </html>

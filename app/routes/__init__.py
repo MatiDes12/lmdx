@@ -11,3 +11,5 @@ def index():
         # First time visit, show index page and set session
         session['visited'] = True
         return render_template('index.html')
+    
+    
