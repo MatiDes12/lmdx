@@ -109,7 +109,7 @@ def signup():
 def signin():
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['pass']
+        password = request.form['password']
         try:
             # Attempt to sign in with the provided email and password
             user = firebase.auth().sign_in_with_email_and_password(email, password)
