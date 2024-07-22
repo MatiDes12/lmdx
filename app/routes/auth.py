@@ -64,7 +64,7 @@ def signup():
             special_email = generate_special_email(name)
             if special_email is None:
                 error = 'Could not generate a valid special email.'
-            user_data = {'full_name': name, 'email': special_email, 'organization': org_name, 'phone_number': phone_number, 'personal_email': email}
+            user_data = {'full_name': name, 'email': special_email, 'specialization': org_name, 'personal_email': email}
 
         else:
             first_name = request.form.get('first_name')
