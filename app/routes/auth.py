@@ -107,7 +107,7 @@ def signup():
 
             # Save additional data to the Firebase database based on user type
             if user_type == 'organization':
-                firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token):
+                firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token)
 
                 # Create a new Doctor record in SQLAlchemy
                 new_organization = Organization(
