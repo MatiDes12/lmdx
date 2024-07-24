@@ -1,0 +1,17 @@
+{% extends 'clients/base.html' %}
+{% block navbar %}
+    {% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
+<div class="p-4">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Health Tips</h1>
+        <p class="mt-1 text-gray-600 dark:text-gray-400">Helpful advice to keep you healthy and active.</p>
+    </div>
+    <ul class="list-disc list-inside bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+        {% for tip in tips %}
+            <li class="text-gray-800 dark:text-white py-2">{{ tip }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

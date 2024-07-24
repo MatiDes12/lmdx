@@ -1,81 +1,131 @@
 {% extends 'clients/base.html' %}
 {% block navbar %}
-{% include 'clients/navbar.html' %}
+    {% include 'clients/navbar.html' %}
 {% endblock %}
 {% block content %}
-<div class="flex flex-col mt-6">
-    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center gap-x-3">
-                                    <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                    <span>Name</span>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                Specialization
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                Schedule
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                Status
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 whitespace-nowrap pl-24">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                        {% for doctor in doctors %}
-                        <tr>
-                            <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                <div class="inline-flex items-center gap-x-3">
-                                    <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                    <div class="flex items-center gap-x-2">
-                                        <img class="object-cover w-10 h-10 rounded-full" src="https://i.pravatar.cc/300?img={{ doctor.id }}" alt="{{ doctor.name }}'s profile picture">
-                                        <div>
-                                            <h2 class="font-medium text-gray-800 dark:text-white ">{{ doctor.name }}</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                {{ doctor.specialization }}
-                            </td>
-                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                {{ doctor.schedule }}
-                            </td>
-                            <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2">
-                                    <span class="h-1.5 w-1.5 rounded-full {% if doctor.status.lower() == 'active' %}bg-green-500{% elif doctor.status.lower() == 'inactive' %}bg-red-500{% else %}bg-gray-500{% endif %}"></span>
-                                    <h2 class="text-sm font-normal {% if doctor.status.lower() == 'active' %}text-green-500{% elif doctor.status.lower() == 'inactive' %}text-red-500{% else %}text-gray-500{% endif %}">{{ doctor.status }}</h2>
-                                </div>
-                            </td>
-                            <td class="px-4 py-4 text-sm whitespace-nowrap">
-                                <div class="flex items-center gap-x-6">
-                                    <a href="{{ url_for('dashboard.message_doctor', doctor_id=doctor.id) }}" class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#4285F4">
-                                            <path d="M280-240q-17 0-28.5-11.5T240-280v-80h520v-360h80q17 0 28.5 11.5T880-680v600L720-240H280ZM80-280v-560q0-17 11.5-28.5T120-880h520q17 0 28.5 11.5T680-840v360q0 17-11.5 28.5T640-440H240L80-280Zm520-240v-280H160v280h440Zm-440 0v-280 280Z"/>
-                                        </svg>
-                                    </a>
-                                    <a href="{{ url_for('dashboard.view_doctor_profile', doctor_id=doctor.id) }}" class="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#34A853">
-                                            <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="px-6 py-4">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Visit Summary</h1>
+        <p>Review the details and outcomes of your recent doctor's visit.</p>
+    </div>
+
+    <section class="container">
+        <div class="flex items-center gap-x-3">
+            <h2 class="text-lg font-medium text-gray-800 dark:text-white">Visit Summaries</h2>
+            <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">3 Visits</span>
+        </div>
+    
+        <div class="flex flex-col mt-6">
+            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                    <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-800">
+                                <tr>
+                                    <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        Doctor Name
+                                    </th>
+                                    <th scope="col" class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        Visit Date
+                                    </th>
+                                    <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        Summary
+                                    </th>
+                                    <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        Next Steps
+                                    </th>
+                                    <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                                <!-- Entry for first visit -->
+                                <tr>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        Dr. John Smith
+                                    </td>
+                                    <td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        July 15, 2024
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        Routine check-up, recommended vitamin D supplementation.
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        Follow-up in 3 months.
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        <a href="#" class="text-blue-500 hover:underline">View Details</a>
+                                    </td>
+                                </tr>
+                                <!-- Entry for second visit -->
+                                <tr>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        Dr. John Smith
+                                    </td>
+                                    <td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        October 20, 2024
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        Follow-up visit, improved health markers.
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        Annual check-up scheduled for next year.
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        <a href="#" class="text-blue-500 hover:underline">View Details</a>
+                                    </td>
+                                </tr>
+                                <!-- Entry for third visit -->
+                                <tr>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        Dr. John Smith
+                                    </td>
+                                    <td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        January 10, 2025
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        Discussing long-term treatment options for chronic conditions.
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        Review new medications in 6 months.
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        <a href="#" class="text-blue-500 hover:underline">View Details</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Summary Details with Icons -->
+    <div class="mt-6 bg-white p-6 rounded-lg shadow-lg">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Detailed Summary</h3>
+        <div class="flex gap-4 items-start">
+            <img src="https://healthicons.org/img/placeholder.svg" alt="Medical Consultation" class="w-12 h-12">
+            <div>
+                <h4 class="text-lg font-semibold">Consultation Overview</h4>
+                <p class="text-gray-600">A comprehensive review was performed discussing symptoms, medication adjustments, and lifestyle modifications.</p>
+            </div>
+        </div>
+        <div class="flex gap-4 items-start mt-4">
+            <img src="https://healthicons.org/img/placeholder.svg" alt="Medication" class="w-12 h-12">
+            <div>
+                <h4 class="text-lg font-semibold">Medication Changes</h4>
+                <p class="text-gray-600">Updated medication regimen to include a new prescription for hypertension.</p>
+            </div>
+        </div>
+        <div class="flex gap-4 items-start mt-4">
+            <img src="https://healthicons.org/img/placeholder.svg" alt="Next Appointment" class="w-12 h-12">
+            <div>
+                <h4 class="text-lg font-semibold">Next Appointment</h4>
+                <p class="text-gray-600">Scheduled for January 15, 2025, to evaluate the effectiveness of the new treatment plan.</p>
             </div>
         </div>
     </div>
+    </section>
 </div>
 {% endblock %}

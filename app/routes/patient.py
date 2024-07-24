@@ -20,6 +20,7 @@ def dashboard():
         # Fetch user data from Firebase
         user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
         if user_data:
+            print('test')
             first_name = user_data.get('first_name')
             last_name = user_data.get('last_name')
             return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
@@ -167,3 +168,15 @@ def insurance():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     return render_template('clients/insurance.html')
+
+
+@bp.route('/health_tips')
+def health_tips():
+    tips = [
+        "Stay hydrated by drinking at least 8 glasses of water a day.",
+        "Exercise for at least 30 minutes most days of the week.",
+        "Maintain a balanced diet rich in fruits, vegetables, and lean proteins.",
+        "Get at least 7-8 hours of sleep per night to promote mental and physical health.",
+        "Manage stress through mindfulness, meditation, or talking to a professional."
+    ]
+    return render_template('clients/health_tips.html', tips=tips)

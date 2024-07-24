@@ -66,24 +66,25 @@ def patient_dashboard():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
-    # user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-    # id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
+    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
+    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
     
-    # try:
-    #     # Fetch user data from Firebase
-    #     user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
-    #     if user_data:
-    #         first_name = user_data.get('first_name')
-    #         last_name = user_data.get('last_name')
-    #         return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
-    #     else:
-    #         flash('Unable to fetch user details.', 'error')
-    #         return redirect(url_for('auth.signin'))
-    # except Exception as e:
-    #     flash('Error accessing user information.', 'error')
-    #     print(f"Firebase fetch error: {e}")
-    #     return redirect(url_for('auth.signin'))
-    return render_template('clients/dashboard.html')
+    try:
+        # Fetch user data from Firebase
+        user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
+        if user_data:
+            print('test')
+            first_name = user_data.get('first_name')
+            last_name = user_data.get('last_name')
+            print(first_name, last_name)
+            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
+        else:
+            flash('Unable to fetch user details.', 'error')
+            return redirect(url_for('auth.signin'))
+    except Exception as e:
+        flash('Error accessing user information.', 'error')
+        print(f"Firebase fetch error: {e}")
+        return redirect(url_for('auth.signin'))
 
 
 

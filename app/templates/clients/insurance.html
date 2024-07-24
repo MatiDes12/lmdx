@@ -1,8 +1,86 @@
 {% extends 'clients/base.html' %}
 {% block navbar %}
-{% include 'clients/navbar.html' %}
+    {% include 'clients/navbar.html' %}
 {% endblock %}
 {% block content %}
-<h1>Insurance</h1>
-<p>Here you can view your Insurance.</p>
+<div class="px-6 py-4">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Your Insurance Details</h1>
+        <p>Efficiently manage your insurance policies, documents, and contacts.</p>
+    </div>
+
+    <!-- Cards for Insurance Details -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Provider Card -->
+        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Provider Information</h2>
+            <p class="text-gray-600"><strong>Great Insurance Co.</strong></p>
+            <p class="text-gray-600">Policy Number: <strong>XYZ123456789</strong></p>
+            <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">Update Details</button>
+        </div>
+
+        <!-- Coverage Card -->
+        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Coverage Details</h2>
+            <p class="text-gray-600">Period: <strong>Jan 1, 2024 - Dec 31, 2024</strong></p>
+            <p class="text-gray-600">Coverage: <strong>Full medical, dental, and vision</strong></p>
+            <button class="mt-4 bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg">View Document</button>
+        </div>
+    </div>
+
+    <!-- Contact Information Table -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6 hover:shadow-xl transition-shadow duration-300">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Contact Information</h2>
+        <!-- Card Style for Each Contact Type -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Email Contact -->
+            <div class="bg-gray-100 p-4 rounded-lg flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 2a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2h8zm0 14a2 2 0 002-2v-1a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a2 2 0 012-2h1a2 2 0 002 2v1a2 2 0 002-2V4H8v8a2 2 0 002 2h6z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold">Email</h3>
+                    <p class="text-sm text-gray-600">support@greatinsurance.com</p>
+                </div>
+            </div>
+            <!-- Phone Contact -->
+            <div class="bg-gray-100 p-4 rounded-lg flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3a2 2 0 012 2v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm13 14a2 2 0 012-2h3a2 2 0 012 2v1a2 2 0 01-2 2h-3a2 2 0 01-2-2v-1zm-2-7a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2h-1a2 2 0 01-2-2v-1zm-6-2a2 2 0 00-2-2H5a2 2 0 00-2 2v1a2 2 0 002 2h3a2 2 0 002-2v-1zm2 7a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2h-1a2 2 0 01-2-2v-1zm4-12a2 2 0 012-2h1a2 2 0 012 2v1a2 2 0 01-2 2h-1a2 2 0 01-2-2V5z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold">Phone</h3>
+                    <p class="text-sm text-gray-600">+1 234 567 8900</p>
+                </div>
+            </div>
+        </div>
+        <!-- Additional Options -->
+        <div class="mt-4">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
+                Update Contact Info
+            </button>
+            <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg ml-4">
+                New Inquiry
+            </button>
+        </div>
+    </div>
+    
+
+    <!-- Drag and Drop Upload Section -->
+    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Upload Insurance Documents</h2>
+        <div class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l10 10m0-10L7 17m14 2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14z" />
+            </svg>
+            <p class="mt-2 text-sm text-gray-500">Drag and drop files here, or click to select files</p>
+            <input type="file" class="hidden" />
+        </div>
+    </div>
+</div>
 {% endblock %}

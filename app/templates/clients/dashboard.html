@@ -1,67 +1,179 @@
-{% extends 'clients/base.html' %}
-{% block navbar %}
-    {% include 'clients/navbar.html' %}
-{% endblock %}
-{% block content %}
+{% extends 'clients/base.html' %} {% block navbar %} {% include
+'clients/navbar.html' %} {% endblock %} {% block content %}
 <div class="p-4">
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{ first_name }} {{ last_name }}!</h1>
-        <p class="mt-1 text-gray-600 dark:text-gray-400">Your personalized health dashboard.</p>
+  <!-- Stylish Header -->
+  <div
+    class="bg-gradient-to-r from-blue-500 to-teal-500 p-6 rounded-lg shadow-lg mb-6 text-white"
+  >
+    <h1 class="text-3xl font-bold">
+      Welcome, {{ first_name }} {{ last_name }}!
+    </h1>
+    <p>
+      Explore your health dashboard to stay on top of appointments, medications,
+      and more.
+    </p>
+  </div>
+  <div class="grid grid-cols-3 gap-6">
+    <!-- General Styling -->
+    <style>
+      .dashboard-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      /* .dashboard-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            } */
+      .card-header {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+      .card-link {
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+      }
+      .card-link:hover {
+        text-decoration: underline;
+      }
+      .card-stats {
+        background: rgba(0, 123, 255, 0.1);
+        color: #007bff;
+        padding: 5px 10px;
+        border-radius: 10px;
+        font-weight: bold;
+      }
+      .card-content {
+        font-size: 14px;
+        color: #5f5e5e;
+      }
+    </style>
+
+    <!-- Appointments Card -->
+    <div class="dashboard-card p-4">
+      <div class="card-header">Upcoming Appointments</div>
+      <p class="card-content">
+        You have {{ total_appointments }} appointments scheduled. Don't miss
+        your next meeting!
+      </p>
+      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
+      <div class="flex justify-between items-center mt-1 mb-6">
+        <button
+          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
+        >
+          Total Appointments: {{ total_appointments }}
+        </button>
+        <a href="{{ url_for('patient.visits') }}" class="card-link"
+          >View Appointments →</a
+        >
+      </div>
     </div>
 
-    <!-- Lab Results -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Latest Lab Results</h2>
-        {% if lab_results %}
-            <ul>
-                {% for result in lab_results %}
-                    <li>{{ result.test_name }}: {{ result.value }} ({{ result.date }})</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No recent lab results.</p>
-        {% endif %}
+    <!-- Test Results Card -->
+    <div class="dashboard-card p-4">
+      <div class="card-header">Recent Test Results</div>
+      <p class="card-content">
+        Check out {{ total_tests }} new test results to stay updated on your
+        health condition.
+      </p>
+      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
+      <div class="flex justify-between items-center mt-1 mb-6">
+        <button
+          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
+        >
+          Total Test Results: {{ total_tests }}
+        </button>
+        <a href="{{ url_for('patient.visits') }}" class="card-link"
+          >Review Results →</a
+        >
+      </div>
     </div>
 
-    <!-- Appointments -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Upcoming Appointments</h2>
-        {% if appointments %}
-            <ul>
-                {% for appointment in appointments %}
-                    <li>{{ appointment.date }} with Dr. {{ appointment.doctor_name }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No appointments scheduled.</p>
-        {% endif %}
+    <!-- Medication Reminders Card -->
+    <div class="dashboard-card p-4">
+      <div class="card-header">Medication Reminders</div>
+      <p class="card-content">
+        Keep track of your medication schedule to ensure timely dosages.
+      </p>
+      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
+      <div class="flex justify-between items-center mt-1 mb-6">
+        <button
+          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
+        >
+          Medications: {{ total_medications }}
+        </button>
+        <a href="{{ url_for('patient.visits') }}" class="card-link"
+          >View Medications →</a
+        >
+      </div>
     </div>
 
-    <!-- Medications -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Current Medications</h2>
-        {% if medications %}
-            <ul>
-                {% for medication in medications %}
-                    <li>{{ medication.name }} - {{ medication.dose }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No current medications.</p>
-        {% endif %}
+    <!-- Health Tips Card -->
+    <div class="dashboard-card p-4">
+      <div class="card-header">Health Tips</div>
+      <p class="card-content">
+        Explore valuable health tips to improve your wellness and lifestyle.
+      </p>
+      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
+      <div class="flex justify-between items-center mt-1 mb-6">
+        <button
+          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
+        >
+          Health Tips: {{ total_tips }}
+        </button>
+        <a href="{{ url_for('patient.visits') }}" class="card-link"
+          >Health Tips →</a
+        >
+      </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Quick Links</h2>
-        <!-- <a href="{{ url_for('patient.update_info') }}" class="text-blue-500 hover:underline">Update Personal Info</a><br> -->
-        <a href="{{ url_for('patient.contact_health_provider') }}" class="text-blue-500 hover:underline">Contact Health Provider</a>
+    <!-- Insurance Information Card -->
+    <div class="dashboard-card p-4">
+      <div class="card-header">Insurance Details</div>
+      <p class="card-content">
+        Review your insurance coverage, update documents, and understand your
+        benefits.
+      </p>
+      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
+      <div class="flex justify-between items-center mt-1 mb-6">
+        <button
+          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
+        >
+          Insurance: {{ total_insurance }}
+        </button>
+        <a href="{{ url_for('patient.visits') }}" class="card-link"
+          >Insurance Details →</a
+        >
+      </div>
     </div>
 
-    <!-- Health Tips -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Health Tips</h2>
-        <p>Stay hydrated and remember to exercise regularly!</p>
+    <!-- Recent Visits Summary Card -->
+    <div class="dashboard-card p-4">
+      <div class="card-header">Recent Visits</div>
+      <p class="card-content">
+        Review details from your last visits and prepare for upcoming ones.
+      </p>
+      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
+      <div class="flex justify-between items-center mt-1 mb-6">
+        <button
+          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
+        >
+          Total Visits: {{ total_visits }}
+        </button>
+        <a href="{{ url_for('patient.visits') }}" class="card-link"
+          >Review Visits →</a
+        >
+      </div>
     </div>
+
+  </div>
 </div>
+
+
 {% endblock %}

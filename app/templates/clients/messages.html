@@ -1,24 +1,134 @@
-{% extends 'clients/base.html' %}
-{% block navbar %}
-{% include 'clients/navbar.html' %}
-{% endblock %}
-{% block content %}
-<h1>Send a Message to a Doctor</h1>
+{% extends 'clients/base.html' %} {% block navbar %} {% include
+'clients/navbar.html' %} {% endblock %} {% block content %}
+<div class="px-6 py-4">
+  <!-- Stylish Header -->
+  <div
+    class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-lg mb-6 text-white"
+  >
+    <h1 class="text-4xl font-bold">Your Health Dashboard</h1>
+    <p>
+      Manage appointments, track your medication, and communicate directly with
+      your healthcare providers.
+    </p>
+  </div>
 
-<form method="POST" action="{{ url_for('client.send_message') }}">
-    <div class="form-group">
-        <label for="doctor">Select Doctor:</label>
-        <select name="doctor_id" id="doctor" class="form-control" required>
-            {% for doctor in doctors %}
-                <option value="{{ doctor.id }}">{{ doctor.full_name }} - {{ doctor.specialization }}</option>
-            {% endfor %}
+  <!-- Main content grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <!-- Extended Message Box -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+      <div class="mb-6">
+        <label
+          for="doctor-select"
+          class="block text-sm font-medium text-gray-700"
+          >Choose your doctor:</label
+        >
+        <select
+          id="doctor-select"
+          class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-full bg-gray-200 text-gray-500"
+        >
+          <option value="">Select a doctor</option>
+          <!-- Assuming 'doctors' is defined -->
+          {% for doctor in doctors %}
+          <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+          {% else %}
+          <option disabled>No doctors available</option>
+          {% endfor %}
         </select>
+      </div>
+      <div class="mb-6">
+        <label for="message" class="block text-sm font-medium text-gray-700"
+          >Your Message:</label
+        >
+        <textarea
+          id="message"
+          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-4 bg-gray-100"
+          rows="20"
+          placeholder="Type your message here..."
+        ></textarea>
+      </div>
+      <button
+        class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        Send Message
+        <svg
+          class="-mr-1 ml-3 h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M14 5l7 7m0 0l-7 7m7-7H3"
+          ></path>
+        </svg>
+      </button>
     </div>
-    <div class="form-group">
-        <label for="content">Message Content:</label>
-        <textarea name="content" id="content" class="form-control" rows="5" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Send Message</button>
-</form>
 
-{% endblock %}
+    <!-- Doctor Status Table -->
+    <div class="lg:col-span-1 space-y-4">
+      <div class="p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold text-gray-900">Doctor Status</h2>
+        <table class="min-w-full mt-2">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                Name
+              </th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                Specialization
+              </th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(1, 9) %}
+            <tr class="{{ 'bg-white' if loop.index is odd else 'bg-gray-50' }}">
+              <td class="px-4 py-2 text-sm text-gray-800">
+                <div class="flex items-center">
+                  <img
+                    class="w-8 h-8 rounded-full"
+                    src="https://i.pravatar.cc/300?img={{ i }}"
+                    alt=""
+                  />
+                  <span class="ml-2">Dr. Name {{ i }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-2 text-sm text-gray-800">
+                Specialist {{ i }}
+              </td>
+              <td class="px-4 py-2 text-sm text-gray-800">
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800' if i is even else 'bg-red-100 text-red-800' }}"
+                >
+                  {{ 'Active' if i is even else 'Inactive' }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    <!-- Recent Messages Section -->
+    <div class="bg-white p-10 rounded-lg shadow-lg mb-4">
+        <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm transition duration-300 ease-in-out hover:shadow-md">
+            <img
+                class="w-12 h-12 rounded-full"
+                src="https://i.pravatar.cc/300?img=1"
+                alt="Dr. Name 1"
+            />
+            <div class="flex-1">
+                <span class="block font-semibold text-gray-800">Dr. Name 1</span>
+                <p class="text-gray-600">Hello, how can I help you today?</p>
+            </div>
+        </div>
+        <!-- Additional messages can be similarly formatted below -->
+    </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+</div>
