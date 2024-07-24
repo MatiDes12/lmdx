@@ -12,7 +12,7 @@
         <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Email Verification Sent</h2>
 
         <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
-            Hi {{ session['user_data']['full_name'] }},
+            Hi {{ session['user_data']['name'] if session['user_data'] else 'User' }},
         </p>
 
         <p class="mt-2 leading-loose text-gray-600 dark:text-gray-300">
