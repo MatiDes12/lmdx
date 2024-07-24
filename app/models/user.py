@@ -27,15 +27,15 @@
 #     name = db.Column(db.String(64), nullable=False)
 #     email = db.Column(db.String(120), unique=True, nullable=False)
 
-from app import sqlalchemy_db as db
-from flask_login import UserMixin
+# from app import sqlalchemy_db as db
+# from flask_login import UserMixin
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    firebase_uid = db.Column(db.String(128), unique=True, nullable=False)
-    name = db.Column(db.String(64), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)  # Ensure you have a password field
-    theme = db.Column(db.String(20), default='light')  # Example of additional fields
-    language = db.Column(db.String(20), default='en')
-    timezone = db.Column(db.String(20), default='UTC')
+# class User(UserMixin, db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     firebase_uid = db.Column(db.String(128), unique=True, nullable=False)
+#     name = db.Column(db.String(64), nullable=False)
+#     email = db.Column(db.String(120), unique=True, nullable=False)
+#     password = db.Column(db.String(128), nullable=False)  # Ensure you have a password field
+#     theme = db.Column(db.String(20), default='light')  # Example of additional fields
+#     language = db.Column(db.String(20), default='en')
+#     timezone = db.Column(db.String(20), default='UTC')

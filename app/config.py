@@ -1,4 +1,8 @@
 import os
+import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
     REMEMBER_COOKIE_DURATION = 86400 * 30  # 30 days
@@ -6,16 +10,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///healthcare.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'filesystem'
-    FIREBASE_CONFIG = {
-        "apiKey": "AIzaSyB52onJLQevCBAm710igMO_ulhnQh0-D1E",
-        "authDomain": "luminamedix.firebaseapp.com",
-        "databaseURL": "https://luminamedix-default-rtdb.firebaseio.com",
-        "projectId": "luminamedix",
-        "storageBucket": "luminamedix.appspot.com",
-        "messagingSenderId": "156575457708",
-        "appId": "1:156575457708:web:0eb4bab2af9f56be075a09",
-        "measurementId": "G-1WGTMYMV1D"
-    }
+    FIREBASE_CONFIG = json.loads(os.environ.get('FIREBASE_CONFIG', '{}'))
     UPLOAD_FOLDER = 'uploads/'
     MAX_CONTENT_LENGTH = 16 * 1000 * 1000  # 16 MB limit
 

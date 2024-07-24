@@ -1,132 +1,214 @@
+from app import sqlalchemy_db as db
 from datetime import datetime
-from . import sqlalchemy_db as db
 
-class DoctorAccounts(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    special_email = db.Column(db.String(120), unique=True, nullable=False)
-    organization = db.Column(db.String(120), nullable=False)
-    phone_number = db.Column(db.String(20), nullable=True)  # Optional phone number
+# import logging
+# logging.basicConfig(level=logging.DEBUG)
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
 
-    def __repr__(self):
-        return f'<Doctor {self.full_name} | Email: {self.email} | Special Email: {self.special_email} | Organization: {self.organization} | Phone: {self.phone_number}>'
+
+class User(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    user_type = db.Column(db.Enum('patient', 'doctor', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Role(db.Model):
+    role_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    role_name = db.Column(db.String(50), unique=True, nullable=False)
+
+class Permission(db.Model):
+    permission_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    permission_name = db.Column(db.String(100), unique=True, nullable=False)
+
+class UserRole(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'), primary_key=True)
+
+class RolePermission(db.Model):
+    role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'), primary_key=True)
+    permission_id = db.Column(db.Integer, db.ForeignKey('permission.permission_id'), primary_key=True)
+
+class AuditLog(db.Model):
+    log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    action = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ClientAccounts(db.Model):
+    __tablename__ = 'client_accounts'
+    client_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    phone_number = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_on': 'type',
+        'polymorphic_identity': 'client'
+    }
+    type = db.Column(db.String(50), nullable=False)
+
+class Patient(ClientAccounts):
+    __tablename__ = 'patients'
+    patient_id = db.Column(db.Integer, db.ForeignKey('client_accounts.client_id'), primary_key=True)
+    dob = db.Column(db.Date)
+    insurance_number = db.Column(db.String(100))
+    gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'patient'
+    }
+
+class DoctorAccounts(db.Model):
+    __tablename__ = 'doctor_accounts'
+    doctor_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    specialization = db.Column(db.String(100), nullable=False)
+    license_number = db.Column(db.String(50), unique=True, nullable=False)
+    phone_number = db.Column(db.String(20))
+
+    __mapper_args__ = {
+        'polymorphic_on': 'type',
+        'polymorphic_identity': 'doctor_account'
+    }
+    type = db.Column(db.String(50), nullable=False)
+
+class Doctor(DoctorAccounts):
+    __tablename__ = 'doctors'
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone_number = db.Column(db.String(20), nullable=True)  # Optional phone number
-
-    def __repr__(self):
-        return f'<Client {self.first_name} {self.last_name} | Email: {self.email} | Phone: {self.phone_number}>'
-
-
-class Doctor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    specialization = db.Column(db.String(100))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_accounts.doctor_id'), primary_key=True)
     status = db.Column(db.String(20))
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
-    
-    patients = db.relationship('Patient', backref='doctor', lazy=True)
-    appointments = db.relationship('Appointment', backref='doctor', lazy=True)
 
-    def __repr__(self):
-        return f'<Doctor {self.name}>'
+    __mapper_args__ = {
+        'polymorphic_identity': 'doctor'
+    }
+
+class Staff(db.Model):
+    staff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    position = db.Column(db.String(100), nullable=False)
+    department = db.Column(db.String(100), nullable=False)
 
 class Appointment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
-    time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(50))
+    appointment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Ensure this matches the actual table name
+    appointment_date = db.Column(db.Date, nullable=False)
+    appointment_time = db.Column(db.Time, nullable=False)
+    status = db.Column(db.Enum('Scheduled', 'Completed', 'Cancelled', name='appointment_status_enum'), default='Scheduled')
+    reason = db.Column(db.Text)
     notes = db.Column(db.Text)
 
-    def __repr__(self):
-        return f'<Appointment {self.id}>'
-    
-    
-class Patient(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    blood_type = db.Column(db.String(3))
-    height = db.Column(db.Float)
-    weight = db.Column(db.Float)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'))
-    admission_date = db.Column(db.DateTime, default=datetime.utcnow)
-    last_visit = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(20))
-    email = db.Column(db.String(120), unique=True)
-    medical_history = db.Column(db.Text)
-    phone_number = db.Column(db.String(20))
 
-    appointments = db.relationship('Appointment', backref='patient', lazy=True)
+class LabTest(db.Model):
+    test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    test_name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
 
-    def __repr__(self):
-        return f'<Patient {self.name}>'
+class LabResult(db.Model):
+    result_id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'))
+    test_id = db.Column(db.Integer, db.ForeignKey('lab_test.test_id'))
+    result_value = db.Column(db.Text, nullable=False)
+    result_date = db.Column(db.Date, nullable=False)
+    notes = db.Column(db.Text)
 
+class InsuranceProvider(db.Model):
+    provider_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    provider_name = db.Column(db.String(255), nullable=False)
+    contact_info = db.Column(db.Text)
+
+class PatientInsurance(db.Model):
+    patient_insurance_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))  # Ensure this references the polymorphic 'patients' table correctly
+    provider_id = db.Column(db.Integer, db.ForeignKey('insurance_provider.provider_id'))
+    policy_number = db.Column(db.String(100), nullable=False)
+    coverage_details = db.Column(db.Text)
+
+
+class Billing(db.Model):
+    billing_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.appointment_id'))
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
+    billing_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.Enum('Pending', 'Paid', 'Overdue', name='billing_status_enum'), default='Pending')
+
+class Inventory(db.Model):
+    inventory_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    item_name = db.Column(db.String(255), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    unit_price = db.Column(db.Numeric(10, 2), nullable=False)
+    supplier = db.Column(db.String(255))
+    last_restocked = db.Column(db.Date)
+
+class Medication(db.Model):
+    medication_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    dosage = db.Column(db.String(100))
+    manufacturer = db.Column(db.String(255))
+
+class Prescription(db.Model):
+    prescription_id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'))
+    medication_id = db.Column(db.Integer, db.ForeignKey('medication.medication_id'))
+    dosage = db.Column(db.String(100), nullable=False)
+    frequency = db.Column(db.String(100), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+
+class Room(db.Model):
+    room_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    room_number = db.Column(db.String(20), unique=True, nullable=False)
+    room_type = db.Column(db.Enum('Ward', 'Private', 'ICU', 'Operating', name='room_type_enum'), nullable=False)
+    capacity = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Enum('Available', 'Occupied', 'Maintenance', name='room_status_enum'), default='Available')
+
+class PatientRoom(db.Model):
+    patient_room_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
+    check_in_date = db.Column(db.Date, nullable=False)
+    check_out_date = db.Column(db.Date)
 
 
 class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    message_type = db.Column(db.String(10), nullable=False)  # 'email' or 'sms'
-    content = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), nullable=False)  # 'sent' or 'failed'
+    message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    subject = db.Column(db.String(255))
+    body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    patient = db.relationship('Patient', backref='messages')
+class Organization(db.Model):
+    org_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
+    contact_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    special_email = db.Column(db.String(255), unique=True, nullable=True)
+    organization = db.Column(db.String(100), nullable=False)
+    phone_number = db.Column(db.String(20), nullable=True)
+    state = db.Column(db.String(100), nullable=True)
+    department = db.Column(db.String(100), nullable=True)
+    license_number = db.Column(db.String(50), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-class Vitals(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    date_recorded = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    blood_pressure = db.Column(db.String(20))
-    heart_rate = db.Column(db.Integer)
-    respiratory_rate = db.Column(db.Integer)
-    temperature = db.Column(db.Float)
-    oxygen_saturation = db.Column(db.Integer)
-
-    def __repr__(self):
-        return f'<Vitals {self.id}>'
-
-class Medication(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    name = db.Column(db.String(100), nullable=False)
-    dosage = db.Column(db.String(100), nullable=False)
-    frequency = db.Column(db.String(100), nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime)
-
-    def __repr__(self):
-        return f'<Medication {self.id}>'
-
-class LabResult(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    test_name = db.Column(db.String(100), nullable=False)
-    result_value = db.Column(db.String(100), nullable=False)
-    units = db.Column(db.String(20))
-    reference_range = db.Column(db.String(100))
-    date_conducted = db.Column(db.DateTime, nullable=False)
-
-    def __repr__(self):
-        return f'<LabResult {self.id}>'
-
-class Surgery(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    surgery_name = db.Column(db.String(100), nullable=False)
-    surgery_date = db.Column(db.DateTime, nullable=False)
-    surgeon_name = db.Column(db.String(100))
-    notes = db.Column(db.Text)
-
-    def __repr__(self):
-        return f'<Surgery {self.id}>'
+    def __init__(self, contact_name, email, special_email, organization, phone_number, state, department):
+        self.contact_name = contact_name
+        self.email = email
+        self.special_email = special_email
+        self.organization = organization
+        self.phone_number = phone_number
+        self.state = state
+        self.department = department

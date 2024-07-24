@@ -33,16 +33,16 @@ def create_app():
     mail.init_app(app)
 
     # Initialize Firebase Admin SDK if not already initialized
-    if not firebase_admin._apps:
-        cred = credentials.Certificate("app/config/firebase-adminsdk.json")
-        firebase_admin.initialize_app(cred)
+    # if not firebase_admin._apps:
+    #     cred = credentials.Certificate("app/config/firebase-adminsdk.json")
+    #     firebase_admin.initialize_app(cred)
 
     # Import and register blueprints
-    from .routes import auth, dashboard, main, upload, client
+    from .routes import auth, dashboard, main, upload, patient
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp, url_prefix='/dashboard')
     app.register_blueprint(main.main_bp)
     app.register_blueprint(upload.bp, url_prefix='/upload')
-    app.register_blueprint(client.bp, url_prefix='/client')
+    app.register_blueprint(patient.bp, url_prefix='/patient')
     
     return app

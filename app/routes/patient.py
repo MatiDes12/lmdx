@@ -1,23 +1,16 @@
-from flask import Blueprint, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Patient, Appointment, Message, LabResult, Medication
-from .. import sqlalchemy_db as db
-from datetime import datetime
-from app.routes.auth import firebase_db
 
-bp = Blueprint('client', __name__)
-
-
+from mailbox import Message
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Patient, Appointment
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from app.routes.auth import firebase_db
 
-bp = Blueprint('client', __name__)
+bp = Blueprint('patient', __name__)
 
 @bp.route('/dashboard')
 def dashboard():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
     user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
@@ -37,10 +30,12 @@ def dashboard():
         flash('Error accessing user information.', 'error')
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
+    
+
 
 @bp.route('/appointments', methods=['GET'])
 def appointments():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
     doctors = Doctor.query.all()
@@ -48,7 +43,7 @@ def appointments():
 
 @bp.route('/make_appointment', methods=['POST'])
 def make_appointment():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
     user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
@@ -59,7 +54,7 @@ def make_appointment():
     
     if not all([doctor_id, date, time]):
         flash('All fields are required.', 'error')
-        return redirect(url_for('client.appointments'))
+        return redirect(url_for('patient.appointments'))
 
     appointment_date = datetime.strptime(date, '%Y-%m-%d')
     appointment_time = datetime.strptime(time, '%H:%M').time()
@@ -81,14 +76,14 @@ def make_appointment():
         flash('Error making appointment.', 'error')
         print(f"Appointment creation error: {e}")
     
-    return redirect(url_for('client.dashboard'))
+    return redirect(url_for('patient.dashboard'))
 
 
 
 
 @bp.route('/messages', methods=['GET'])
 def messages():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
 
     doctors = Doctor.query.all()
@@ -97,7 +92,7 @@ def messages():
 
 @bp.route('/send_message', methods=['POST'])
 def send_message():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
 
     doctor_id = request.form.get('doctor_id')
@@ -106,7 +101,7 @@ def send_message():
 
     if not doctor_id or not content:
         flash('All fields are required.', 'danger')
-        return redirect(url_for('client.messages'))
+        return redirect(url_for('patient.messages'))
 
     message = Message(
         patient_id=patient_id,
@@ -120,37 +115,37 @@ def send_message():
     db.session.commit()
 
     flash('Message sent successfully!', 'success')
-    return redirect(url_for('client.messages'))
+    return redirect(url_for('patient.messages'))
 
 
 
 @bp.route('/test_results')
 def test_results():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     return render_template('clients/test_results.html')
 
 @bp.route('/medication')
 def medication():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     return render_template('clients/medication.html')
 
 @bp.route('/visits')
 def visits():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     return render_template('clients/visits.html')
 
 
 @bp.route('/billing')
 def billing():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     return render_template('clients/billing.html')
 
 @bp.route('/insurance')
 def insurance():
-    if 'user' not in session or session.get('user_type') != 'client':
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     return render_template('clients/insurance.html')
