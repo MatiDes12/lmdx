@@ -38,11 +38,12 @@ def create_app():
     #     firebase_admin.initialize_app(cred)
 
     # Import and register blueprints
-    from .routes import auth, dashboard, main, upload, patient
+    from .routes import auth, dashboard, main, upload, patient, contact
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp, url_prefix='/dashboard')
     app.register_blueprint(main.main_bp)
     app.register_blueprint(upload.bp, url_prefix='/upload')
     app.register_blueprint(patient.bp, url_prefix='/patient')
+    app.register_blueprint(contact.bp, url_prefix='/contact')
     
     return app
