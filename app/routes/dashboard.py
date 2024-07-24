@@ -43,7 +43,7 @@ def organization_dashboard():
 
     try:
         # Fetch doctor data from Firebase
-        doctor_data = firebase_db.child("DoctorAccounts").child(user_id).get(token=id_token).val()
+        doctor_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
         if doctor_data:
             doctor_name = doctor_data.get('name')
             total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs

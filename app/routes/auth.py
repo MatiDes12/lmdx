@@ -107,24 +107,29 @@ def signup():
 
             # Save additional data to the Firebase database based on user type
             if user_type == 'organization':
-                firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token)
+                firebase_db.child("Organization").child(user['localId']).set(user_data, token=id_token)
+                
+                try:
+                    # Attempt to add the new organization to the session and commit
+                    new_organization = Organization(
+                    user_id=new_user.user_id,
+                    contact_name=name,
+                    email=email,
+                    special_email=None,
+                    organization=org_name,
+                    phone_number=phone_number,
+                    state=state,
+                    department=None,
+                    license_number=license_number
+                    )
+                    db.session.add(new_organization)
+                    db.session.commit()
 
-                # Create a new Doctor record in SQLAlchemy
-                new_organization = Organization(
-                user_id=new_user.user_id,
-                contact_name=name,
-                email=email,
-                special_email= None,
-                organization=org_name,
-                phone_number=phone_number,
-                state=state,
-                department= None,
-                license_number=license_number,
-                created_at=datetime.utcnow()
-                )
-               
-                db.session.add(new_organization)
-                db.session.commit()
+                    print("Organization added successfully.")
+                except Exception as e:
+                    print(f"Failed to add organization: {e}")
+                    db.session.rollback()
+
 
             if user_type == 'patient':
                 firebase_db.child("ClientAccounts").child(user['localId']).set(user_data, token=id_token)
@@ -174,7 +179,7 @@ def signin():
             user_id = user_info['users'][0]['localId']
 
             # Check if the user is a doctor
-            doctor_data = firebase_db.child("DoctorAccounts").child(user_id).get(token=id_token).val()
+            doctor_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
             if doctor_data:
                 user_type = 'organization'
 
@@ -334,3 +339,6 @@ def resend_verification_email():
         return {'status': 'success', 'message': 'Verification email sent'}
     except Exception as e:
         return {'status': 'error', 'message': str(e)}, 400
+    
+    
+    

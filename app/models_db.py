@@ -192,6 +192,7 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Organization(db.Model):
+    __tablename__ = 'organization'
     org_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
     contact_name = db.Column(db.String(100), nullable=False)
@@ -204,7 +205,8 @@ class Organization(db.Model):
     license_number = db.Column(db.String(50), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-    def __init__(self, contact_name, email, special_email, organization, phone_number, state, department):
+    def __init__(self, user_id, contact_name, email, organization, phone_number, state, department, special_email, license_number):
+        self.user_id = user_id
         self.contact_name = contact_name
         self.email = email
         self.special_email = special_email
@@ -212,3 +214,4 @@ class Organization(db.Model):
         self.phone_number = phone_number
         self.state = state
         self.department = department
+        self.license_number = license_number
