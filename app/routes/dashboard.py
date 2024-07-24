@@ -45,9 +45,9 @@ def doctor_dashboard():
         # Fetch doctor data from Firebase
         doctor_data = firebase_db.child("DoctorAccounts").child(user_id).get(token=id_token).val()
         if doctor_data:
-            doctor_name = doctor_data.get('name')
-            total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
-            total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
+            doctor_name = doctor_data.get('full_name')
+            # total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
+            # total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
 
             return render_template('doctors/dashboard.html',
                                    doctor_name=doctor_name,
