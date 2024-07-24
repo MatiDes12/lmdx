@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 <h2>Make an Appointment</h2>
-<form method="post" action="{{ url_for('client.make_appointment') }}">
+<form method="post" action="{{ url_for('patient.make_appointment') }}">
     <div>
         <label for="doctor">Select Doctor:</label>
         <select name="doctor_id" id="doctor" required>

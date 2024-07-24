@@ -1,7 +1,7 @@
 
 from mailbox import Message
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Patient, Appointment
+from ..models_db import Doctor, Patient, Appointment, User
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from app.routes.auth import firebase_db
@@ -31,6 +31,24 @@ def dashboard():
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
     
+@bp.route('/fetch_user_info')
+def fetch_user_info():
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            raise ValueError("User ID not found in session")
+
+        user_info = User.query.filter_by(id=user_id).first()
+        if not user_info:
+            raise ValueError("No user found with the given ID")
+
+        return render_template('user_info.html', user=user_info)
+
+    except Exception as e:
+        # Log the error for further investigation
+        print(f"Error accessing user information: {e}")
+        flash('Error accessing user information.', 'error')
+        return redirect(url_for('auth.login'))  # Redirect to login or appropriate error page
 
 
 @bp.route('/appointments', methods=['GET'])
