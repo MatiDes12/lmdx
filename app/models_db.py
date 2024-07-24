@@ -22,7 +22,6 @@ class ClientAccounts(db.Model):
     def __repr__(self):
         return f'<Client {self.first_name} {self.last_name} | Email: {self.email} | Phone: {self.phone_number}>'
 
-
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -30,25 +29,26 @@ class Doctor(db.Model):
     status = db.Column(db.String(20))
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
-    
+    is_scheduled = db.Column(db.Boolean, default=False)  # New field to track scheduling
+
     patients = db.relationship('Patient', backref='doctor', lazy=True)
     appointments = db.relationship('Appointment', backref='doctor', lazy=True)
 
     def __repr__(self):
         return f'<Doctor {self.name}>'
 
+    def get_active_appointment(self):
+        return next((appt for appt in self.appointments if appt.status == 'Scheduled'), None)
+
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(50))
-    notes = db.Column(db.Text)
+    status = db.Column(db.String(20), nullable=False, default='Scheduled')
+    notes = db.Column(db.String(200))
 
-    def __repr__(self):
-        return f'<Appointment {self.id}>'
-    
     
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)

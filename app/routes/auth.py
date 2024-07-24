@@ -1,11 +1,15 @@
+from mailbox import Message
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import pyrebase
 from firebase_admin import auth
 import requests
 from app.config import Config
 from app import sqlalchemy_db as db
-from ..models_db import ClientAccounts, DoctorAccounts
+from ..models_db import ClientAccounts, DoctorAccounts, Doctor
 
+from flask_mail import Mail
+
+mail = Mail()
 bp = Blueprint('auth', __name__)
 
 firebase = None  # Define firebase variable globally
@@ -22,7 +26,6 @@ initialize_firebase()
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     user_type = request.args.get('type', 'patient')  # Default to 'patient' if not specified
-    error = None
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -30,82 +33,104 @@ def signup():
         phone_number = request.form['phone_number']
 
         if password != confirm_password:
-            error = 'Passwords do not match.'
+            return render_template('auth/signup.html', user_type=user_type) + '''
+                <script>
+                    showFlashMessage('Passwords do not match.', 'red');
+                </script>
+            '''
         elif len(password) < 8:
-            error = 'Password must be at least 8 characters long.'
+            return render_template('auth/signup.html', user_type=user_type) + '''
+                <script>
+                    showFlashMessage('Password must be at least 8 characters long.', 'red');
+                </script>
+            '''
 
         if user_type == 'doctor':
             name = request.form['name']
             org_name = request.form['org_name']
             if not name or len(name) < 6:
-                error = 'Username must be at least 6 characters long for doctors.'
+                return render_template('auth/signup.html', user_type=user_type) + '''
+                    <script>
+                        showFlashMessage('Username must be at least 6 characters long for doctors.', 'red');
+                    </script>
+                '''
             user_data = {'full_name': name, 'email': email, 'organization': org_name, 'phone_number': phone_number}
-
         else:
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
             if not first_name or not last_name or len(first_name) < 2 or len(last_name) < 2:
-                error = 'Both first name and last name are required for clients and must be at least 2 characters long.'
+                return render_template('auth/signup.html', user_type=user_type) + '''
+                    <script>
+                        showFlashMessage('Both first name and last name are required for clients and must be at least 2 characters long.', 'red');
+                    </script>
+                '''
             user_data = {'first_name': first_name, 'last_name': last_name, 'email': email, 'phone_number': phone_number}
 
-        if error is None:
+        try:
+            # Check if the email already exists
             try:
-                # Check if the email already exists
-                try:
-                    existing_user = firebase.auth().get_account_info(email)
-                    error = 'The email address is already in use by another account.'
-                except:
-                    # If the email does not exist, proceed to create the user
-                    pass
-                
-                if not error:
-                    # Create user in Firebase Authentication
-                    user = firebase.auth().create_user_with_email_and_password(email, password)
-                    id_token = user['idToken']
-                    refresh_token = user['refreshToken']
-                    
-                    # Send email verification
-                    firebase.auth().send_email_verification(id_token)
+                existing_user = firebase.auth().get_account_info(email)
+                return render_template('auth/signup.html', user_type=user_type) + '''
+                    <script>
+                        showFlashMessage('The email address is already in use by another account.', 'red');
+                    </script>
+                '''
+            except:
+                # If the email does not exist, proceed to create the user
+                pass
 
-                    # Save additional data to the Firebase database based on user type
-                    if user_type == 'doctor':
-                        firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token)
+            # Create user in Firebase Authentication
+            user = firebase.auth().create_user_with_email_and_password(email, password)
+            id_token = user['idToken']
+            refresh_token = user['refreshToken']
 
-                        # Create a new Doctor record in SQLAlchemy
-                        new_doctor = DoctorAccounts(
-                            full_name=name,
-                            email=email,
-                            special_email=email,
-                            organization=org_name,
-                            phone_number=phone_number
-                        )
-                        db.session.add(new_doctor)
-                    else:
-                        firebase_db.child("ClientAccounts").child(user['localId']).set(user_data, token=id_token)
-                        
-                        # Create a new Client record in SQLAlchemy
-                        new_client = ClientAccounts(
-                            first_name=first_name,
-                            last_name=last_name,
-                            email=email,
-                            phone_number=phone_number
-                        )
-                        db.session.add(new_client)
+            # Send email verification
+            firebase.auth().send_email_verification(id_token)
 
-                    db.session.commit()
+            # Save additional data to the Firebase database based on user type
+            if user_type == 'doctor':
+                firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token)
 
-                    session['user_type'] = user_type
-                    session['user_id_token'] = id_token
-                    session['refresh_token'] = refresh_token
-                    session['local_id'] = user['localId']
-                    session['user_data'] = user_data
-                    return redirect(url_for('auth.check_verification'))  # Redirect to verification check
+                # Create a new Doctor record in SQLAlchemy
+                new_doctor = DoctorAccounts(
+                    full_name=name,
+                    email=email,
+                    special_email=email,
+                    organization=org_name,
+                    phone_number=phone_number
+                )
+                db.session.add(new_doctor)
+            else:
+                firebase_db.child("ClientAccounts").child(user['localId']).set(user_data, token=id_token)
 
-            except Exception as e:
-                db.session.rollback()
-                error = str(e)
-                
-    return render_template('auth/signup.html', error=error, user_type=user_type)
+                # Create a new Client record in SQLAlchemy
+                new_client = ClientAccounts(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phone_number=phone_number
+                )
+                db.session.add(new_client)
+
+            db.session.commit()
+
+            session['user_type'] = user_type
+            session['user_id_token'] = id_token
+            session['refresh_token'] = refresh_token
+            session['local_id'] = user['localId']
+            session['user_data'] = user_data
+            return redirect(url_for('auth.check_verification'))  # Redirect to verification check
+
+        except Exception as e:
+            db.session.rollback()
+            return render_template('auth/signup.html', user_type=user_type) + f'''
+                <script>
+                    showFlashMessage('Error: {str(e)}', 'red');
+                </script>
+            '''
+    return render_template('auth/signup.html', user_type=user_type)
+
+
 
 @bp.route('/signin', methods=['GET', 'POST'])
 def signin():
@@ -133,8 +158,11 @@ def signin():
                 if client_data:
                     user_type = 'client'
                 else:
-                    flash('Invalid email or password', 'danger')
-                    return redirect(url_for('auth.signin'))
+                    return render_template('auth/signin.html') + '''
+                        <script>
+                            showFlashMessage('Invalid email or password', 'red');
+                        </script>
+                    '''
 
             # Debug: Output user type
             print(f"User Type: {user_type}")
@@ -150,12 +178,19 @@ def signin():
                 session['user_id'] = user_id  # Store user_id in session
                 return redirect(url_for(f'dashboard.{user_type}_dashboard'))
             else:
-                flash('Please verify your email before signing in.', 'warning')
-                return redirect(url_for('auth.signin'))
+                return render_template('auth/signin.html') + '''
+                    <script>
+                        showFlashMessage('Please verify your email before signing in.', 'yellow');
+                    </script>
+                '''
         except Exception as e:
             # Debug: Output error
             print(f"Sign-in error: {e}")
-            flash('Invalid email or password', 'danger')
+            return render_template('auth/signin.html') + '''
+                <script>
+                    showFlashMessage('Invalid email or password', 'red');
+                </script>
+            '''
     return render_template('auth/signin.html')
 
 @bp.route('/logout')
@@ -195,42 +230,70 @@ def refresh_id_token(refresh_token):
 
 @bp.route('/check-verification')
 def check_verification():
-    # Check if user ID token is in session
-    if 'user_id_token' not in session:
-        # If not in session, redirect to sign in page with a flash message
+    if 'user_id_token' not in session or 'user_type' not in session:
         flash('Please sign in to continue.', 'warning')
         return redirect(url_for('auth.signin'))
 
     try:
-        # Get the user ID token from the session
         id_token = session['user_id_token']
+        user_type = session['user_type']
+        local_id = session['local_id']
+        user_data = session['user_data']
 
-        # Refresh ID token to ensure it is up-to-date
         refreshed_data = refresh_id_token(session['refresh_token'])
         if refreshed_data is None:
             flash('Failed to refresh ID token. Please try signing in again.', 'danger')
             return redirect(url_for('auth.signin'))
 
-        # Update session with new ID token and refresh token
         session['user_id_token'] = refreshed_data['id_token']
         session['refresh_token'] = refreshed_data['refresh_token']
 
-        # Get user info with refreshed ID token
         user_info = firebase.auth().get_account_info(session['user_id_token'])
         email_verified = user_info['users'][0]['emailVerified']
 
-        # Check if the email is verified
         if email_verified:
-            # If verified, redirect to the appropriate dashboard
-            return redirect(url_for(f'dashboard.{session["user_type"]}_dashboard'))
+            if user_type == 'doctor':
+                name = user_data['full_name']
+                name_parts = name.split()
+                special_email = f"{name_parts[0]}.{name_parts[-1]}@lmdx.com".lower()
+                special_email = special_email.replace('..', '.')
+
+                auth.update_user(local_id, email=special_email)
+
+                firebase_db.child("special_emails").child(local_id).set({'special_email': special_email}, token=id_token)
+
+                send_special_email_notification(user_data['email'], special_email)
+                flash(f'Please use your new email {special_email} for future logins.', 'success')
+            return redirect(url_for('auth.signin'))
         else:
-            # If not verified, render the check verification page to allow user to request another verification email
-            flash('Your email is not verified. Please verify your email.', 'warning')
             return render_template('auth/check_verification.html')
     except Exception as e:
-        # If there are any errors, display them and redirect to sign in
         flash(f'Error during verification check: {str(e)}', 'danger')
         return redirect(url_for('auth.signin'))
+
+def send_special_email_notification(personal_email, special_email):
+    msg = Message('Your New Luminamedix Email', recipients=[personal_email])
+    msg.body = f"Dear Doctor,\n\nYour new email for signing in to Luminamedix is {special_email}.\nPlease use this email for all future logins.\n\nBest regards,\nLuminamedix Team"
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print(f"Failed to send email: {str(e)}")
+        return f"An error occurred while sending the email: {str(e)}"
+
+def refresh_id_token(refresh_token):
+    try:
+        refresh_url = f"https://securetoken.googleapis.com/v1/token?key={Config.FIREBASE_CONFIG['apiKey']}"
+        payload = {
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token
+        }
+        response = requests.post(refresh_url, data=payload)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Error refreshing ID token: {e}")
+        return None
+
         
 
 @bp.route('/resend-verification-email', methods=['POST'])
@@ -244,7 +307,6 @@ def resend_verification_email():
         return {'status': 'success', 'message': 'Verification email sent'}
     except Exception as e:
         return {'status': 'error', 'message': str(e)}, 400
-
 
 
 # from flask import Blueprint, render_template, request, redirect, url_for, flash, session

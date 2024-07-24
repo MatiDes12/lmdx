@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 import firebase_admin
 from firebase_admin import credentials
+import json
 
 # Initialize extensions
 sqlalchemy_db = SQLAlchemy()
@@ -32,10 +33,6 @@ def create_app():
     Session(app)
     mail.init_app(app)
 
-    # Initialize Firebase Admin SDK if not already initialized
-    if not firebase_admin._apps:
-        cred = credentials.Certificate("app/config/firebase-adminsdk.json")
-        firebase_admin.initialize_app(cred)
 
     # Import and register blueprints
     from .routes import auth, dashboard, main, upload, client

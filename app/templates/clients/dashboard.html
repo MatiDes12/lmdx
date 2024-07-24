@@ -94,30 +94,7 @@
         </div>
     </div>
   
-    <!-- Tasks/Reminders Section -->
-    <div class="grid grid-cols-3 gap-4 mt-4">
-        <!-- Pending Tasks -->
-        <div class="col-span-1">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Pending Tasks</h2>
-            <div class="space-y-2">
-                <!-- Example Task -->
-                <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="task" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Complete patient report</label>
-                </div>
-                <!-- Add more tasks as needed -->
-                <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="task" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Review new patient applications</label>
-                </div>
-                <!-- Add more tasks as needed -->
-                <div class="flex items center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="task" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Schedule staff meeting</label>
-                </div>
-            </div>
-        </div>
-  
+    <div class="grid grid-cols-3 gap-4">
         <!-- Quick Links Section -->
         <div class="col-span-1">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Quick Links</h2>
@@ -147,16 +124,19 @@
         <div class="col-span-1">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Upcoming Appointments</h2>
             <div class="space-y-2">
-                <!-- Example Appointment -->
+                {% for appointment in appointments %}
                 <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">John Doe - 3:00 PM</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ appointment.doctor.name }} - {{ appointment.time.strftime('%I:%M %p') }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ appointment.date.strftime('%B %d, %Y') }}</p>
                 </div>
-                <!-- Add more appointments as needed -->
+                {% else %}
                 <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">Jane Smith - 4:00 PM</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">No scheduled appointments.</p>
                 </div>
+                {% endfor %}
             </div>
         </div>
+        
   
         <!-- Staff Schedules Section -->
         <div class="col-span-1">
@@ -172,22 +152,8 @@
                 </div>
             </div>
         </div>
-  
-        <!-- Patient Statistics Section -->
-        <div class="col-span-1">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Patient Statistics</h2>
-            <div class="space-y-2">
-                <!-- Example Statistic -->
-                <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">Admitted: 120</p>
-                </div>
-                <!-- Add more statistics as needed -->
-                <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">Discharged: 80</p>
-                </div>
-            </div>
-        </div>
     </div>
+    
   </div>
                 
 {% endblock %}
