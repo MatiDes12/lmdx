@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ec7969cac943
+Revision ID: 068dba61a274
 Revises: 
-Create Date: 2024-07-23 20:26:00.500549
+Create Date: 2024-07-24 23:33:51.922393
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ec7969cac943'
+revision = '068dba61a274'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -72,7 +72,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
-    sa.Column('user_type', sa.Enum('patient', 'doctor', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False),
+    sa.Column('user_type', sa.Enum('patient', 'doctors', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email')
@@ -99,7 +99,7 @@ def upgrade():
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('user_id')
     )
-    op.create_table('doctor_accounts',
+    op.create_table('doctors',
     sa.Column('doctor_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('first_name', sa.String(length=100), nullable=False),
@@ -107,7 +107,9 @@ def upgrade():
     sa.Column('specialization', sa.String(length=100), nullable=False),
     sa.Column('license_number', sa.String(length=50), nullable=False),
     sa.Column('phone_number', sa.String(length=20), nullable=True),
-    sa.Column('type', sa.String(length=50), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('schedule', sa.String(length=100), nullable=True),
+    sa.Column('time', sa.String(length=100), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.user_id'], ),
     sa.PrimaryKeyConstraint('doctor_id'),
     sa.UniqueConstraint('license_number'),
@@ -168,15 +170,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.user_id'], ),
     sa.PrimaryKeyConstraint('user_id', 'role_id')
     )
-    op.create_table('doctors',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('doctor_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=True),
-    sa.Column('schedule', sa.String(length=100), nullable=True),
-    sa.Column('time', sa.String(length=100), nullable=True),
-    sa.ForeignKeyConstraint(['doctor_id'], ['doctor_accounts.doctor_id'], ),
-    sa.PrimaryKeyConstraint('id', 'doctor_id')
-    )
     op.create_table('patients',
     sa.Column('patient_id', sa.Integer(), nullable=False),
     sa.Column('dob', sa.Date(), nullable=True),
@@ -184,6 +177,18 @@ def upgrade():
     sa.Column('gender', sa.Enum('Male', 'Female', 'Other', name='gender_enum'), nullable=True),
     sa.ForeignKeyConstraint(['patient_id'], ['client_accounts.client_id'], ),
     sa.PrimaryKeyConstraint('patient_id')
+    )
+    op.create_table('prescription',
+    sa.Column('prescription_id', sa.Integer(), nullable=False),
+    sa.Column('doctor_id', sa.Integer(), nullable=True),
+    sa.Column('medication_id', sa.Integer(), nullable=True),
+    sa.Column('dosage', sa.String(length=100), nullable=False),
+    sa.Column('frequency', sa.String(length=100), nullable=False),
+    sa.Column('start_date', sa.Date(), nullable=False),
+    sa.Column('end_date', sa.Date(), nullable=True),
+    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
+    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
+    sa.PrimaryKeyConstraint('prescription_id')
     )
     op.create_table('appointment',
     sa.Column('appointment_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -206,7 +211,7 @@ def upgrade():
     sa.Column('result_value', sa.Text(), nullable=False),
     sa.Column('result_date', sa.Date(), nullable=False),
     sa.Column('notes', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.id'], ),
+    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ),
     sa.ForeignKeyConstraint(['test_id'], ['lab_test.test_id'], ),
     sa.PrimaryKeyConstraint('result_id')
@@ -231,18 +236,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['room_id'], ['room.room_id'], ),
     sa.PrimaryKeyConstraint('patient_room_id')
     )
-    op.create_table('prescription',
-    sa.Column('prescription_id', sa.Integer(), nullable=False),
-    sa.Column('doctor_id', sa.Integer(), nullable=True),
-    sa.Column('medication_id', sa.Integer(), nullable=True),
-    sa.Column('dosage', sa.String(length=100), nullable=False),
-    sa.Column('frequency', sa.String(length=100), nullable=False),
-    sa.Column('start_date', sa.Date(), nullable=False),
-    sa.Column('end_date', sa.Date(), nullable=True),
-    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.id'], ),
-    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
-    sa.PrimaryKeyConstraint('prescription_id')
-    )
     op.create_table('billing',
     sa.Column('billing_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('patient_id', sa.Integer(), nullable=True),
@@ -260,19 +253,18 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('billing')
-    op.drop_table('prescription')
     op.drop_table('patient_room')
     op.drop_table('patient_insurance')
     op.drop_table('lab_result')
     op.drop_table('appointment')
+    op.drop_table('prescription')
     op.drop_table('patients')
-    op.drop_table('doctors')
     op.drop_table('user_role')
     op.drop_table('staff')
     op.drop_table('role_permission')
     op.drop_table('organization')
     op.drop_table('message')
-    op.drop_table('doctor_accounts')
+    op.drop_table('doctors')
     op.drop_table('client_accounts')
     op.drop_table('audit_log')
     op.drop_table('user')

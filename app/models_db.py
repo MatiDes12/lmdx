@@ -10,7 +10,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    user_type = db.Column(db.Enum('patient', 'doctor', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False)
+    user_type = db.Column(db.Enum('patient', 'doctors', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Role(db.Model):
@@ -62,33 +62,17 @@ class Patient(ClientAccounts):
         'polymorphic_identity': 'patient'
     }
 
-class DoctorAccounts(db.Model):
-    __tablename__ = 'doctor_accounts'
+class Doctor(db.Model):
+    __tablename__ = 'doctors'
     doctor_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     specialization = db.Column(db.String(100), nullable=False)
     license_number = db.Column(db.String(50), unique=True, nullable=False)
     phone_number = db.Column(db.String(20))
-
-    __mapper_args__ = {
-        'polymorphic_on': 'type',
-        'polymorphic_identity': 'doctor_account'
-    }
-    type = db.Column(db.String(50), nullable=False)
-
-class Doctor(DoctorAccounts):
-    __tablename__ = 'doctors'
-    id = db.Column(db.Integer, primary_key=True)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor_accounts.doctor_id'), primary_key=True)
     status = db.Column(db.String(20))
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'doctor'
-    }
 
 class Staff(db.Model):
     staff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -117,7 +101,7 @@ class LabTest(db.Model):
 class LabResult(db.Model):
     result_id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
     test_id = db.Column(db.Integer, db.ForeignKey('lab_test.test_id'))
     result_value = db.Column(db.Text, nullable=False)
     result_date = db.Column(db.Date, nullable=False)
@@ -161,7 +145,7 @@ class Medication(db.Model):
 
 class Prescription(db.Model):
     prescription_id = db.Column(db.Integer, primary_key=True)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
     medication_id = db.Column(db.Integer, db.ForeignKey('medication.medication_id'))
     dosage = db.Column(db.String(100), nullable=False)
     frequency = db.Column(db.String(100), nullable=False)
@@ -184,12 +168,15 @@ class PatientRoom(db.Model):
 
 
 class Message(db.Model):
+    __tablename__ = 'messages'
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     subject = db.Column(db.String(255))
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 
 class Organization(db.Model):
     __tablename__ = 'organization'

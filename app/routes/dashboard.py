@@ -372,43 +372,53 @@ def update_patient_status(patient_id, status):
     flash('Patient status updated successfully.', 'success')
     return redirect(url_for('dashboard.patients'))
 
-@bp.route('/send_message_page/<int:patient_id>', methods=['GET'])
-def send_message_page(patient_id):
-    if 'user' not in session:
+
+@bp.route('/doctor/messages', methods=['GET'])
+def doctor_messages():
+    if 'user' not in session or session.get('user_type') != 'doctors':
         return redirect(url_for('auth.signin'))
+
+    user_id = session.get('user_id')
+    messages = Message.query.filter_by(recipient_id=user_id).all()
+
+    return render_template('doctors/messages.html', messages=messages)
+# @bp.route('/send_message_page/<int:patient_id>', methods=['GET'])
+# def send_message_page(patient_id):
+#     if 'user' not in session:
+#         return redirect(url_for('auth.signin'))
     
-    patient = Patient.query.get_or_404(patient_id)
-    return render_template('send_message.html', patient=patient)
+#     patient = Patient.query.get_or_404(patient_id)
+#     return render_template('send_message.html', patient=patient)
 
-@bp.route('/send_message', methods=['POST'])
-def send_message():
-    patient_id = request.form.get('patient_id')
-    message_type = request.form.get('message_type')
-    content = request.form.get('content')
+# @bp.route('/send_message', methods=['POST'])
+# def send_message():
+#     patient_id = request.form.get('patient_id')
+#     message_type = request.form.get('message_type')
+#     content = request.form.get('content')
 
-    patient = Patient.query.get(patient_id)
-    if not patient:
-        flash('Patient not found', 'danger')
-        return redirect(url_for('dashboard.patients'))
+#     patient = Patient.query.get(patient_id)
+#     if not patient:
+#         flash('Patient not found', 'danger')
+#         return redirect(url_for('dashboard.patients'))
 
-    if message_type == 'email':
-        success = send_email(patient.email, "Message from Hospital", content)
-    elif message_type == 'sms':
-        success = send_sms(patient.phone_number, content)
-    else:
-        flash('Invalid message type', 'danger')
-        return redirect(url_for('dashboard.send_message_page', patient_id=patient_id))
+#     if message_type == 'email':
+#         success = send_email(patient.email, "Message from Hospital", content)
+#     elif message_type == 'sms':
+#         success = send_sms(patient.phone_number, content)
+#     else:
+#         flash('Invalid message type', 'danger')
+#         return redirect(url_for('dashboard.send_message_page', patient_id=patient_id))
 
-    if success:
-        message = Message(patient_id=patient.id, message_type=message_type, content=content, status='sent')
-        flash('Message sent successfully', 'success')
-    else:
-        message = Message(patient_id=patient.id, message_type=message_type, content=content, status='failed')
-        flash('Failed to send message', 'danger')
+#     if success:
+#         message = Message(patient_id=patient.id, message_type=message_type, content=content, status='sent')
+#         flash('Message sent successfully', 'success')
+#     else:
+#         message = Message(patient_id=patient.id, message_type=message_type, content=content, status='failed')
+#         flash('Failed to send message', 'danger')
 
-    db.session.add(message)
-    db.session.commit()
-    return redirect(url_for('dashboard.patients'))
+#     db.session.add(message)
+#     db.session.commit()
+#     return redirect(url_for('dashboard.patients'))
 
 
 

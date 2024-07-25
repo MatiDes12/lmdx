@@ -1,12 +1,15 @@
 
 from mailbox import Message
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Patient, Appointment, User
+from ..models_db import Doctor, Appointment, User, Message
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from app.routes.auth import firebase_db
 
 bp = Blueprint('patient', __name__)
+
+
+#<-------------------------- dashboard -------------------------------->
 
 @bp.route('/dashboard')
 def dashboard():
@@ -52,6 +55,7 @@ def fetch_user_info():
         return redirect(url_for('auth.login'))  # Redirect to login or appropriate error page
 
 
+#<-------------------------- appointments -------------------------------->
 @bp.route('/appointments', methods=['GET'])
 def appointments():
     if 'user' not in session or session.get('user_type') != 'patient':
@@ -98,45 +102,84 @@ def make_appointment():
     return redirect(url_for('patient.dashboard'))
 
 
-
+#<-------------------------- messages -------------------------------->
 
 @bp.route('/messages', methods=['GET'])
 def messages():
-    if 'user' not in session or session.get('user_type') != 'patient':
+    if 'user' not in session or session.get('user_type') not in ['patient', 'client']:
         return redirect(url_for('auth.signin'))
 
+    # Fetch doctors
     doctors = Doctor.query.all()
-    return render_template('clients/messages.html', doctors=doctors)
+    doctor_statuses = []
+    for doctor in doctors:
+        user = User.query.get(doctor.doctor_id)
+        status = 'Active' if user else 'Inactive'
+        doctor_statuses.append({
+            'id': doctor.doctor_id,
+            'name': f"{doctor.first_name} {doctor.last_name}",
+            'specialization': doctor.specialization,
+            'status': status
+        })
 
+    # Fetch messages sent to the current client from doctors
+    client_id = session.get('user_id')
+    messages = Message.query.filter_by(recipient_id=client_id).all()
+
+    # Fetch the sender information for each message
+    message_details = []
+    for message in messages:
+        sender = User.query.get(message.sender_id)
+        doctor = Doctor.query.filter_by(doctor_id=sender.doctor_id).first()
+        if doctor:
+            message_details.append({
+                'doctor_name': f"{doctor.first_name} {doctor.last_name}",
+                'doctor_image': f"https://i.pravatar.cc/300?img={doctor.doctor_id % 70}",  # Random image for doctor
+                'body': message.body,
+                'timestamp': message.timestamp
+            })
+
+    # Add a sample message from a "doctor" to yourself
+    sample_message = {
+        'doctor_name': 'Dr. Sample',
+        'doctor_image': 'https://i.pravatar.cc/300?img=1',  # Sample image
+        'body': 'This is a sample message from Dr. Sample.',
+        'timestamp': datetime.utcnow()
+    }
+    message_details.append(sample_message)
+
+    return render_template('clients/messages.html', doctor_statuses=doctor_statuses, doctors=doctor_statuses, messages=message_details)
 
 @bp.route('/send_message', methods=['POST'])
 def send_message():
-    if 'user' not in session or session.get('user_type') != 'patient':
+    if 'user' not in session or session.get('user_type') not in ['patient', 'client']:
         return redirect(url_for('auth.signin'))
 
     doctor_id = request.form.get('doctor_id')
-    content = request.form.get('content')
-    patient_id = session.get('user_id')  # Assuming the client is a patient and their ID is stored in the session
+    message_body = request.form.get('message')
+    sender_id = session.get('user_id')  # Assuming you store the logged-in user's ID in session
 
-    if not doctor_id or not content:
-        flash('All fields are required.', 'danger')
+    if not doctor_id or not message_body:
+        flash('Please select a doctor and enter a message.')
         return redirect(url_for('patient.messages'))
 
-    message = Message(
-        patient_id=patient_id,
-        doctor_id=doctor_id,
-        content=content,
-        status='sent',
-        timestamp=datetime.utcnow()
-    )
+    # Assuming recipient_id is the user_id of the doctor
+    doctor = Doctor.query.get(doctor_id)
+    if not doctor:
+        flash('Invalid doctor selected.')
+        return redirect(url_for('patient.messages'))
 
+    recipient_id = doctor.doctor_id
+
+    # Create and save the message
+    message = Message(sender_id=sender_id, recipient_id=recipient_id, subject='Message from Client', body=message_body)
     db.session.add(message)
     db.session.commit()
 
-    flash('Message sent successfully!', 'success')
+    flash('Message sent successfully.')
     return redirect(url_for('patient.messages'))
 
-
+#<-------------------------- test results -------------------------------->
 
 @bp.route('/test_results')
 def test_results():
