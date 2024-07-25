@@ -1,7 +1,9 @@
 {% extends 'clients/base.html' %}
+
 {% block navbar %}
     {% include 'clients/navbar.html' %}
 {% endblock %}
+
 {% block content %}
 <div class="px-6 py-4">
     <!-- Header Section -->
@@ -13,18 +15,18 @@
     <!-- Cards for Insurance Details -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Provider Card -->
-        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Provider Information</h2>
-            <p class="text-gray-600"><strong>Great Insurance Co.</strong></p>
-            <p class="text-gray-600">Policy Number: <strong>XYZ123456789</strong></p>
+        <div class="card bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold mb-4">Provider Information</h2>
+            <p><strong>Great Insurance Co.</strong></p>
+            <p>Policy Number: <strong>XYZ123456789</strong></p>
             <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">Update Details</button>
         </div>
 
         <!-- Coverage Card -->
-        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Coverage Details</h2>
-            <p class="text-gray-600">Period: <strong>Jan 1, 2024 - Dec 31, 2024</strong></p>
-            <p class="text-gray-600">Coverage: <strong>Full medical, dental, and vision</strong></p>
+        <div class="card bg-gradient-to-r from-purple-400 to-purple-600 text-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold mb-4">Coverage Details</h2>
+            <p>Period: <strong>Jan 1, 2024 - Dec 31, 2024</strong></p>
+            <p>Coverage: <strong>Full medical, dental, and vision</strong></p>
             <button class="mt-4 bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg">View Document</button>
         </div>
     </div>
@@ -70,17 +72,28 @@
         </div>
     </div>
     
-
     <!-- Drag and Drop Upload Section -->
     <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Upload Insurance Documents</h2>
-        <div class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500">
+        <form action="/insurance" method="post" enctype="multipart/form-data" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500" id="upload-form">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l10 10m0-10L7 17m14 2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14z" />
             </svg>
             <p class="mt-2 text-sm text-gray-500">Drag and drop files here, or click to select files</p>
-            <input type="file" class="hidden" />
-        </div>
+            <input type="file" name="file" class="hidden" id="file-input" />
+        </form>
     </div>
 </div>
+
+<script>
+    // Add click listener to the container, not the entire form
+    document.getElementById('upload-form').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+    });
+
+    // Handle file input change to submit the form
+    document.getElementById('file-input').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
 {% endblock %}

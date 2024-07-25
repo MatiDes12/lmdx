@@ -1,17 +1,37 @@
 {% extends 'clients/base.html' %}
+
 {% block navbar %}
     {% include 'clients/navbar.html' %}
 {% endblock %}
+
 {% block content %}
-<div class="p-4">
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Health Tips</h1>
-        <p class="mt-1 text-gray-600 dark:text-gray-400">Helpful advice to keep you healthy and active.</p>
+<style>
+    .container {
+    max-width: 960px; /* Wider container for better layout */
+    margin: auto;
+}
+.header {
+    background: linear-gradient(90deg, rgba(29,78,216,1) 0%, rgba(14,165,233,1) 100%);
+}
+
+.text-gray-600 {
+    color: #4a5568;
+}
+
+
+</style>
+<div class="px-6 py-4">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-3xl font-bold">Today's Health Tips</h1>
+        <p>Check out these tips to improve your daily wellness routine.</p>
     </div>
-    <ul class="list-disc list-inside bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+    <div class="tips-grid grid grid-cols-2 md:grid-cols-1 gap-4">
         {% for tip in tips %}
-            <li class="text-gray-800 dark:text-white py-2">{{ tip }}</li>
+            <div class="tip-card p-5 bg-white rounded-lg shadow">
+                <p class="text-gray-600" style="white-space: pre-line;">{{ tip | safe }}</p>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}
