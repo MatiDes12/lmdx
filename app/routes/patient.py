@@ -1,14 +1,15 @@
 
 from mailbox import Message
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Patient, Appointment, User
+from ..models_db import Doctor, Appointment, User, Message
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from app.routes.auth import firebase_db
-from werkzeug.utils import secure_filename
-
 
 bp = Blueprint('patient', __name__)
+
+
+#<-------------------------- dashboard -------------------------------->
 
 @bp.route('/dashboard')
 def dashboard():
@@ -25,7 +26,6 @@ def dashboard():
             print('test')
             first_name = user_data.get('first_name')
             last_name = user_data.get('last_name')
-            print(first_name, last_name)
             return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
         else:
             flash('Unable to fetch user details.', 'error')
@@ -35,24 +35,24 @@ def dashboard():
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
     
-@bp.route('/fetch_user_info')
-def fetch_user_info():
-    try:
-        user_id = session.get('user_id')
-        if not user_id:
-            raise ValueError("User ID not found in session")
+# @bp.route('/fetch_user_info')
+# def fetch_user_info():
+#     try:
+#         user_id = session.get('user_id')
+#         if not user_id:
+#             raise ValueError("User ID not found in session")
 
-        user_info = User.query.filter_by(id=user_id).first()
-        if not user_info:
-            raise ValueError("No user found with the given ID")
+#         user_info = User.query.filter_by(id=user_id).first()
+#         if not user_info:
+#             raise ValueError("No user found with the given ID")
 
-        return render_template('user_info.html', user=user_info)
+#         return render_template('user_info.html', user=user_info)
 
-    except Exception as e:
-        # Log the error for further investigation
-        print(f"Error accessing user information: {e}")
-        flash('Error accessing user information.', 'error')
-        return redirect(url_for('auth.login'))  # Redirect to login or appropriate error page
+#     except Exception as e:
+#         # Log the error for further investigation
+#         print(f"Error accessing user information: {e}")
+#         flash('Error accessing user information.', 'error')
+#         return redirect(url_for('auth.login'))  # Redirect to login or appropriate error page
 
 
 #<-------------------------- appointments -------------------------------->
@@ -206,80 +206,20 @@ def billing():
         return redirect(url_for('auth.signin'))
     return render_template('clients/billing.html')
 
-@bp.route('/insurance', methods=['GET', 'POST'])
+@bp.route('/insurance')
 def insurance():
-    # Ensure user is logged in and has the right user type
     if 'user' not in session or session.get('user_type') != 'patient':
-        flash('You must be signed in to access this page.', 'error')
         return redirect(url_for('auth.signin'))
-
-    if request.method == 'POST':
-        file = request.files.get('file')
-        if not file:
-            flash('No file part in the request.', 'error')
-            return redirect(request.url)
-
-        if file.filename == '':
-            flash('No selected file.', 'error')
-            return redirect(request.url)
-
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            flash('File successfully uploaded.', 'success')
-            return redirect(url_for('insurance'))
-
     return render_template('clients/insurance.html')
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in {'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-
-
-def get_health_tips():
-    url = "https://api.perplexity.ai/chat/completions"
-    payload = {
-        "model": "llama-3-sonar-small-32k-online",
-        "messages": [
-            {
-                "role": "system",
-                "content": "Be precise and concise."
-            },
-            {
-                "role": "user",
-                "content": "Provide five daily health tips."
-            }
-        ]
-    }
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": "Bearer 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"
-    }
-    
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        if response.status_code == 200:
-            raw_tips = response.json().get('choices', [])[0].get('message', {}).get('content', '').split('\n')
-            tips = [markdown_to_html(tip) for tip in raw_tips if tip.strip()]
-            return tips
-        else:
-            print(f"Failed to fetch tips, status code: {response.status_code}")
-            return ["Error fetching tips: Server responded with an error."]
-    except requests.RequestException as e:
-        print(f"Request failed: {e}")
-        return ["Error fetching tips: Failed to reach the server."]
-
-def markdown_to_html(text):
-    """Convert markdown bold syntax to HTML."""
-    return re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
 
 @bp.route('/health_tips')
 def health_tips():
-    tips = get_health_tips()
-    if tips:
-        return render_template('clients/health_tips.html', tips=tips)
-    else:
-        return abort(500, description="Failed to load health tips.")
-
+    tips = [
+        "Stay hydrated by drinking at least 8 glasses of water a day.",
+        "Exercise for at least 30 minutes most days of the week.",
+        "Maintain a balanced diet rich in fruits, vegetables, and lean proteins.",
+        "Get at least 7-8 hours of sleep per night to promote mental and physical health.",
+        "Manage stress through mindfulness, meditation, or talking to a professional."
+    ]
+    return render_template('clients/health_tips.html', tips=tips)
