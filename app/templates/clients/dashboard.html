@@ -1,179 +1,141 @@
-{% extends 'clients/base.html' %} {% block navbar %} {% include
-'clients/navbar.html' %} {% endblock %} {% block content %}
+{% extends 'clients/base.html' %}
+{% block navbar %}
+  {% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
 <div class="p-4">
-  <!-- Stylish Header -->
-  <div
-    class="bg-gradient-to-r from-blue-500 to-teal-500 p-6 rounded-lg shadow-lg mb-6 text-white"
-  >
-    <h1 class="text-3xl font-bold">
-      Welcome, {{ first_name }} {{ last_name }}!
-    </h1>
-    <p>
-      Explore your health dashboard to stay on top of appointments, medications,
-      and more.
-    </p>
+  <!-- Welcome Section -->
+  <div class="bg-gradient-to-r from-blue-500 to-teal-500 p-6 rounded-lg shadow-lg mb-6 text-white">
+    <h1 class="text-3xl font-bold">Welcome, {{ first_name }} {{ last_name }}!</h1>
+    <p>Explore your health dashboard to stay on top of appointments, medications, and more.</p>
   </div>
-  <div class="grid grid-cols-3 gap-6">
-    <!-- General Styling -->
-    <style>
-      .dashboard-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      /* .dashboard-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
-            } */
-      .card-header {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
-        margin-bottom: 10px;
-      }
-      .card-link {
-        text-decoration: none;
-        color: #007bff;
-        font-weight: bold;
-      }
-      .card-link:hover {
-        text-decoration: underline;
-      }
-      .card-stats {
-        background: rgba(0, 123, 255, 0.1);
-        color: #007bff;
-        padding: 5px 10px;
-        border-radius: 10px;
-        font-weight: bold;
-      }
-      .card-content {
-        font-size: 14px;
-        color: #5f5e5e;
-      }
-    </style>
 
-    <!-- Appointments Card -->
-    <div class="dashboard-card p-4">
-      <div class="card-header">Upcoming Appointments</div>
-      <p class="card-content">
-        You have {{ total_appointments }} appointments scheduled. Don't miss
-        your next meeting!
-      </p>
-      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
-      <div class="flex justify-between items-center mt-1 mb-6">
-        <button
-          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
-        >
-          Total Appointments: {{ total_appointments }}
-        </button>
-        <a href="{{ url_for('patient.visits') }}" class="card-link"
-          >View Appointments →</a
-        >
+  <div class="grid grid-cols-3 gap-4">
+    <!-- Left Section: Health Metrics -->
+    <div class="col-span-2">
+      <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Health Metrics
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <!-- Medication Reminders -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Medication</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Upcoming medication schedules.</p>
+          <a href="{{ url_for('patient.medication') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
+              Manage Medications
+          </a>
+        </div>
+
+        <!-- Appointment Reminders -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Appointments</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Your upcoming appointments.</p>
+          <a href="{{ url_for('patient.appointments') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
+              View Appointments
+          </a>
+        </div>
+
+        <!-- Test Results -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Test Results</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Latest health test results.</p>
+          <a href="{{ url_for('patient.test_results') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-purple-800">
+              Check Results
+          </a>
+        </div>
+
+        <!-- Lifestyle Tips -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Lifestyle Tips</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Advice on healthy living habits.</p>
+          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800">
+              Explore Tips
+          </a>
+        </div>
+
+        <!-- Medical Articles -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Medical Articles</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Read the latest health articles.</p>
+          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
+              Read Articles
+          </a>
+        </div>
+
+        <!-- Health Tracker -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Health Tracker</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Monitor your health metrics over time.</p>
+          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 dark:bg-teal-500 dark:hover:bg-teal-600 dark:focus:ring-teal-800">
+              Track Health
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Test Results Card -->
-    <div class="dashboard-card p-4">
-      <div class="card-header">Recent Test Results</div>
-      <p class="card-content">
-        Check out {{ total_tests }} new test results to stay updated on your
-        health condition.
-      </p>
-      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
-      <div class="flex justify-between items-center mt-1 mb-6">
-        <button
-          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
-        >
-          Total Test Results: {{ total_tests }}
-        </button>
-        <a href="{{ url_for('patient.visits') }}" class="card-link"
-          >Review Results →</a
-        >
-      </div>
-    </div>
 
-    <!-- Medication Reminders Card -->
-    <div class="dashboard-card p-4">
-      <div class="card-header">Medication Reminders</div>
-      <p class="card-content">
-        Keep track of your medication schedule to ensure timely dosages.
-      </p>
-      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
-      <div class="flex justify-between items-center mt-1 mb-6">
-        <button
-          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
-        >
-          Medications: {{ total_medications }}
-        </button>
-        <a href="{{ url_for('patient.visits') }}" class="card-link"
-          >View Medications →</a
-        >
-      </div>
+    <!-- Right Section: Notifications and Reminders -->
+    <div class="col-span-1">
+        <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+            Notifications
+          </div>
+      <div class="space-y-2">
+        <!-- Example Notification -->
+        <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex-shrink-0">
+                <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/300" alt="User">
+            </div>
+            <div class="min-w-0 ml-2 flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">John Doe</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">New appointment scheduled</p>
+            </div>
+            <div class="flex-shrink-0 ml-auto">
+                <p class="text-sm text-gray-500 dark:text-gray-400">2 hours ago</p>
+            </div>
+        </div>
+        <!-- Add more notifications as needed -->
+        <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex-shrink-0">
+                <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/301" alt="User">
+            </div>
+            <div class="min-w-0 ml-2 flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">Jane Smith</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Patient report updated</p>
+            </div>
+            <div class="flex-shrink-0 ml-auto">
+                <p class="text-sm text-gray-500 dark:text-gray-400">1 hour ago</p>
+            </div>
+        </div>
     </div>
-
-    <!-- Health Tips Card -->
-    <div class="dashboard-card p-4">
-      <div class="card-header">Health Tips</div>
-      <p class="card-content">
-        Explore valuable health tips to improve your wellness and lifestyle.
-      </p>
-      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
-      <div class="flex justify-between items-center mt-1 mb-6">
-        <button
-          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
-        >
-          Health Tips: {{ total_tips }}
-        </button>
-        <a href="{{ url_for('patient.visits') }}" class="card-link"
-          >Health Tips →</a
-        >
-      </div>
-    </div>
-
-    <!-- Insurance Information Card -->
-    <div class="dashboard-card p-4">
-      <div class="card-header">Insurance Details</div>
-      <p class="card-content">
-        Review your insurance coverage, update documents, and understand your
-        benefits.
-      </p>
-      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
-      <div class="flex justify-between items-center mt-1 mb-6">
-        <button
-          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
-        >
-          Insurance: {{ total_insurance }}
-        </button>
-        <a href="{{ url_for('patient.visits') }}" class="card-link"
-          >Insurance Details →</a
-        >
-      </div>
-    </div>
-
-    <!-- Recent Visits Summary Card -->
-    <div class="dashboard-card p-4">
-      <div class="card-header">Recent Visits</div>
-      <p class="card-content">
-        Review details from your last visits and prepare for upcoming ones.
-      </p>
-      <hr class="my-2 border-1 border-gray-200 mt-12 mb-4" />
-      <div class="flex justify-between items-center mt-1 mb-6">
-        <button
-          class="card-stats text-center text-sm border-1 border-blue-500 rounded-full"
-        >
-          Total Visits: {{ total_visits }}
-        </button>
-        <a href="{{ url_for('patient.visits') }}" class="card-link"
-          >Review Visits →</a
-        >
-      </div>
-    </div>
-
   </div>
 </div>
+<div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
+
+<script>
+  function showFlashMessage(message, category) {
+      const flashMessageContainer = document.getElementById('flash-message-container');
+      const flashMessage = document.createElement('div');
+      flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;
+      flashMessage.innerHTML = `
+          <div class="flex items-center justify-center w-12 bg-${category}-500">
+              <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
+              </svg>
+          </div>
+          <div class="px-4 py-2 -mx-3">
+              <div class="mx-3">
+                  <span class="font-semibold text-${category}-500 dark:text-${category}-400">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                  <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
+              </div>
+          </div>
+      `;
+      flashMessageContainer.appendChild(flashMessage);
+
+      setTimeout(() => {
+          flashMessage.remove();
+      }, 5000);
+  }
+</script>
 
 
 {% endblock %}

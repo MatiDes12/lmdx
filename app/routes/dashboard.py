@@ -38,21 +38,26 @@ def organization_dashboard():
     if 'user' not in session or session.get('user_type') != 'organization':
         return redirect(url_for('auth.signin'))
 
-    user_id = session.get('user_id') 
-    id_token = session.get('user_id_token') 
-    
+    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
+    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
+
     try:
-        # Fetch user data from Firebase
-        user_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
-        if user_data:
-            full_name = user_data.get('full_name')
-            print("full name", full_name)
-            return render_template('doctors/dashboard.html', full_name=full_name)
+        # Fetch doctor data from Firebase
+        doctor_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
+        if doctor_data:
+            doctor_name = doctor_data.get('name')
+            total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
+            total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
+
+            return render_template('doctors/dashboard.html',
+                                   doctor_name=doctor_name,
+                                   total_patients=total_patients,
+                                   total_appointments=total_appointments)
         else:
-            flash('Unable to fetch user details.', 'error')
+            flash('Unable to fetch doctor details.', 'error')
             return redirect(url_for('auth.signin'))
     except Exception as e:
-        flash('Error accessing user information.', 'error')
+        flash('Error accessing doctor information.', 'error')
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
 
