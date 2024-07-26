@@ -46,7 +46,6 @@ class Visit(db.Model):
 class ClientAccounts(db.Model):
     __tablename__ = 'client_accounts'
     client_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), unique=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -92,13 +91,15 @@ class Staff(db.Model):
 
 class Appointment(db.Model):
     appointment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    client_id = db.Column(db.Integer, db.ForeignKey('client_accounts.client_id'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Ensure this matches the actual table name
     appointment_date = db.Column(db.Date, nullable=False)
     appointment_time = db.Column(db.Time, nullable=False)
     status = db.Column(db.Enum('Scheduled', 'Completed', 'Cancelled', name='appointment_status_enum'), default='Scheduled')
     reason = db.Column(db.Text)
     notes = db.Column(db.Text)
+    
+    doctor = db.relationship('Doctor', backref='appointments')
 
 
 class LabTest(db.Model):

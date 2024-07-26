@@ -10,6 +10,7 @@
         <p class="text-white text-sm mt-2">Manage your healthcare schedule with ease.</p>
     </div>
 
+<<<<<<< HEAD
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Upcoming Appointments Section -->
 <!-- Upcoming Appointments Section -->
@@ -57,6 +58,17 @@
         {% endif %}
     </div>
 </div>
+=======
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Upcoming Appointments Section -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Upcoming Appointments</h2>
+      <div class="space-y-4" id="upcoming-appointments">
+        {% include 'clients/_upcoming_appointments.html' %}
+      </div>
+    </div>
+    
+>>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
 
         <!-- Schedule New Appointment Section -->
         <div class="bg-white p-6 rounded-lg shadow-md">
@@ -98,6 +110,7 @@
     </div>
 </div>
 <script>
+<<<<<<< HEAD
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
@@ -116,3 +129,41 @@
     });
     </script>
 {% endblock %}
+=======
+document.addEventListener("DOMContentLoaded", function () {
+  const doctorSelect = document.getElementById('doctor-select');
+  const dateSelect = document.getElementById('date-select');
+  const timeSelect = document.getElementById('time-select');
+
+  function updateAvailableTimes() {
+    const doctorId = doctorSelect.value;
+    const date = dateSelect.value;
+
+    if (doctorId && date) {
+      fetch(`{{ url_for('patient.get_available_times', _external=true) }}?doctor_id=${doctorId}&date=${date}`)
+        .then(response => response.json())
+        .then(times => {
+          timeSelect.innerHTML = '';
+          if (times.length > 0) {
+            times.forEach(time => {
+              const option = document.createElement('option');
+              option.value = time;
+              option.textContent = time;
+              timeSelect.appendChild(option);
+            });
+          } else {
+            const option = document.createElement('option');
+            option.textContent = 'No available times';
+            timeSelect.appendChild(option);
+          }
+        });
+    }
+  }
+
+  doctorSelect.addEventListener('change', updateAvailableTimes);
+  dateSelect.addEventListener('change', updateAvailableTimes);
+});
+
+</script>
+{% endblock %}
+>>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
