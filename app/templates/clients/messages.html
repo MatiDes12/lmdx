@@ -1,87 +1,73 @@
 {% extends 'clients/base.html' %}
 {% block navbar %} {% include 'clients/navbar.html' %} {% endblock %}
 {% block content %}
-<div class="px-6 py-4">
+<div class="px-6 py-4 bg-gray-100">
   <!-- Stylish Header -->
-  <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-lg mb-6 text-white">
-    <h1 class="text-4xl font-bold">Your Health Dashboard</h1>
-    <p>Manage appointments, track your medication, and communicate directly with your healthcare providers.</p>
-  </div>
+  <div
+  class="bg-gradient-to-r from-green-500 via-teal-500 to-cyan-500 p-6 rounded-lg shadow-md mb-8"
+>
+  <h1 class="text-3xl font-bold text-white">Your Messages</h1>
+  <p class="text-white text-sm mt-2">
+    Communicate with your healthcare providers securely and conveniently.
+  </p>
+</div>
+
 
   <!-- Main content grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-    <!-- Extended Message Box -->
-    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Message Box -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-lg mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Send a Message</h2>
       <form action="{{ url_for('patient.send_message') }}" method="POST">
         <div class="mb-6">
-          <label for="doctor-select" class="block text-sm font-medium text-gray-700">Choose your doctor:</label>
-          <select id="doctor-select" name="doctor_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-full bg-gray-200 text-gray-500" required>
+          <label for="doctor-select" class="block text-sm font-medium text-gray-700 mb-2">Choose your doctor:</label>
+          <select id="doctor-select" name="doctor_id" class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 text-gray-700" required>
             <option value="">Select a doctor</option>
             {% for doctor in doctors %}
-            <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+            <option value="{{ doctor.id }}">{{ doctor.name }} - {{ doctor.specialization }}</option>
             {% else %}
             <option disabled>No doctors available</option>
             {% endfor %}
           </select>
         </div>
-        <div class="mb-6">
-          <label for="message" class="block text-sm font-medium text-gray-700">Your Message:</label>
-          <textarea id="message" name="message" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-4 bg-gray-100" rows="20" placeholder="Type your message here..." required></textarea>
+        <div id="message-display" class="mb-6 bg-gray-50 p-4 rounded-lg h-64 overflow-y-auto">
+          <!-- Message display area -->
         </div>
-        <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <div class="mb-6">
+          <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Your Message:</label>
+          <textarea id="message" name="message" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-lg p-4 bg-gray-50 h-24" placeholder="Type your message here..." required></textarea>
+        </div>
+        <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
           Send Message
-          <svg class="-mr-1 ml-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
           </svg>
         </button>
       </form>
     </div>
 
-    <!-- Doctor Status Table -->
-    <div class="lg:col-span-1 space-y-4">
-      <div class="p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="text-xl font-bold text-gray-900">Doctor Status</h2>
-        <table class="min-w-full mt-2">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Name</th>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Specialization</th>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for doctor in doctor_statuses %}
-            <tr class="{{ 'bg-white' if loop.index is odd else 'bg-gray-50' }}">
-              <td class="px-4 py-2 text-sm text-gray-800">
-                <div class="flex items-center">
-                  <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/300?img={{ loop.index }}" alt="" />
-                  <span class="ml-2">{{ doctor.name }}</span>
+    <!-- Message History -->
+    <div class="lg:col-span-1 bg-white p-6 rounded-lg mb-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Message History</h2>
+      <div class="overflow-y-auto max-h-96">
+        {% for date, day_messages in messages|groupby('timestamp.date') %}
+        <div class="mb-4">
+          <div class="text-sm font-semibold text-gray-600 mb-2">
+            {{ date.strftime('%B %d, %Y') }}
+          </div>
+          <div class="space-y-2">
+            {% for message in day_messages %}
+            <div class="bg-gray-50 p-4 rounded-lg cursor-pointer message-preview" onclick="showMessage('{{ message.doctor_name }}', '{{ message.body | replace("'", "\\'") }}')">
+              <div class="flex items-center space-x-4">
+                <img class="w-10 h-10 rounded-full" src="{{ message.doctor_image }}" alt="{{ message.doctor_name }}" />
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 truncate">{{ message.doctor_name }}</p>
+                  <p class="text-sm text-gray-500 truncate">{{ message.body[:50] }}{% if message.body|length > 50 %}...{% endif %}</p>
                 </div>
-              </td>
-              <td class="px-4 py-2 text-sm text-gray-800">{{ doctor.specialization }}</td>
-              <td class="px-4 py-2 text-sm text-gray-800">
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800' if doctor.status == 'Active' else 'bg-red-100 text-red-800' }}">
-                  {{ doctor.status }}
-                </span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Recent Messages Section -->
-      <div class="mt-10">
-        <h3 class="text-xl font-bold text-gray-900">Messages from Doctors</h3>
-        {% for message in messages %}
-        <div class="bg-white p-10 rounded-lg shadow-lg mb-4 message-preview" data-doctor="{{ message.doctor_name }}" data-message="{{ message.body }}" data-image="{{ message.doctor_image }}">
-          <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm transition duration-300 ease-in-out hover:shadow-md">
-            <img class="w-12 h-12 rounded-full" src="{{ message.doctor_image }}" alt="{{ message.doctor_name }}" />
-            <div class="flex-1">
-              <span class="block font-semibold text-gray-800">{{ message.doctor_name }}</span>
-              <p class="text-gray-600">{{ message.body }}</p>
-              <small class="text-gray-500">{{ message.timestamp }}</small>
+                <div class="inline-flex items-center text-xs font-semibold text-gray-500">{{ message.timestamp.strftime('%I:%M %p') }}</div>
+              </div>
             </div>
+            {% endfor %}
           </div>
         </div>
         {% endfor %}
@@ -90,87 +76,15 @@
   </div>
 </div>
 
-<!-- Chat Room Container -->
-<div id="chat-room" class="container hidden">
-  <div class="nav-bar">
-    <a>Chat</a>
-    <div class="close" onclick="closeChat()">
-      <div class="line one"></div>
-      <div class="line two"></div>
-    </div>
-  </div>
-  <div class="messages-area" id="chat-messages">
-    <!-- Messages will be dynamically added here -->
-  </div>
-  <div class="sender-area">
-    <div class="input-place">
-      <input placeholder="Send a message." class="send-input" id="chat-input" type="text">
-      <div class="send" onclick="sendMessage()">
-        <svg class="send-icon" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"><g><g><path fill="#6B6C7B" d="M481.508,210.336L68.414,38.926c-17.403-7.222-37.064-4.045-51.309,8.287C2.86,59.547-3.098,78.551,1.558,96.808 L38.327,241h180.026c8.284,0,15.001,6.716,15.001,15.001c0,8.284-6.716,15.001-15.001,15.001H38.327L1.558,415.193 c-4.656,18.258,1.301,37.262,15.547,49.595c14.274,12.357,33.937,15.495,51.31,8.287l413.094-171.409 C500.317,293.862,512,276.364,512,256.001C512,235.638,500.317,218.139,481.508,210.336z"></path></g></g></svg>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
-  document.querySelectorAll('.message-preview').forEach(messagePreview => {
-    messagePreview.addEventListener('click', function() {
-      const doctorName = this.getAttribute('data-doctor');
-      const messageBody = this.getAttribute('data-message');
-      const doctorImage = this.getAttribute('data-image');
-      
-      const chatRoom = document.getElementById('chat-room');
-      const chatMessages = document.getElementById('chat-messages');
-      
-      // Clear previous messages
-      chatMessages.innerHTML = '';
-      
-      // Add the selected message
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message', 'one');
-      messageDiv.innerHTML = `
-        <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-          <img class="w-12 h-12 rounded-full" src="${doctorImage}" alt="${doctorName}" />
-          <div class="flex-1">
-            <span class="block font-semibold text-gray-800">${doctorName}</span>
-            <p class="text-gray-600">${messageBody}</p>
-          </div>
-        </div>
-      `;
-      chatMessages.appendChild(messageDiv);
-      
-      // Show the chat room
-      chatRoom.classList.remove('hidden');
-    });
-  });
-
-  function closeChat() {
-    document.getElementById('chat-room').classList.add('hidden');
-  }
-
-  function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const messageText = input.value;
-    if (messageText.trim() === '') {
-      return;
-    }
-
-    const chatMessages = document.getElementById('chat-messages');
-    
-    // Add the new message
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', 'two');
-    messageDiv.innerHTML = `
-      <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-        <div class="flex-1">
-          <p class="text-gray-600">${messageText}</p>
-        </div>
-      </div>
-    `;
-    chatMessages.appendChild(messageDiv);
-
-    // Clear the input
-    input.value = '';
-  }
+function showMessage(doctorName, messageBody) {
+  const messageDisplay = document.getElementById('message-display');
+  messageDisplay.innerHTML = `<div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                <p class="text-lg font-medium text-gray-800">${doctorName}</p>
+                                <p class="text-sm text-gray-600">${messageBody}</p>
+                              </div>`;
+  document.getElementById('message').value = `Re: ${messageBody}\n\n`;
+  document.getElementById('message').focus();
+}
 </script>
 {% endblock %}

@@ -35,6 +35,14 @@ class AuditLog(db.Model):
     action = db.Column(db.String(255), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+# class Visit(db.Model):
+#     visit_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     patient_id = db.Column(db.Integer, db.ForeignKey('patient.patient_id'))
+#     doctor_name = db.Column(db.String(255), nullable=False)
+#     date = db.Column(db.Date, nullable=False)
+#     summary = db.Column(db.Text)
+#     next_steps = db.Column(db.Text)
+
 class ClientAccounts(db.Model):
     __tablename__ = 'client_accounts'
     client_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -142,6 +150,12 @@ class Medication(db.Model):
     description = db.Column(db.Text)
     dosage = db.Column(db.String(100))
     manufacturer = db.Column(db.String(255))
+
+class Reminder(db.Model):
+    reminder_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    medication_id = db.Column(db.Integer, db.ForeignKey('medication.medication_id'))
+    time = db.Column(db.Time, nullable=False)
+    medication = db.relationship('Medication', backref=db.backref('reminders', lazy=True))
 
 class Prescription(db.Model):
     prescription_id = db.Column(db.Integer, primary_key=True)
