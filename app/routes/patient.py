@@ -58,6 +58,36 @@ def dashboard():
 #<-------------------------- appointments -------------------------------->
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
+    if request.method == 'POST':
+        # Handle appointment booking
+        doctor_id = request.form.get('doctor_id')
+        appointment_date = request.form.get('appointment_date')
+        appointment_time = request.form.get('appointment_time')
+        reason = request.form.get('reason')
+        notes = request.form.get('notes')
+        patient_id = 1  # Replace with actual patient ID (you may want to get this from the session)
+        
+        # Create new appointment
+        new_appointment = Appointment(
+            patient_id=patient_id,
+            doctor_id=doctor_id,
+            appointment_date=datetime.strptime(appointment_date, "%Y-%m-%d").date(),
+            appointment_time=datetime.strptime(appointment_time, "%I:%M %p").time(),
+            status='Scheduled',
+            reason=reason,
+            notes=notes
+        )
+        db.session.add(new_appointment)
+        db.session.commit()
+
+        # Fetch updated upcoming appointments
+        upcoming_appointments = Appointment.query.filter(
+            Appointment.appointment_date >= datetime.now(),
+            Appointment.status != 'Cancelled'
+        ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
+
+        return render_template('clients/_upcoming_appointments.html', upcoming_appointments=upcoming_appointments)
+    
     # Fetch upcoming appointments
     upcoming_appointments = Appointment.query.filter(
         Appointment.appointment_date >= datetime.now(),
@@ -75,68 +105,11 @@ def appointments():
         available_times.append(start_time.strftime("%I:%M %p"))
         start_time += timedelta(minutes=30)
 
-    if request.method == 'POST':
-        # Handle appointment booking
-        doctor_id = request.form.get('doctor_id')
-        appointment_date = request.form.get('appointment_date')
-        appointment_time = request.form.get('appointment_time')
-        patient_id = 1  # Replace with actual patient ID (you may want to get this from the session)
-        
-        # Create new appointment
-        new_appointment = Appointment(
-            patient_id=patient_id,
-            doctor_id=doctor_id,
-            appointment_date=datetime.strptime(appointment_date, "%Y-%m-%d").date(),
-            appointment_time=datetime.strptime(appointment_time, "%I:%M %p").time(),
-            status='Scheduled'
-        )
-        db.session.add(new_appointment)
-        db.session.commit()
-
-        return redirect(url_for('patient.appointments'))
-
     return render_template('clients/appointments.html', 
                            upcoming_appointments=upcoming_appointments,
                            doctors=doctors,
                            available_times=available_times)
-    
 
-@bp.route('/make_appointment', methods=['POST'])
-def make_appointment():
-    if 'user' not in session or session.get('user_type') != 'patient':
-        return redirect(url_for('auth.signin'))
-    
-    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-    doctor_id = request.form.get('doctor_id')
-    date = request.form.get('date')
-    time = request.form.get('time')
-    notes = request.form.get('notes', '')
-    
-    if not all([doctor_id, date, time]):
-        flash('All fields are required.', 'error')
-        return redirect(url_for('patient.appointments'))
-
-    appointment_date = datetime.strptime(date, '%Y-%m-%d')
-    appointment_time = datetime.strptime(time, '%H:%M').time()
-    
-    try:
-        new_appointment = Appointment(
-            patient_id=user_id,
-            doctor_id=doctor_id,
-            date=appointment_date,
-            time=appointment_time,
-            status='Scheduled',
-            notes=notes
-        )
-        db.session.add(new_appointment)
-        db.session.commit()
-        flash('Appointment made successfully.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash('Error making appointment.', 'error')
-        print(f"Appointment creation error: {e}")
-    
-    return redirect(url_for('patient.dashboard'))
 
 
 #<-------------------------- messages -------------------------------->

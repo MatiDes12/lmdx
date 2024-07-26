@@ -99,6 +99,8 @@ class Appointment(db.Model):
     status = db.Column(db.Enum('Scheduled', 'Completed', 'Cancelled', name='appointment_status_enum'), default='Scheduled')
     reason = db.Column(db.Text)
     notes = db.Column(db.Text)
+    
+    doctor = db.relationship('Doctor', backref='appointments')
 
 
 class LabTest(db.Model):
