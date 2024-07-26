@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: bdef6af48b2d
+Revision ID: b3a1a995b4c7
 Revises: 
-Create Date: 2024-07-25 15:19:52.281412
+Create Date: 2024-07-25 21:31:52.574040
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'bdef6af48b2d'
+revision = 'b3a1a995b4c7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -116,12 +116,13 @@ def upgrade():
     sa.Column('message_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('sender_id', sa.Integer(), nullable=True),
     sa.Column('recipient_id', sa.Integer(), nullable=True),
-    sa.Column('subject', sa.String(length=255), nullable=True),
-    sa.Column('body', sa.Text(), nullable=True),
+    sa.Column('conversation_id', sa.String(length=255), nullable=False),
+    sa.Column('conversation_data', sa.JSON(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['recipient_id'], ['user.user_id'], ),
     sa.ForeignKeyConstraint(['sender_id'], ['user.user_id'], ),
-    sa.PrimaryKeyConstraint('message_id')
+    sa.PrimaryKeyConstraint('message_id'),
+    sa.UniqueConstraint('conversation_id')
     )
     op.create_table('organization',
     sa.Column('org_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -153,6 +154,13 @@ def upgrade():
     sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
     sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
     sa.PrimaryKeyConstraint('prescription_id')
+    )
+    op.create_table('reminder',
+    sa.Column('reminder_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('medication_id', sa.Integer(), nullable=True),
+    sa.Column('time', sa.Time(), nullable=False),
+    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
+    sa.PrimaryKeyConstraint('reminder_id')
     )
     op.create_table('role_permission',
     sa.Column('role_id', sa.Integer(), nullable=False),
@@ -258,6 +266,7 @@ def downgrade():
     op.drop_table('user_role')
     op.drop_table('staff')
     op.drop_table('role_permission')
+    op.drop_table('reminder')
     op.drop_table('prescription')
     op.drop_table('organization')
     op.drop_table('messages')

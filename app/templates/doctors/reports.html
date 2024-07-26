@@ -3,128 +3,135 @@
 {% block title %}Reports{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-4">Reports</h1>
-    <div x-data="{ activeTab: 'patient-info' }">
-        <!-- Tab Navigation -->
-        <nav class="flex space-x-4 mb-4">
-            <button @click="activeTab = 'patient-info'" :class="{ 'text-blue-600 border-b-2 border-blue-600': activeTab === 'patient-info' }" class="py-2 text-gray-600 hover:text-blue-600 focus:outline-none">Patient Information</button>
-            <button @click="activeTab = 'appointments'" :class="{ 'text-blue-600 border-b-2 border-blue-600': activeTab === 'appointments' }" class="py-2 text-gray-600 hover:text-blue-600 focus:outline-none">Appointments</button>
-            <button @click="activeTab = 'medical-history'" :class="{ 'text-blue-600 border-b-2 border-blue-600': activeTab === 'medical-history' }" class="py-2 text-gray-600 hover:text-blue-600 focus:outline-none">Medical History</button>
-        </nav>
-
-        <!-- Patient Information Tab -->
-        <div x-show="activeTab === 'patient-info'" class="space-y-6">
-            <h2 class="text-2xl font-bold mb-4">Patient Information</h2>
-            <section class="container px-4 mx-auto">
-                <div class="flex flex-col">
-                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Name</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Age</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Gender</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Blood Type</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Height</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Weight</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                        {% for patient in patients %}
-                                        <tr>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ patient.name }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ patient.age }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ patient.gender }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ patient.blood_type }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ patient.height }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ patient.weight }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
+            <rect width="48" height="48" fill="none"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 9V35C8 36.6569 9.34315 38 11 38H22.8321C22.2969 36.7751 22 35.4222 22 34C22 28.4772 26.4772 24 32 24C32.6849 24 33.3538 24.0689 34 24.2V9C34 7.34315 32.6569 6 31 6H11C9.34315 6 8 7.34315 8 9ZM13 13C12.4477 13 12 13.4477 12 14C12 14.5523 12.4477 15 13 15H29C29.5523 15 30 14.5523 30 14C30 13.4477 29.5523 13 29 13H13ZM13 18C12.4477 18 12 18.4477 12 19C12 19.5523 12.4477 20 13 20H29C29.5523 20 30 19.5523 30 19C30 18.4477 29.5523 18 29 18H13ZM12 24C12 23.4477 12.4477 23 13 23H21C21.5523 23 22 23.4477 22 24C22 24.5523 21.5523 25 21 25H13C12.4477 25 12 24.5523 12 24ZM13 28C12.4477 28 12 28.4477 12 29C12 29.5523 12.4477 30 13 30H18C18.5523 30 19 29.5523 19 29C19 28.4477 18.5523 28 18 28H13Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M32 42C36.4183 42 40 38.4183 40 34C40 29.5817 36.4183 26 32 26C27.5817 26 24 29.5817 24 34C24 38.4183 27.5817 42 32 42ZM34.567 30.2929C34.9575 29.9024 35.5906 29.9024 35.9812 30.2929C36.3717 30.6834 36.3717 31.3166 35.9812 31.7071L35.1902 32.498L33.776 31.0838L34.567 30.2929ZM28 36.8597L33.0689 31.7909L34.4831 33.2052L29.4143 38.274H28.0001L28 36.8597Z" fill="currentColor"/>
+        </svg>
+        <div>
+            <h1 class="text-3xl font-bold">Medical Reports</h1>
+            <p class="text-lg">Comprehensive patient health information at your fingertips</p>
         </div>
+    </div>
 
-        <!-- Appointments Tab -->
-        <div x-show="activeTab === 'appointments'" class="space-y-6">
-            <h2 class="text-2xl font-bold mb-4">Appointments</h2>
-            <section class="container px-4 mx-auto">
-                <div class="flex flex-col">
-                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Patient Name</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Doctor Name</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Date</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Time</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                        {% for appointment in appointments %}
-                                        <tr>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.patient.name }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.doctor.name }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.date }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.time }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.status }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Report Filter Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filter Reports
+        </h2>
+        <form action="" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">
+                        Patient Name
+                    </label>
+                    <input type="text" id="patient" name="patient" placeholder="Search by patient name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
-            </section>
-        </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="report_type">
+                        Report Type
+                    </label>
+                    <select id="report_type" name="report_type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">All Types</option>
+                        <option value="lab">Lab Results</option>
+                        <option value="imaging">Imaging</option>
+                        <option value="consultation">Consultation</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="date_range">
+                        Date Range
+                    </label>
+                    <input type="date" id="date_range" name="date_range" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
 
-        <!-- Medical History Tab -->
-        <div x-show="activeTab === 'medical-history'" class="space-y-6">
-            <h2 class="text-2xl font-bold mb-4">Medical History</h2>
-            <section class="container px-4 mx-auto">
-                <div class="flex flex-col">
-                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Patient Name</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Condition</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Diagnosis Date</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Treatment</th>
-                                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                        {% for history in medical_history %}
-                                        <tr>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ history.patient.name }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ history.condition }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ history.diagnosis_date }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ history.treatment }}</td>
-                                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ history.notes }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+    <!-- Reports List -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            Medical Reports
+        </h2>
+        {% if reports %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Patient Name
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Report Type
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex items-center">
+                                <div class="ml-3">
+                                    <p class="text-gray-900 whitespace-no-wrap">
+                                        {{ report.patient.name }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ report.type }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ report.date }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                                <span class="relative">{{ report.status }}</span>
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-2">View</a>
+                            <a href="#" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
+                            <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% else %}
+        <div class="text-center py-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Reports Found</h3>
+            <p class="text-gray-500">There are currently no medical reports available. Use the filter above to search for specific reports or check back later.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

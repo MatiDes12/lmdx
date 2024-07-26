@@ -1,194 +1,118 @@
-{% extends 'clients/base.html' %} {% block navbar %} {% include
-'clients/navbar.html' %} {% endblock %} {% block content %}
+{% extends 'clients/base.html' %}
+{% block navbar %}
+    {% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
 <div class="px-6 py-4 bg-gray-100">
-  <!-- Header Section -->
-  <div
-    class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-md mb-8"
-  >
-    <h1 class="text-3xl font-bold text-white">Your Appointments</h1>
-    <p class="text-white text-sm mt-2">
-      Manage your healthcare schedule with ease.
-    </p>
-  </div>
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-md mb-8">
+        <h1 class="text-3xl font-bold text-white">Your Appointments</h1>
+        <p class="text-white text-sm mt-2">Manage your healthcare schedule with ease.</p>
+    </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Upcoming Appointments Section -->
-    <!-- Upcoming Appointments Section -->
-    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">
-        Upcoming Appointments
-      </h2>
-      <div class="space-y-4" id="upcoming-appointments">
-        {% if upcoming_appointments %} {% for appointment in
-        upcoming_appointments %}
-        <div
-          class="border border-gray-200 p-4 rounded-md hover:shadow-md transition duration-300"
-        >
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <h3 class="text-lg font-medium text-gray-800">
-                Dr. {{ appointment.doctor.first_name }} {{
-                appointment.doctor.last_name }}
-              </h3>
-              <p class="text-sm text-gray-600">
-                {{ appointment.doctor.specialization }}
-              </p>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Upcoming Appointments Section -->
+<!-- Upcoming Appointments Section -->
+<div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Upcoming Appointments</h2>
+    <div class="space-y-4" id="upcoming-appointments">
+        {% if upcoming_appointments %}
+            {% for appointment in upcoming_appointments %}
+            <div class="border border-gray-200 p-4 rounded-md hover:shadow-md transition duration-300">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-800">Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h3>
+                        <p class="text-sm text-gray-600">{{ appointment.doctor.specialization }}</p>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
+                        {{ appointment.status }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-700 mb-2">
+                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
+                    {{ appointment.appointment_date.strftime('%B %d, %Y') }} at {{ appointment.appointment_time.strftime('%I:%M %p') }}
+                </p>
+                <p class="text-sm text-gray-600 mb-2">
+                    <i class="fas fa-comment-medical mr-2 text-green-500"></i>
+                    Reason: {{ appointment.reason }}
+                </p>
+                {% if appointment.notes %}
+                <p class="text-xs text-gray-500 mb-3">
+                    <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
+                    Notes: {{ appointment.notes }}
+                </p>
+                {% endif %}
+                <div class="flex justify-end space-x-2">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-full transition duration-300">
+                        View Details
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded-full transition duration-300">
+                        Cancel
+                    </button>
+                </div>
             </div>
-            <span
-              class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full"
-            >
-              {{ appointment.status }}
-            </span>
-          </div>
-          <p class="text-sm text-gray-700 mb-2">
-            <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-            {{ appointment.appointment_date.strftime('%B %d, %Y') }} at {{
-            appointment.appointment_time.strftime('%I:%M %p') }}
-          </p>
-          <p class="text-sm text-gray-600 mb-2">
-            <i class="fas fa-comment-medical mr-2 text-green-500"></i>
-            Reason: {{ appointment.reason }}
-          </p>
-          {% if appointment.notes %}
-          <p class="text-xs text-gray-500 mb-3">
-            <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
-            Notes: {{ appointment.notes }}
-          </p>
-          {% endif %}
-          <div class="flex justify-end space-x-2">
-            <button
-              class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-full transition duration-300"
-            >
-              View Details
-            </button>
-            <button
-              class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded-full transition duration-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-        {% endfor %} {% else %}
-        <p class="text-gray-600 italic text-center py-4">
-          No upcoming appointments. Schedule a new one to start your health
-          journey!
-        </p>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-600 italic text-center py-4">No upcoming appointments. Schedule a new one to start your health journey!</p>
         {% endif %}
-      </div>
     </div>
+</div>
 
-    <!-- Schedule New Appointment Section -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">
-        Schedule Appointment
-      </h2>
-      <form
-        action="{{ url_for('patient.appointments') }}"
-        method="POST"
-        class="space-y-4"
-      >
-        <div>
-          <label
-            for="doctor-select"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Select Doctor</label
-          >
-          <select
-            id="doctor-select"
-            name="doctor_id"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          >
-            {% for doctor in doctors %}
-            <option value="{{ doctor.doctor_id }}">
-              Dr. {{ doctor.first_name }} {{ doctor.last_name }} - {{
-              doctor.specialization }}
-            </option>
-            {% endfor %}
-          </select>
+        <!-- Schedule New Appointment Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Schedule Appointment</h2>
+            <form action="{{ url_for('patient.appointments') }}" method="POST" class="space-y-4">
+                <div>
+                    <label for="doctor-select" class="block text-sm font-medium text-gray-700 mb-1">Select Doctor</label>
+                    <select id="doctor-select" name="doctor_id" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        {% for doctor in doctors %}
+                            <option value="{{ doctor.doctor_id }}">Dr. {{ doctor.first_name }} {{ doctor.last_name }} - {{ doctor.specialization }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="date-select" class="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
+                    <input type="date" id="date-select" name="appointment_date" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="time-select" class="block text-sm font-medium text-gray-700 mb-1">Select Time</label>
+                    <select id="time-select" name="appointment_time" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                        {% for time in available_times %}
+                            <option value="{{ time }}">{{ time }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Reason for Appointment</label>
+                    <input type="text" id="reason" name="reason" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="Brief description of your visit">
+                </div>
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Additional Notes (Optional)</label>
+                    <textarea id="notes" name="notes" rows="3" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="Any additional information for the doctor"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-2 px-4 rounded-md transition duration-300 text-sm">
+                    Book Appointment
+                </button>
+            </form>  
         </div>
-        <div>
-          <label
-            for="date-select"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Select Date</label
-          >
-          <input
-            type="date"
-            id="date-select"
-            name="appointment_date"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label
-            for="time-select"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Select Time</label
-          >
-          <select
-            id="time-select"
-            name="appointment_time"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          >
-            {% for time in available_times %}
-            <option value="{{ time }}">{{ time }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div>
-          <label
-            for="reason"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Reason for Appointment</label
-          >
-          <input
-            type="text"
-            id="reason"
-            name="reason"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Brief description of your visit"
-          />
-        </div>
-        <div>
-          <label
-            for="notes"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Additional Notes (Optional)</label
-          >
-          <textarea
-            id="notes"
-            name="notes"
-            rows="3"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Any additional information for the doctor"
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-2 px-4 rounded-md transition duration-300 text-sm"
-        >
-          Book Appointment
-        </button>
-      </form>
     </div>
-  </div>
 </div>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      fetch("{{ url_for('patient.appointments') }}", {
-        method: "POST",
-        body: new FormData(form),
-      })
-        .then((response) => response.text())
-        .then((html) => {
-          document.querySelector("#upcoming-appointments").innerHTML = html;
-          form.reset();
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            fetch("{{ url_for('patient.appointments') }}", {
+                method: 'POST',
+                body: new FormData(form)
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('#upcoming-appointments').innerHTML = html;
+                form.reset();
+            });
         });
     });
-  });
-</script>
+    </script>
 {% endblock %}

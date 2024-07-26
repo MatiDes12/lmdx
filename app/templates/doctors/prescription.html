@@ -1,0 +1,148 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Prescriptions{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
+            <rect width="48" height="48" fill="none"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 4C9.44772 4 9 4.44772 9 5V43C9 43.5523 9.44772 44 10 44H38C38.5523 44 39 43.5523 39 43V15C39 14.7348 38.8946 14.4804 38.7071 14.2929L28.7071 4.29289C28.5196 4.10536 28.2652 4 28 4H10ZM11 42V6H27V15C27 15.5523 27.4477 16 28 16H37V42H11ZM35.5858 14L29 7.41421V14H35.5858ZM17 33H19V26H20.5857L25.5858 31.0001L22.2929 34.293L23.7072 35.7072L27 32.4143L30.2928 35.7072L31.7071 34.293L28.4142 31.0001L31.7072 27.7072L30.2929 26.293L27 29.5859L23.3948 25.9808C25.4186 25.7825 27 24.0759 27 22C27 19.7909 25.2091 18 23 18H18C17.4477 18 17 18.4477 17 19V33ZM23 24H19V20H23C24.1046 20 25 20.8954 25 22C25 23.1046 24.1046 24 23 24Z" fill="currentColor"/>
+        </svg>
+        <div>
+            <h1 class="text-3xl font-bold">Prescription Management</h1>
+            <p>Manage all your patients' prescriptions, dosages, and schedules.</p>
+        </div>
+    </div>
+
+    <!-- New Prescription Form -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none" class="mr-2">
+                <rect width="48" height="48" fill="none"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 4C9.44772 4 9 4.44772 9 5V43C9 43.5523 9.44772 44 10 44H38C38.5523 44 39 43.5523 39 43V15C39 14.7348 38.8946 14.4804 38.7071 14.2929L28.7071 4.29289C28.5196 4.10536 28.2652 4 28 4H10ZM11 42V6H27V15C27 15.5523 27.4477 16 28 16H37V42H11ZM35.5858 14L29 7.41421V14H35.5858ZM17 33H19V26H20.5857L25.5858 31.0001L22.2929 34.293L23.7072 35.7072L27 32.4143L30.2928 35.7072L31.7071 34.293L28.4142 31.0001L31.7072 27.7072L30.2929 26.293L27 29.5859L23.3948 25.9808C25.4186 25.7825 27 24.0759 27 22C27 19.7909 25.2091 18 23 18H18C17.4477 18 17 18.4477 17 19V33ZM23 24H19V20H23C24.1046 20 25 20.8954 25 22C25 23.1046 24.1046 24 23 24Z" fill="currentColor"/>
+            </svg>
+            Create New Prescription
+        </h2>
+        <form action="" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">
+                    Patient
+                </label>
+                <div class="relative">
+                    <select name="patient_id" id="patient" class="block w-full mt-1 rounded-full border-gray-300 border-2 border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 appearance-none px-3 py-2">
+                        {% for patient in patients %}
+                        <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="medication">
+                    Medication
+                </label>
+                <input id="medication" name="medication" type="text" placeholder="Medication name" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="dosage">
+                    Dosage
+                </label>
+                <input id="dosage" name="dosage" type="text" placeholder="e.g., 500mg" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="frequency">
+                    Frequency
+                </label>
+                <input id="frequency" name="frequency" type="text" placeholder="e.g., Twice daily" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="duration">
+                    Duration
+                </label>
+                <input id="duration" name="duration" type="text" placeholder="e.g., 7 days" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2">
+            </div>
+            <div class="flex justify-end">
+                <button class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 hover:from-green-500 hover:via-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Create Prescription
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Prescription List -->
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none" class="mr-2">
+                <rect width="48" height="48" fill="none"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 4C9.44772 4 9 4.44772 9 5V43C9 43.5523 9.44772 44 10 44H38C38.5523 44 39 43.5523 39 43V15C39 14.7348 38.8946 14.4804 38.7071 14.2929L28.7071 4.29289C28.5196 4.10536 28.2652 4 28 4H10ZM11 42V6H27V15C27 15.5523 27.4477 16 28 16H37V42H11ZM35.5858 14L29 7.41421V14H35.5858ZM17 33H19V26H20.5857L25.5858 31.0001L22.2929 34.293L23.7072 35.7072L27 32.4143L30.2928 35.7072L31.7071 34.293L28.4142 31.0001L31.7072 27.7072L30.2929 26.293L27 29.5859L23.3948 25.9808C25.4186 25.7825 27 24.0759 27 22C27 19.7909 25.2091 18 23 18H18C17.4477 18 17 18.4477 17 19V33ZM23 24H19V20H23C24.1046 20 25 20.8954 25 22C25 23.1046 24.1046 24 23 24Z" fill="currentColor"/>
+            </svg>
+            Prescription List
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Patient
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Medication
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Dosage
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Frequency
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Duration
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prescription in prescriptions %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            {{ prescription.patient.first_name }} {{ prescription.patient.last_name }}
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            {{ prescription.medication }}
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            {{ prescription.dosage }}
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            {{ prescription.frequency }}
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            {{ prescription.duration }}
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
+                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
