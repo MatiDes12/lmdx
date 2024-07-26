@@ -1,7 +1,7 @@
 
 from mailbox import Message
-from flask import Blueprint, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
+from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
+from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message, Patient
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
@@ -35,41 +35,68 @@ def dashboard():
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
     
-# @bp.route('/fetch_user_info')
-# def fetch_user_info():
-#     try:
-#         user_id = session.get('user_id')
-#         if not user_id:
-#             raise ValueError("User ID not found in session")
-
-#         user_info = User.query.filter_by(id=user_id).first()
-#         if not user_info:
-#             raise ValueError("No user found with the given ID")
-
-#         return render_template('user_info.html', user=user_info)
-
-#     except Exception as e:
-#         # Log the error for further investigation
-#         print(f"Error accessing user information: {e}")
-#         flash('Error accessing user information.', 'error')
-#         return redirect(url_for('auth.login'))  # Redirect to login or appropriate error page
 
 
 #<-------------------------- appointments -------------------------------->
+def generate_available_times(doctor_id, appointment_date):
+    doctor = Doctor.query.get(doctor_id)
+    if not doctor or doctor.status != 'Active':
+        print(f"Doctor {doctor_id} not active or not found.")
+        return []
+
+    working_hours = doctor.time.split(' - ')
+    start_time = datetime.strptime(working_hours[0], "%I:%M %p")
+    end_time = datetime.strptime(working_hours[1], "%I:%M %p")
+
+    available_times = []
+    while start_time < end_time:
+        available_times.append(start_time.strftime("%I:%M %p"))
+        start_time += timedelta(minutes=30)  # Ensure increment is happening
+
+    # Debug: print all generated times before filtering
+    print(f"Generated times for Doctor {doctor_id} on {appointment_date}: {available_times}")
+
+    # Fetch booked times for the doctor on the given date
+    booked_times = [appt.appointment_time.strftime("%I:%M %p") for appt in Appointment.query.filter(
+        Appointment.doctor_id == doctor_id,
+        Appointment.appointment_date == appointment_date,
+        Appointment.status == 'Scheduled'
+    ).all()]
+
+    print(f"Booked times for Doctor {doctor_id} on {appointment_date}: {booked_times}")
+
+    # Filter out booked times
+    available_times = [time for time in available_times if time not in booked_times]
+    print("available_times: ",available_times)
+    return available_times
+
+@bp.route('/get-available-times', methods=['GET'])
+def get_available_times():
+    doctor_id = request.args.get('doctor_id')
+    date = request.args.get('date')
+    if doctor_id and date:
+        available_times = generate_available_times(doctor_id, datetime.strptime(date, "%Y-%m-%d").date())
+        return jsonify(available_times)
+    return jsonify([])
+
+
+
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
     if request.method == 'POST':
-        # Handle appointment booking
         doctor_id = request.form.get('doctor_id')
         appointment_date = request.form.get('appointment_date')
         appointment_time = request.form.get('appointment_time')
         reason = request.form.get('reason')
         notes = request.form.get('notes')
-        patient_id = 1  # Replace with actual patient ID (you may want to get this from the session)
-        
-        # Create new appointment
+        client_id = session.get('user_id')
+
+        if not client_id:
+            flash('You must be logged in to schedule an appointment.')
+            return redirect(url_for('auth.signin'))
+
         new_appointment = Appointment(
-            patient_id=patient_id,
+            client_id=client_id,
             doctor_id=doctor_id,
             appointment_date=datetime.strptime(appointment_date, "%Y-%m-%d").date(),
             appointment_time=datetime.strptime(appointment_time, "%I:%M %p").time(),
@@ -80,37 +107,21 @@ def appointments():
         db.session.add(new_appointment)
         db.session.commit()
 
-        # Fetch updated upcoming appointments
-        upcoming_appointments = Appointment.query.filter(
-            Appointment.appointment_date >= datetime.now(),
-            Appointment.status != 'Cancelled'
-        ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
+        return redirect(url_for('patient.appointments'))
 
-        return render_template('clients/_upcoming_appointments.html', upcoming_appointments=upcoming_appointments)
-    
-    # Fetch upcoming appointments
+    doctors = Doctor.query.filter_by(status='Active').all()
     upcoming_appointments = Appointment.query.filter(
         Appointment.appointment_date >= datetime.now(),
         Appointment.status != 'Cancelled'
     ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
 
-    # Fetch all doctors
-    doctors = Doctor.query.all()
-
-    # Generate available times (example: 9 AM to 5 PM, every 30 minutes)
-    start_time = datetime.strptime("09:00", "%H:%M")
-    end_time = datetime.strptime("17:00", "%H:%M")
-    available_times = []
-    while start_time <= end_time:
-        available_times.append(start_time.strftime("%I:%M %p"))
-        start_time += timedelta(minutes=30)
-
+    doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, datetime.now().date()) for doctor in doctors}
+    
+    print("Doctor timeslots: ", doctor_timeslots)
     return render_template('clients/appointments.html', 
                            upcoming_appointments=upcoming_appointments,
                            doctors=doctors,
-                           available_times=available_times)
-
-
+                           doctor_timeslots=doctor_timeslots)
 
 #<-------------------------- messages -------------------------------->
 
@@ -375,3 +386,30 @@ def health_tips():
     ]
     return render_template('clients/health_tips.html', tips=tips)
 
+
+#<-------------------------- profile_settings -------------------------------->
+
+# @bp.route('/profile_settings', methods=['GET', 'POST'])
+# @login_required  # Ensure user is logged in
+# def profile_settings():
+#     user_id = current_user.user_id  # Assuming you have a way to get the current logged in user's ID
+#     patient = Patient.query.filter_by(user_id=user_id).first()
+
+#     if request.method == 'POST':
+#         dob = request.form.get('dob')
+#         insurance_number = request.form.get('insurance_number')
+#         gender = request.form.get('gender')
+
+#         # Validations can be added here
+#         if dob:
+#             patient.dob = datetime.strptime(dob, '%Y-%m-%d')  # Make sure the date format matches the input
+#         if insurance_number:
+#             patient.insurance_number = insurance_number
+#         if gender:
+#             patient.gender = gender
+
+#         db.session.commit()
+#         flash('Profile updated successfully!', 'success')
+#         return redirect(url_for('profile_settings'))
+
+#     return render_template('profile_settings.html', patient=patient)
