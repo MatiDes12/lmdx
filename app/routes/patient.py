@@ -51,7 +51,7 @@ def generate_available_times(doctor_id, appointment_date):
     available_times = []
     while start_time < end_time:
         available_times.append(start_time.strftime("%I:%M %p"))
-        start_time += timedelta(minutes=30)  # Ensure increment is happening
+        start_time += timedelta(minutes=120) 
 
     # Debug: print all generated times before filtering
     print(f"Generated times for Doctor {doctor_id} on {appointment_date}: {available_times}")
