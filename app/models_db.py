@@ -210,8 +210,9 @@ class Message(db.Model):
     body = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-
-
+class Department(db.Model):
+    __tablename__ = 'department'
+    department_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
 class Organization(db.Model):
     __tablename__ = 'organization'

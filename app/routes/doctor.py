@@ -6,7 +6,7 @@ import requests
 import pyrebase
 from app.config import Config
 from app.routes.auth import firebase_db
-from ..models_db import Patient, Doctor, Appointment, Message, Prescription, Settings, User, ClientAccounts
+from ..models_db import Patient, Doctor, Appointment, Message, Prescription, Settings, User, ClientAccounts, Department
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from functools import wraps
@@ -26,123 +26,6 @@ genai.configure(api_key=GOOGLE_API_KEY1)
 bp = Blueprint('doctor', __name__)
 
 
-#<----------------------Firebase Authentication----------------------->
-
-def firebase_login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        id_token = request.cookies.get('token')
-        if not id_token:
-            return redirect(url_for('auth.signin'))
-        try:
-            decoded_token = auth.verify_id_token(id_token)
-            session['user_id'] = decoded_token['uid']
-            session['email'] = decoded_token['email']
-        except Exception as e:
-            flash('Authentication failed. Please sign in again.', 'error')
-            return redirect(url_for('auth.signin'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-@bp.route('/settings', methods=['GET', 'POST'])
-@firebase_login_required
-def settings():
-    user = User.query.filter_by(email=session.get('email')).first()
-
-    if not user:
-        user = User(email=session.get('email'), user_type='doctor')
-        db.session.add(user)
-        db.session.commit()
-
-    if not user.settings:
-        user.settings = Settings(user_id=user.user_id)
-        db.session.add(user.settings)
-        db.session.commit()
-
-    if request.method == 'POST':
-        try:
-            # General Settings
-            user.settings.language = request.form.get('language')
-            user.settings.timezone = request.form.get('timezone')
-            user.settings.dark_mode = 'dark_mode' in request.form
-            
-            # Patient Management Settings
-            user.settings.default_patient_view = request.form.get('default_view')
-            user.settings.show_inactive_patients = 'show_inactive' in request.form
-            user.settings.records_per_page = int(request.form.get('records_per_page', 20))
-            
-            # Doctor Management Settings
-            user.settings.default_specialization_filter = request.form.get('specialization_filter')
-            user.settings.show_doctor_schedules = 'show_schedule' in request.form
-            
-            # Analytics Settings
-            user.settings.default_chart_type = request.form.get('default_chart')
-            user.settings.auto_refresh_analytics = 'auto_refresh' in request.form
-            user.settings.refresh_interval = int(request.form.get('refresh_interval', 5))
-            
-            # Notification Settings
-            user.settings.email_notifications = 'email_notifications' in request.form
-            user.settings.sms_notifications = 'sms_notifications' in request.form
-            user.settings.notification_frequency = request.form.get('notification_frequency')
-            
-            # Security Settings
-            user.settings.two_factor_auth = 'two_factor_auth' in request.form
-            user.settings.session_timeout = int(request.form.get('session_timeout', 30))
-            user.settings.password_expiry = int(request.form.get('password_expiry', 90))
-            
-            db.session.commit()
-            flash('Settings updated successfully', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'An error occurred while updating settings: {str(e)}', 'error')
-        
-        return redirect(url_for('doctors.settings'))
-    
-    timezones = pytz.all_timezones
-    specializations = ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'General Surgery', 'Psychiatry', 'Endocrinology']
-    
-    return render_template('doctors/settings.html', 
-                           settings=user.settings, 
-                           timezones=timezones, 
-                           specializations=specializations)
-
-@bp.route('/settings/toggle_dark_mode', methods=['POST'])
-@firebase_login_required
-def toggle_dark_mode():
-    user = User.query.filter_by(email=session.get('email')).first()
-    if user and user.settings:
-        user.settings.dark_mode = not user.settings.dark_mode
-        db.session.commit()
-        return jsonify({'success': True, 'dark_mode': user.settings.dark_mode})
-    return jsonify({'success': False}), 400
-
-@bp.route('/settings/update_timezone', methods=['POST'])
-@firebase_login_required
-def update_timezone():
-    user = User.query.filter_by(email=session.get('email')).first()
-    if user and user.settings:
-        new_timezone = request.json.get('timezone')
-        if new_timezone in pytz.all_timezones:
-            user.settings.timezone = new_timezone
-            db.session.commit()
-            return jsonify({'success': True, 'timezone': user.settings.timezone})
-    return jsonify({'success': False}), 400
-
-@bp.route('/settings/test_notification', methods=['POST'])
-@firebase_login_required
-def test_notification():
-    notification_type = request.json.get('type')
-    user = User.query.filter_by(email=session.get('email')).first()
-    
-    if notification_type == 'email' and user.settings.email_notifications:
-        # Implement email sending logic here
-        return jsonify({'success': True, 'message': 'Test email sent successfully'})
-    elif notification_type == 'sms' and user.settings.sms_notifications:
-        # Implement SMS sending logic here
-        return jsonify({'success': True, 'message': 'Test SMS sent successfully'})
-    
-    return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
-
 #<---------------------- Dashboard Routes----------------------->
 @bp.route('/')
 def index():
@@ -153,18 +36,24 @@ def index():
         return redirect(url_for('doctor.organization_dashboard'))
     elif session.get('user_type') == 'patient':
         return redirect(url_for('patient.patient_dashboard'))
-    elif session.get('user_type') == 'admin':
-        return redirect(url_for('admin.admin_dashboard'))
     return redirect(url_for('auth.signin'))
 
 #<---------------------- organization Dashboard Routes----------------------->
-
 @bp.route('/admin')
 def admin_dashboard():
-    if 'user' not in session or session.get('user_type') != 'admin':
-        return render_template('auth/signin.html')
-    
-    return render_template('admin/dashboard.html')
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+
+    total_doctors = Doctor.query.count()
+    total_departments = Department.query.count()
+    total_patients = Patient.query.count()
+
+    return render_template('admin/dashboard.html',
+                           total_doctors=total_doctors,
+                           total_departments=total_departments,
+                           total_patients=total_patients)
+
+
 #<---------------------- organization Dashboard Routes----------------------->
 @bp.route('/organization')
 def organization_dashboard():
@@ -733,3 +622,119 @@ def monitor():
     return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
 
 
+#<----------------------Firebase Authentication----------------------->
+
+def firebase_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        id_token = request.cookies.get('token')
+        if not id_token:
+            return redirect(url_for('auth.signin'))
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+            session['user_id'] = decoded_token['uid']
+            session['email'] = decoded_token['email']
+        except Exception as e:
+            flash('Authentication failed. Please sign in again.', 'error')
+            return redirect(url_for('auth.signin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@bp.route('/settings', methods=['GET', 'POST'])
+@firebase_login_required
+def settings():
+    user = User.query.filter_by(email=session.get('email')).first()
+
+    if not user:
+        user = User(email=session.get('email'), user_type='doctor')
+        db.session.add(user)
+        db.session.commit()
+
+    if not user.settings:
+        user.settings = Settings(user_id=user.user_id)
+        db.session.add(user.settings)
+        db.session.commit()
+
+    if request.method == 'POST':
+        try:
+            # General Settings
+            user.settings.language = request.form.get('language')
+            user.settings.timezone = request.form.get('timezone')
+            user.settings.dark_mode = 'dark_mode' in request.form
+            
+            # Patient Management Settings
+            user.settings.default_patient_view = request.form.get('default_view')
+            user.settings.show_inactive_patients = 'show_inactive' in request.form
+            user.settings.records_per_page = int(request.form.get('records_per_page', 20))
+            
+            # Doctor Management Settings
+            user.settings.default_specialization_filter = request.form.get('specialization_filter')
+            user.settings.show_doctor_schedules = 'show_schedule' in request.form
+            
+            # Analytics Settings
+            user.settings.default_chart_type = request.form.get('default_chart')
+            user.settings.auto_refresh_analytics = 'auto_refresh' in request.form
+            user.settings.refresh_interval = int(request.form.get('refresh_interval', 5))
+            
+            # Notification Settings
+            user.settings.email_notifications = 'email_notifications' in request.form
+            user.settings.sms_notifications = 'sms_notifications' in request.form
+            user.settings.notification_frequency = request.form.get('notification_frequency')
+            
+            # Security Settings
+            user.settings.two_factor_auth = 'two_factor_auth' in request.form
+            user.settings.session_timeout = int(request.form.get('session_timeout', 30))
+            user.settings.password_expiry = int(request.form.get('password_expiry', 90))
+            
+            db.session.commit()
+            flash('Settings updated successfully', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred while updating settings: {str(e)}', 'error')
+        
+        return redirect(url_for('doctors.settings'))
+    
+    timezones = pytz.all_timezones
+    specializations = ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'General Surgery', 'Psychiatry', 'Endocrinology']
+    
+    return render_template('doctors/settings.html', 
+                           settings=user.settings, 
+                           timezones=timezones, 
+                           specializations=specializations)
+
+@bp.route('/settings/toggle_dark_mode', methods=['POST'])
+@firebase_login_required
+def toggle_dark_mode():
+    user = User.query.filter_by(email=session.get('email')).first()
+    if user and user.settings:
+        user.settings.dark_mode = not user.settings.dark_mode
+        db.session.commit()
+        return jsonify({'success': True, 'dark_mode': user.settings.dark_mode})
+    return jsonify({'success': False}), 400
+
+@bp.route('/settings/update_timezone', methods=['POST'])
+@firebase_login_required
+def update_timezone():
+    user = User.query.filter_by(email=session.get('email')).first()
+    if user and user.settings:
+        new_timezone = request.json.get('timezone')
+        if new_timezone in pytz.all_timezones:
+            user.settings.timezone = new_timezone
+            db.session.commit()
+            return jsonify({'success': True, 'timezone': user.settings.timezone})
+    return jsonify({'success': False}), 400
+
+@bp.route('/settings/test_notification', methods=['POST'])
+@firebase_login_required
+def test_notification():
+    notification_type = request.json.get('type')
+    user = User.query.filter_by(email=session.get('email')).first()
+    
+    if notification_type == 'email' and user.settings.email_notifications:
+        # Implement email sending logic here
+        return jsonify({'success': True, 'message': 'Test email sent successfully'})
+    elif notification_type == 'sms' and user.settings.sms_notifications:
+        # Implement SMS sending logic here
+        return jsonify({'success': True, 'message': 'Test SMS sent successfully'})
+    
+    return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
