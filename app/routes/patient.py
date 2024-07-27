@@ -1,19 +1,14 @@
 
 from mailbox import Message
-<<<<<<< HEAD
 import os
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
-=======
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message, Patient
->>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
-import calendar
-import firebase_admin
-from firebase_admin import credentials, messaging
+
 
 bp = Blueprint('patient', __name__)
 
@@ -51,6 +46,7 @@ def dashboard():
 
 
 #<-------------------------- appointments -------------------------------->
+
 def generate_available_times(doctor_id, appointment_date):
     doctor = Doctor.query.get(doctor_id)
     if not doctor or doctor.status != 'Active':
@@ -78,8 +74,11 @@ def generate_available_times(doctor_id, appointment_date):
 
     print(f"Booked times for Doctor {doctor_id} on {appointment_date}: {booked_times}")
 
-    # Filter out booked times
-    available_times = [time for time in available_times if time not in booked_times]
+    # Get current date and time
+    current_datetime = datetime.now()
+
+    # Filter out booked times and past times for the current day
+    available_times = [time for time in available_times if time not in booked_times and (appointment_date != current_datetime.date().strftime("%Y-%m-%d") or datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime)]
     
     print(f"Available times after filtering for Doctor {doctor_id} on {appointment_date}: {available_times}")
     return available_times
