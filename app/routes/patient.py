@@ -1,13 +1,8 @@
 
 from mailbox import Message
-<<<<<<< HEAD
 import os
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
-=======
-from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message, Patient
->>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
@@ -461,3 +456,6 @@ def health_tips():
 #         return redirect(url_for('profile_settings'))
 
 #     return render_template('profile_settings.html', patient=patient)
+
+
+

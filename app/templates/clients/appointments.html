@@ -10,55 +10,6 @@
         <p class="text-white text-sm mt-2">Manage your healthcare schedule with ease.</p>
     </div>
 
-<<<<<<< HEAD
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Upcoming Appointments Section -->
-<!-- Upcoming Appointments Section -->
-<div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Upcoming Appointments</h2>
-    <div class="space-y-4" id="upcoming-appointments">
-        {% if upcoming_appointments %}
-            {% for appointment in upcoming_appointments %}
-            <div class="border border-gray-200 p-4 rounded-md hover:shadow-md transition duration-300">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-800">Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h3>
-                        <p class="text-sm text-gray-600">{{ appointment.doctor.specialization }}</p>
-                    </div>
-                    <span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
-                        {{ appointment.status }}
-                    </span>
-                </div>
-                <p class="text-sm text-gray-700 mb-2">
-                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                    {{ appointment.appointment_date.strftime('%B %d, %Y') }} at {{ appointment.appointment_time.strftime('%I:%M %p') }}
-                </p>
-                <p class="text-sm text-gray-600 mb-2">
-                    <i class="fas fa-comment-medical mr-2 text-green-500"></i>
-                    Reason: {{ appointment.reason }}
-                </p>
-                {% if appointment.notes %}
-                <p class="text-xs text-gray-500 mb-3">
-                    <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
-                    Notes: {{ appointment.notes }}
-                </p>
-                {% endif %}
-                <div class="flex justify-end space-x-2">
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-full transition duration-300">
-                        View Details
-                    </button>
-                    <button class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded-full transition duration-300">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-gray-600 italic text-center py-4">No upcoming appointments. Schedule a new one to start your health journey!</p>
-        {% endif %}
-    </div>
-</div>
-=======
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Upcoming Appointments Section -->
     <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
@@ -68,7 +19,6 @@
       </div>
     </div>
     
->>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
 
         <!-- Schedule New Appointment Section -->
         <div class="bg-white p-6 rounded-lg shadow-md">
@@ -110,26 +60,6 @@
     </div>
 </div>
 <script>
-<<<<<<< HEAD
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            fetch("{{ url_for('patient.appointments') }}", {
-                method: 'POST',
-                body: new FormData(form)
-            })
-            .then(response => response.text())
-            .then(html => {
-                document.querySelector('#upcoming-appointments').innerHTML = html;
-                form.reset();
-            });
-        });
-    });
-    </script>
-{% endblock %}
-=======
 document.addEventListener("DOMContentLoaded", function () {
   const doctorSelect = document.getElementById('doctor-select');
   const dateSelect = document.getElementById('date-select');
@@ -166,4 +96,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 {% endblock %}
->>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
