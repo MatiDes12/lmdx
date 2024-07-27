@@ -52,7 +52,7 @@ def generate_available_times(doctor_id, appointment_date):
     available_times = []
     while start_time < end_time:
         available_times.append(start_time.strftime("%I:%M %p"))
-        start_time += timedelta(minutes=120) 
+        start_time += timedelta(minutes=120)  # Change increment as needed
 
     # Debug: print all generated times before filtering
     print(f"Generated times for Doctor {doctor_id} on {appointment_date}: {available_times}")
@@ -68,8 +68,11 @@ def generate_available_times(doctor_id, appointment_date):
 
     # Filter out booked times
     available_times = [time for time in available_times if time not in booked_times]
-    print("available_times: ",available_times)
+    
+    print(f"Available times after filtering for Doctor {doctor_id} on {appointment_date}: {available_times}")
     return available_times
+
+
 
 
 def day_of_week(day_name):
@@ -95,12 +98,13 @@ def get_available_times():
 
         # Check if the selected day falls within the doctor's schedule
         if start_day <= day_index <= end_day or (end_day < start_day and (day_index >= start_day or day_index <= end_day)):
-            available_times = generate_available_times(doctor_id, date)
+            available_times = generate_available_times(doctor_id, date_str)
             return jsonify(available_times)
 
         return jsonify([])  # Return empty if the date is not within the doctor's working days
 
     return jsonify([])
+
 
 
 @bp.route('/appointments', methods=['GET', 'POST'])
@@ -129,18 +133,23 @@ def appointments():
         db.session.add(new_appointment)
         db.session.commit()
 
+        # Redirect after POST to avoid duplicate submissions
         return redirect(url_for('patient.appointments'))
 
+    # Fetch all active doctors
     doctors = Doctor.query.all()
+
+    # Fetch upcoming appointments including today's past the current time
+    now = datetime.now()
     upcoming_appointments = Appointment.query.filter(
-        Appointment.appointment_date >= datetime.now(),
+        (Appointment.appointment_date > now.date()) | 
+        ((Appointment.appointment_date == now.date()) & (Appointment.appointment_time >= now.time())),
         Appointment.status != 'Cancelled'
     ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
 
-    doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, datetime.now().date()) for doctor in doctors}
-    today_date = datetime.now().strftime("%Y-%m-%d")
+    doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, now.date()) for doctor in doctors}
+    today_date = now.strftime("%Y-%m-%d")
     
-    print("Doctor timeslots: ", doctor_timeslots)
     return render_template('clients/appointments.html', 
                            upcoming_appointments=upcoming_appointments,
                            doctors=doctors,
