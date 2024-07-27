@@ -11,193 +11,134 @@
 {% endblock %}
 
 {% block content %}
-<section class="container px-4 mx-auto">
-    <div class="flex items-center gap-x-3 mb-4">
-        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Appointments</h2>
-        <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-lg dark:bg-gray-800 dark:text-blue-400">{{ appointments|length }} appointments</span>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
+            <rect width="48" height="48" fill="none"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C10.8954 21 10 21.8954 10 23V25C10 26.1046 10.8954 27 12 27H14C15.1046 27 16 26.1046 16 25V23C16 21.8954 15.1046 21 14 21H12ZM12 23V25H14V23H12Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M18 23C18 21.8954 18.8954 21 20 21H22C23.1046 21 24 21.8954 24 23V25C24 26.1046 23.1046 27 22 27H20C18.8954 27 18 26.1046 18 25V23ZM20 23H22V25H20V23Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M28 21C26.8954 21 26 21.8954 26 23V25C26 26.1046 26.8954 27 28 27H30C31.1046 27 32 26.1046 32 25V23C32 21.8954 31.1046 21 30 21H28ZM28 23V25H30V23H28Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 31C10 29.8954 10.8954 29 12 29H14C15.1046 29 16 29.8954 16 31V33C16 34.1046 15.1046 35 14 35H12C10.8954 35 10 34.1046 10 33V31ZM14 31V33H12V31H14Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M20 29C18.8954 29 18 29.8954 18 31V33C18 34.1046 18.8954 35 20 35H22C23.1046 35 24 34.1046 24 33V31C24 29.8954 23.1046 29 22 29H20ZM22 31H20V33H22V31Z" fill="currentColor"/>
+            <path d="M36 32.5C36 31.9477 35.5523 31.5 35 31.5C34.4477 31.5 34 31.9477 34 32.5V35.4142L35.2929 36.7071C35.6834 37.0976 36.3166 37.0976 36.7071 36.7071C37.0976 36.3166 37.0976 35.6834 36.7071 35.2929L36 34.5858V32.5Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 7C12 6.44772 12.4477 6 13 6C13.5523 6 14 6.44772 14 7V12C14 12.5523 14.4477 13 15 13C15.5523 13 16 12.5523 16 12V9H26V7C26 6.44772 26.4477 6 27 6C27.5523 6 28 6.44772 28 7V12C28 12.5523 28.4477 13 29 13C29.5523 13 30 12.5523 30 12V9H33C34.6569 9 36 10.3432 36 12V28.0709C39.3923 28.5561 42 31.4735 42 35C42 38.866 38.866 42 35 42C32.6213 42 30.5196 40.8135 29.2547 39H9C7.34315 39 6 37.6569 6 36V12C6 10.3431 7.34315 9 9 9H12V7ZM28 35C28 31.4735 30.6077 28.5561 34 28.0709V18H8V36C8 36.5523 8.44772 37 9 37H28.2899C28.1013 36.3663 28 35.695 28 35ZM40 35C40 37.7614 37.7614 40 35 40C32.2386 40 30 37.7614 30 35C30 32.2386 32.2386 30 35 30C37.7614 30 40 32.2386 40 35Z" fill="currentColor"/>
+        </svg>
+        <div>
+            <h1 class="text-3xl font-bold">Appointment Management</h1>
+            <p>View and manage your patient appointments</p>
+        </div>
     </div>
 
-    <!-- Search and Filter Section -->
-    <form method="GET" action="{{ url_for('dashboard.appointments') }}" class="flex flex-col md:flex-row items-center gap-4 mb-4 p-6 bg-white rounded-lg shadow-md">
-        <!-- Search Input -->
-        <div class="relative flex-grow">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search appointments..." 
-                value="{{ request.args.get('search', '') }}" 
-                class="w-full py-3 px-4 text-gray-700 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-300"
-            >
-            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+    <!-- Appointment Filter Section -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-        </div>
-        
-        <!-- Status Filter Dropdown -->
-        <div x-data="{ isOpen: false, selectedStatus: '{{ request.args.get('status', 'All') }}' }" class="relative">
-            <button 
-                @click="isOpen = !isOpen" 
-                type="button" 
-                class="relative z-10 block py-3 px-4 text-gray-700 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 w-48"
-            >
-                <div class="flex items-center justify-between">
-                    <span class="flex items-center">
-                        <span :class="{
-                            'bg-gray-500': selectedStatus === 'All',
-                            'bg-yellow-500': selectedStatus === 'Pending',
-                            'bg-green-500': selectedStatus === 'Completed',
-                            'bg-red-500': selectedStatus === 'Cancelled',
-                            'bg-blue-500': selectedStatus === 'Scheduled'
-                        }" class="inline-block w-2.5 h-2.5 mr-2 rounded-full"></span>
-                        <span x-text="selectedStatus"></span>
-                    </span>
-                    <svg class="w-5 h-5 text-gray-400 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
+            Filter Appointments
+        </h2>
+        <form action="" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
+                        Date
+                    </label>
+                    <input type="date" id="date" name="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
-            </button>
-    
-            <div 
-                x-show="isOpen" 
-                @click.away="isOpen = false"
-                x-transition:enter="transition ease-out duration-100"
-                x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90" 
-                class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800"
-            >
-                <a @click="selectedStatus = 'All'; isOpen = false" href="{{ url_for('dashboard.appointments') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-gray-500 rounded-full"></span>All
-                </a>
-                <a @click="selectedStatus = 'Pending'; isOpen = false" href="{{ url_for('dashboard.appointments', status='Pending') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-yellow-500 rounded-full"></span>Pending
-                </a>
-                <a @click="selectedStatus = 'Completed'; isOpen = false" href="{{ url_for('dashboard.appointments', status='Completed') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-green-500 rounded-full"></span>Completed
-                </a>
-                <a @click="selectedStatus = 'Cancelled'; isOpen = false" href="{{ url_for('dashboard.appointments', status='Cancelled') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-red-500 rounded-full"></span>Cancelled
-                </a>
-                <a @click="selectedStatus = 'Scheduled'; isOpen = false" href="{{ url_for('dashboard.appointments', status='Scheduled') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-blue-500 rounded-full"></span>Scheduled
-                </a>
-            </div>
-        </div>
-        
-        <!-- Filter Button -->
-        <button 
-            type="submit" 
-            class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 flex items-center justify-center"
-        >
-            <span>Filter</span>
-            <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-              </svg>
-        </button>
-    </form>    
-      
-    <div class="flex flex-col mt-6">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-800">
-                            <tr>
-                                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    <div class="flex items-center gap-x-3">
-                                        <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                        <span>Patient Name</span>
-                                    </div>
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Doctor
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Date
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Time
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Status
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                            {% for appointment in appointments %}
-                            <tr>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    <div class="inline-flex items-center gap-x-3">
-                                        <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                        <div class="flex items-center gap-x-2">
-                                            <img class="object-cover w-10 h-10 rounded-full" src="https://i.pravatar.cc/300?img={{ appointment.id }}" alt="{{ appointment.patient.name }}'s image">
-                                            <div>
-                                                <h2 class="font-medium text-gray-800 dark:text-white ">{{ appointment.patient.name }}</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">{{ appointment.doctor.name }}</td>
-                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.date.strftime('%B %d, %Y') }}</td>
-                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{{ appointment.time.strftime('%I:%M %p') }}</td>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 {% if appointment.status == 'Completed' %}bg-green-100/60 dark:bg-gray-800{% elif appointment.status == 'Pending' %}bg-yellow-100/60 dark:bg-gray-800{% elif appointment.status == 'Cancelled' %}bg-red-100/60 dark:bg-gray-800{% elif appointment.status == 'Scheduled' %}bg-blue-100/60 dark:bg-gray-800{% endif %}">
-                                        <span class="h-1.5 w-1.5 rounded-full {% if appointment.status == 'Completed' %}bg-green-500{% elif appointment.status == 'Pending' %}bg-yellow-500{% elif appointment.status == 'Cancelled' %}bg-red-500{% elif appointment.status == 'Scheduled' %}bg-blue-500{% endif %}"></span>
-                                        <h2 class="text-sm font-normal {% if appointment.status == 'Completed' %}text-green-500{% elif appointment.status == 'Pending' %}text-yellow-500{% elif appointment.status == 'Cancelled' %}text-red-500{% elif appointment.status == 'Scheduled' %}text-blue-500{% endif %}">{{ appointment.status }}</h2>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm whitespace-nowrap">
-                                    <div class="flex items-center gap-x-6">
-                                        <a href="{{ url_for('dashboard.edit_appointment', appointment_id=appointment.id) }}" class="text-gray-500 transition-colors duration-200 dark:hover:text-indigo-500 dark:text-gray-300 hover:text-indigo-500 focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                            </svg>
-                                        </a>
-                                        <a href="{{ url_for('dashboard.reschedule_appointment', appointment_id=appointment.id) }}" class="text-gray-500 transition-colors duration-200 dark:hover:text-indigo-500 dark:text-gray-300 hover:text-indigo-500 focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="w-5 h-5">
-                                                <path d="M320-400q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm160 0q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm160 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/>
-                                            </svg>
-                                        </a>                                                                                                                
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
+                        Status
+                    </label>
+                    <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">All</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">
+                        Patient Name
+                    </label>
+                    <input type="text" id="patient" name="patient" placeholder="Search by patient name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
             </div>
-        </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Apply Filters
+                </button>
+            </div>
+        </form>
     </div>
-    
-    <div class="flex items-center justify-between mt-6">
-        <a href="{{ url_for('dashboard.appointments', page=pagination.prev_num, search=search_query, status=status_filter) }}" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 {% if not pagination.has_prev %}opacity-50 cursor-not-allowed{% endif %}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+
+    <!-- Appointments List -->
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
-            <span>Previous</span>
-        </a>
-    
-        <div class="items-center hidden lg:flex gap-x-3">
-            {% for page_num in pagination.iter_pages() %}
-            {% if page_num %}
-            <a href="{{ url_for('dashboard.appointments', page=page_num, search=search_query, status=status_filter) }}" class="px-2 py-1 text-sm text-blue-500 rounded-md dark:bg-gray-800 bg-blue-100/60">{{ page_num }}</a>
-            {% else %}
-            <span class="px-2 py-1 text-sm text-gray-500 rounded-md dark:bg-gray-800 bg-gray-100/60">...</span>
-            {% endif %}
-            {% endfor %}
+            Appointments
+        </h2>
+        {% if appointments %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Patient
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Date & Time
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex items-center">
+                                <div class="ml-3">
+                                    <p class="text-gray-900 whitespace-no-wrap">
+                                        {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ appointment.date_time }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                                <span class="relative">{{ appointment.status }}</span>
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-2">View</a>
+                            <a href="#" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
+                            <a href="#" class="text-red-600 hover:text-red-900">Cancel</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    
-        <a href="{{ url_for('dashboard.appointments', page=pagination.next_num, search=search_query, status=status_filter) }}" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 {% if not pagination.has_next %}opacity-50 cursor-not-allowed{% endif %}">
-            <span>Next</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+        {% else %}
+        <div class="text-center py-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-        </a>
-    </div>      
-</section>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Appointments Found</h3>
+            <p class="text-gray-500">There are currently no appointments scheduled. Use the filter above to search for specific appointments or check back later.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

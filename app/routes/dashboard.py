@@ -4,14 +4,13 @@ import requests
 import pyrebase
 from app.config import Config
 from app.routes.auth import firebase_db
-from ..models_db import Patient, Doctor, Appointment, Message
+from ..models_db import Patient, Doctor, Appointment, Message, Prescription
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import google.generativeai as genai
 from PIL import Image
 from flask_paginate import Pagination, get_page_parameter
-# from ..models.user import User
 from app.helpers import send_email, send_sms
 from sqlalchemy import func
 
@@ -21,7 +20,7 @@ genai.configure(api_key=GOOGLE_API_KEY1)
 
 bp = Blueprint('dashboard', __name__)
 
-
+#<----------------------Dashboard Routes----------------------->
 @bp.route('/')
 def index():
     if 'user' not in session:
@@ -33,10 +32,16 @@ def index():
         return redirect(url_for('patient.patient_dashboard'))
     return redirect(url_for('auth.signin'))
 
+
+#<----------------------Dashboard Routes----------------------->
 @bp.route('/organization')
 def organization_dashboard():
     if 'user' not in session or session.get('user_type') != 'organization':
-        return redirect(url_for('auth.signin'))
+        return render_template('auth/signin.html') + '''
+            <script>
+                showFlashMessage('You must be signed in to access this page.', 'red', 'error');
+            </script>
+        '''
 
     user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
     id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
@@ -45,49 +50,65 @@ def organization_dashboard():
         # Fetch doctor data from Firebase
         doctor_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
         if doctor_data:
-            doctor_name = doctor_data.get('name')
+            full_name = doctor_data.get('full_name')
             total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
             total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
 
             return render_template('doctors/dashboard.html',
-                                   doctor_name=doctor_name,
-                                   total_patients=total_patients,
-                                   total_appointments=total_appointments)
+                                      full_name=full_name,
+                                   )
         else:
-            flash('Unable to fetch doctor details.', 'error')
-            return redirect(url_for('auth.signin'))
+            return render_template('auth/signin.html') + '''
+                <script>
+                    showFlashMessage('Unable to fetch organization details.', 'red', 'error');
+                </script>
+            '''
     except Exception as e:
-        flash('Error accessing doctor information.', 'error')
         print(f"Firebase fetch error: {e}")
-        return redirect(url_for('auth.signin'))
+        return render_template('auth/signin.html') + '''
+            <script>
+                showFlashMessage('Error accessing organization information.', 'red', 'error');
+            </script>
+        '''
 
 @bp.route('/patient')
 def patient_dashboard():
     if 'user' not in session or session.get('user_type') != 'patient':
-        return redirect(url_for('auth.signin'))
-    
-    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
-    
+        return render_template('auth/signin.html') + '''
+            <script>
+                showFlashMessage('You must be signed in to access this page.', 'red', 'error');
+            </script>
+        '''
+
+    user_id = session.get('user_id')
+    id_token = session.get('user_id_token')
+
     try:
         # Fetch user data from Firebase
         user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
         if user_data:
-            print('test')
             first_name = user_data.get('first_name')
             last_name = user_data.get('last_name')
-            print(first_name, last_name)
             return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
         else:
-            flash('Unable to fetch user details.', 'error')
-            return redirect(url_for('auth.signin'))
+            return render_template('auth/signin.html') + '''
+                <script>
+                    showFlashMessage('Unable to fetch user details.', 'red', 'error');
+                </script>
+            '''
     except Exception as e:
-        flash('Error accessing user information.', 'error')
         print(f"Firebase fetch error: {e}")
-        return redirect(url_for('auth.signin'))
+        return render_template('auth/signin.html') + '''
+            <script>
+                showFlashMessage('Error accessing user information.', 'red', 'error');
+            </script>
+        '''
 
 
 
+
+
+#<----------------------Image Analysis----------------------->
 # Allowed extensions for image upload
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -156,6 +177,10 @@ def image_analysis():
     return render_template('doctors/image_analysis.html', results=results)
 
 
+
+
+
+#<----------------------Predictive Analytics----------------------->
 @bp.route('/predictive_analytics', methods=['GET', 'POST'])
 def predictive_analytics():
     patients = Patient.query.all()
@@ -233,6 +258,9 @@ def predictive_analytics():
     
     return render_template('doctors/predictive_analytics.html', patients=patients)
 
+
+
+#<----------------------Get Patient Details----------------------->
 @bp.route('/patients/<int:patient_id>', methods=['GET'])
 def get_patient(patient_id):
     patient = Patient.query.get_or_404(patient_id)
@@ -274,12 +302,8 @@ def doctors():
     return render_template('doctors/doctors.html', doctors=doctors, search_query=search_query, specialization_filter=specialization_filter, status_filter=status_filter, pagination=pagination, specializations=specializations)
 
 
-    ery.get_or_404(doctor_id)
-    if request.method == 'POST':
-        # Add your message handling logic here
-        pass
-    return render_template('message_doctor.html', doctor=doctor)
 
+#<----------------------Add Doctor----------------------->
 @bp.route('/dashboard/add_doctor', methods=['GET', 'POST'])
 def add_doctor():
     if 'user' not in session:
@@ -296,12 +320,15 @@ def add_doctor():
 
     return render_template('add_doctor.html')
 
+
+#<----------------------View Doctor Profile----------------------->
 @bp.route('/dashboard/view_doctor_profile/<int:doctor_id>', methods=['GET'])
 def view_doctor_profile(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
     return render_template('view_doctor_profile.html', doctor=doctor)
 
 
+#<----------------------Edit Doctor Profile----------------------->
 @bp.route('/doctor/edit/<int:doctor_id>', methods=['GET', 'POST'])
 def edit_doctor(doctor_id):
     if 'user' not in session:
@@ -318,6 +345,7 @@ def edit_doctor(doctor_id):
 
     return render_template('edit_doctor.html', doctor=doctor)
 
+
 @bp.route('/doctor/delete/<int:doctor_id>', methods=['POST'])
 def delete_doctor(doctor_id):
     if 'user' not in session:
@@ -329,6 +357,8 @@ def delete_doctor(doctor_id):
     flash('Doctor deleted successfully!', 'success')
     return redirect(url_for('dashboard.doctors'))
 
+
+#<----------------------patients----------------------->
 @bp.route('/patients', methods=['GET', 'POST'])
 def patients():
     if 'user' not in session:
@@ -378,64 +408,36 @@ def update_patient_status(patient_id, status):
     return redirect(url_for('dashboard.patients'))
 
 
-@bp.route('/doctor/messages', methods=['GET'])
-def doctor_messages():
-    if 'user' not in session or session.get('user_type') != 'doctors':
+
+#<----------------------Messages----------------------->
+@bp.route('/messages')
+def messages():
+    if 'user' not in session or session.get('user_type') != 'organization':
         return redirect(url_for('auth.signin'))
-
-    user_id = session.get('user_id')
-    messages = Message.query.filter_by(recipient_id=user_id).all()
-
-    return render_template('doctors/messages.html', messages=messages)
-# @bp.route('/send_message_page/<int:patient_id>', methods=['GET'])
-# def send_message_page(patient_id):
-#     if 'user' not in session:
-#         return redirect(url_for('auth.signin'))
-    
-#     patient = Patient.query.get_or_404(patient_id)
-#     return render_template('send_message.html', patient=patient)
-
-# @bp.route('/send_message', methods=['POST'])
-# def send_message():
-#     patient_id = request.form.get('patient_id')
-#     message_type = request.form.get('message_type')
-#     content = request.form.get('content')
-
-#     patient = Patient.query.get(patient_id)
-#     if not patient:
-#         flash('Patient not found', 'danger')
-#         return redirect(url_for('dashboard.patients'))
-
-#     if message_type == 'email':
-#         success = send_email(patient.email, "Message from Hospital", content)
-#     elif message_type == 'sms':
-#         success = send_sms(patient.phone_number, content)
-#     else:
-#         flash('Invalid message type', 'danger')
-#         return redirect(url_for('dashboard.send_message_page', patient_id=patient_id))
-
-#     if success:
-#         message = Message(patient_id=patient.id, message_type=message_type, content=content, status='sent')
-#         flash('Message sent successfully', 'success')
-#     else:
-#         message = Message(patient_id=patient.id, message_type=message_type, content=content, status='failed')
-#         flash('Failed to send message', 'danger')
-
-#     db.session.add(message)
-#     db.session.commit()
-#     return redirect(url_for('dashboard.patients'))
+    return render_template('doctors/messages.html')
 
 
-
+#<----------------------Reports----------------------->
 @bp.route('/reports')
 def reports():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
     return render_template('doctors/reports.html')
 
+
+#<----------------------prescription and medical history----------------------->
+@bp.route('/prescription', methods=['GET', 'POST'])
+def prescription():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    
+    return render_template('doctors/prescription.html')
+
+
+#<----------------------Appointments----------------------->
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
-    if 'user' not in session or session.get('user_type') != 'doctor':
+    if 'user' not in session or session.get('user_type') != 'organization':
         return redirect(url_for('auth.signin'))
 
     search_query = request.args.get('search', '')

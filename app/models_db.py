@@ -35,13 +35,13 @@ class AuditLog(db.Model):
     action = db.Column(db.String(255), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# class Visit(db.Model):
-#     visit_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     patient_id = db.Column(db.Integer, db.ForeignKey('patient.patient_id'))
-#     doctor_name = db.Column(db.String(255), nullable=False)
-#     date = db.Column(db.Date, nullable=False)
-#     summary = db.Column(db.Text)
-#     next_steps = db.Column(db.Text)
+class Visit(db.Model):
+    visit_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    doctor_name = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    summary = db.Column(db.Text)
+    next_steps = db.Column(db.Text)
 
 class ClientAccounts(db.Model):
     __tablename__ = 'client_accounts'
@@ -182,14 +182,25 @@ class PatientRoom(db.Model):
     check_out_date = db.Column(db.Date)
 
 
+# class Message(db.Model):
+#     __tablename__ = 'messages'
+#     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+#     recipient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+#     subject = db.Column(db.String(255))
+#     body = db.Column(db.Text)
+#     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class Message(db.Model):
     __tablename__ = 'messages'
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    subject = db.Column(db.String(255))
-    body = db.Column(db.Text)
+    conversation_id = db.Column(db.String(255), unique=True, nullable=False)
+    conversation_data = db.Column(db.JSON, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 
 

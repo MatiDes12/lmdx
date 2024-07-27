@@ -1,14 +1,26 @@
 
 from mailbox import Message
+<<<<<<< HEAD
+import os
+from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
+from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
+=======
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message, Patient
+>>>>>>> 2af27d80838f179ba379c33d7d8f4775b49e3e63
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
 import calendar
+import firebase_admin
+from firebase_admin import credentials, messaging
 
 bp = Blueprint('patient', __name__)
 
+
+
+if not os.path.exists('static/conversations'):
+    os.makedirs('static/conversations')
 
 #<-------------------------- dashboard -------------------------------->
 
@@ -163,90 +175,116 @@ def messages():
     if 'user' not in session or session.get('user_type') not in ['patient', 'client']:
         return redirect(url_for('auth.signin'))
 
-    # Fetch doctors
     doctors = Doctor.query.all()
-    doctor_statuses = []
-    for doctor in doctors:
-        user = User.query.get(doctor.doctor_id)
-        status = 'Active' if user else 'Inactive'
-        doctor_statuses.append({
-            'id': doctor.doctor_id,
-            'name': f"{doctor.first_name} {doctor.last_name}",
-            'specialization': doctor.specialization,
-            'status': status
-        })
-
-    # Fetch messages sent to the current client from doctors
     client_id = session.get('user_id')
     messages = Message.query.filter_by(recipient_id=client_id).all()
     message_details = []
 
-    # Fetch the sender information for each message and ensure timestamp is a datetime object
     for message in messages:
-        sender = User.query.get(message.sender_id)
-        doctor = Doctor.query.filter_by(doctor_id=sender.doctor_id).first()
+        doctor = Doctor.query.filter_by(doctor_id=message.sender_id).first()
         if doctor:
             timestamp = message.timestamp
             if isinstance(timestamp, str):
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
+
             message_details.append({
                 'doctor_name': f"{doctor.first_name} {doctor.last_name}",
-                'doctor_image': f"https://i.pravatar.cc/300?img={doctor.doctor_id % 70}",  # Random image for doctor
+                'doctor_image': f"https://i.pravatar.cc/300?img={doctor.doctor_id % 70}",
                 'body': message.body,
                 'timestamp': timestamp
             })
 
-    return render_template('clients/messages.html', doctor_statuses=doctor_statuses, doctors=doctors, messages=message_details)
+    return render_template('clients/messages.html', doctors=doctors, messages=message_details)
+
 
 @bp.route('/send_message', methods=['POST'])
 def send_message():
-    if 'user' not in session or session.get('user_type') not in ['patient', 'client']:
+    data = request.form
+    sender = data.get('sender')
+    receiver = data.get('receiver')
+    message = data.get('message')
+    timestamp = datetime.utcnow().isoformat()
+
+    if not sender or not receiver or not message:
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    # Create a unique filename for the conversation
+    filename = f"{sender}_{receiver}.json"
+    filepath = os.path.join('static/conversations', filename)
+
+    # Load existing conversation or create a new one
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file:
+            conversation = json.load(file)
+    else:
+        conversation = []
+
+    # Append the new message
+    conversation.append({
+        'sender': sender,
+        'receiver': receiver,
+        'message': message,
+        'timestamp': timestamp
+    })
+
+    # Save the conversation back to the file
+    with open(filepath, 'w') as file:
+        json.dump(conversation, file, indent=4)
+
+    return jsonify({'success': True}), 200
+
+@bp.route('/get_messages', methods=['GET'])
+def get_messages():
+    sender = request.args.get('sender')
+    receiver = request.args.get('receiver')
+
+    if not sender or not receiver:
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    # Create a unique filename for the conversation
+    filename = f"{sender}_{receiver}.json"
+    filepath = os.path.join('static/conversations', filename)
+
+    # Load existing conversation or return an empty list
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file:
+            conversation = json.load(file)
+    else:
+        conversation = []
+
+    return jsonify({'success': True, 'conversation': conversation}), 200
+
+#<-------------------------- profile -------------------------------->
+
+@bp.route('/profile')
+def profile():
+    if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
+    
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    return render_template('clients/profile.html', user=user)
 
-    doctor_id = request.form.get('doctor_id')
-    message_body = request.form.get('message')
-    sender_id = session.get('user_id')  # Assuming you store the logged-in user's ID in session
 
-    if not doctor_id or not message_body:
-        flash('Please select a doctor and enter a message.')
-        return redirect(url_for('patient.messages'))
-
-    doctor = Doctor.query.get(doctor_id)
-    if not doctor:
-        flash('Invalid doctor selected.')
-        return redirect(url_for('patient.messages'))
-
-    recipient_id = doctor.doctor_id
-
-    # Create and save the message
-    message = Message(sender_id=sender_id, recipient_id=recipient_id, subject='Message from Client', body=message_body)
-    db.session.add(message)
+@bp.route('/update_profile', methods=['POST'])
+def update_profile():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+    
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    
+    user.first_name = request.form.get('first_name')
+    user.last_name = request.form.get('last_name')
+    user.email = request.form.get('email')
+    user.phone = request.form.get('phone')
+    user.address = request.form.get('address')
+    user.city = request.form.get('city')
+    user.state = request.form.get('state')
+    user.zipcode = request.form.get('zipcode')
+    
     db.session.commit()
-
-    flash('Message sent successfully.')
-    return redirect(url_for('patient.messages'))
-
-
-@bp.route('/active_doctors', methods=['GET'])
-def active_doctors():
-    if 'user' not in session or session.get('user_type') not in ['patient', 'client']:
-        return redirect(url_for('auth.signin'))
-
-    # Fetch only 5 active doctors
-    doctors = Doctor.query.join(User).filter(User.is_active == True).limit(5).all()
-    doctor_details = []
-    for index, doctor in enumerate(doctors):
-        user = User.query.get(doctor.doctor_id)
-        doctor_details.append({
-            'id': doctor.doctor_id,
-            'name': f"{doctor.first_name} {doctor.last_name}",
-            'specialization': doctor.specialization,
-            'status': 'Active',
-            'image_url': f"https://i.pravatar.cc/30{index+1}"  # Generates a unique profile image for each doctor
-        })
-
-    return render_template('active_doctors.html', doctors=doctor_details)
-
+    return redirect(url_for('patient.profile'))
 
 
 
@@ -332,6 +370,16 @@ def set_reminder():
     db.session.commit()
     
     return redirect(url_for('patient.medication'))
+
+@bp.route('/schedule_now')
+def schedule_now():
+    # Logic to schedule a blood test
+    return redirect(url_for('dashboard'))
+
+@bp.route('/find_specialist')
+def find_specialist():
+    # Logic to find a specialist
+    return redirect(url_for('dashboard'))
 
 #<-------------------------- visits -------------------------------->
 @bp.route('/visits')
