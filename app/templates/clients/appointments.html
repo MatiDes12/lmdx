@@ -119,18 +119,6 @@
   </div>
 </div>
 <script>
-<<<<<<< HEAD
-document.addEventListener("DOMContentLoaded", function () {
-  const doctorSelect = document.getElementById('doctor-select');
-  const dateSelect = document.getElementById('date-select');
-  const timeSelect = document.getElementById('time-select');
-
-  function updateAvailableTimes() {
-    const doctorId = doctorSelect.value;
-    const date = dateSelect.value;
-
-    if (doctorId && date) {
-=======
   document.addEventListener("DOMContentLoaded", function () {
     const doctorSelect = document.getElementById('doctor-select');
     const dateSelect = document.getElementById('date-select');
@@ -142,7 +130,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const date = dateSelect.value;
       const now = new Date();
   
->>>>>>> 4fcb532283ce3f11f237f9827c76a4954f9d4487
       fetch(`{{ url_for('patient.get_available_times', _external=true) }}?doctor_id=${doctorId}&date=${date}`)
         .then(response => response.json())
         .then(times => {

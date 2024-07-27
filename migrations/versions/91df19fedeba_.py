@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 8bd89422d7a3
+Revision ID: 91df19fedeba
 Revises: 
-Create Date: 2024-07-26 03:44:56.658216
+Create Date: 2024-07-26 21:35:35.246262
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8bd89422d7a3'
+revision = '91df19fedeba'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -97,7 +97,10 @@ def upgrade():
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
     sa.Column('user_type', sa.Enum('patient', 'doctors', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False),
+    sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('last_login', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email')
     )
@@ -189,6 +192,29 @@ def upgrade():
     sa.ForeignKeyConstraint(['role_id'], ['role.role_id'], ),
     sa.PrimaryKeyConstraint('role_id', 'permission_id')
     )
+    op.create_table('settings',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('language', sa.String(length=20), nullable=True),
+    sa.Column('timezone', sa.String(length=20), nullable=True),
+    sa.Column('dark_mode', sa.Boolean(), nullable=True),
+    sa.Column('default_patient_view', sa.String(length=20), nullable=True),
+    sa.Column('show_inactive_patients', sa.Boolean(), nullable=True),
+    sa.Column('records_per_page', sa.Integer(), nullable=True),
+    sa.Column('default_specialization_filter', sa.String(length=50), nullable=True),
+    sa.Column('show_doctor_schedules', sa.Boolean(), nullable=True),
+    sa.Column('default_chart_type', sa.String(length=20), nullable=True),
+    sa.Column('auto_refresh_analytics', sa.Boolean(), nullable=True),
+    sa.Column('refresh_interval', sa.Integer(), nullable=True),
+    sa.Column('email_notifications', sa.Boolean(), nullable=True),
+    sa.Column('sms_notifications', sa.Boolean(), nullable=True),
+    sa.Column('notification_frequency', sa.String(length=20), nullable=True),
+    sa.Column('two_factor_auth', sa.Boolean(), nullable=True),
+    sa.Column('session_timeout', sa.Integer(), nullable=True),
+    sa.Column('password_expiry', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.user_id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('staff',
     sa.Column('staff_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
@@ -231,6 +257,30 @@ def upgrade():
     sa.ForeignKeyConstraint(['test_id'], ['lab_test.test_id'], ),
     sa.PrimaryKeyConstraint('result_id')
     )
+    op.create_table('organization_doctor',
+    sa.Column('org_doctor_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('org_id', sa.Integer(), nullable=True),
+    sa.Column('doctor_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
+    sa.ForeignKeyConstraint(['org_id'], ['organization.org_id'], ),
+    sa.PrimaryKeyConstraint('org_doctor_id')
+    )
+    op.create_table('organization_patient',
+    sa.Column('org_patient_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('org_id', sa.Integer(), nullable=True),
+    sa.Column('patient_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['org_id'], ['organization.org_id'], ),
+    sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ),
+    sa.PrimaryKeyConstraint('org_patient_id')
+    )
+    op.create_table('organization_staff',
+    sa.Column('org_staff_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('org_id', sa.Integer(), nullable=True),
+    sa.Column('staff_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['org_id'], ['organization.org_id'], ),
+    sa.ForeignKeyConstraint(['staff_id'], ['staff.staff_id'], ),
+    sa.PrimaryKeyConstraint('org_staff_id')
+    )
     op.create_table('patient_insurance',
     sa.Column('patient_insurance_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('patient_id', sa.Integer(), nullable=True),
@@ -269,10 +319,14 @@ def downgrade():
     op.drop_table('visit')
     op.drop_table('patient_room')
     op.drop_table('patient_insurance')
+    op.drop_table('organization_staff')
+    op.drop_table('organization_patient')
+    op.drop_table('organization_doctor')
     op.drop_table('lab_result')
     op.drop_table('billing')
     op.drop_table('user_role')
     op.drop_table('staff')
+    op.drop_table('settings')
     op.drop_table('role_permission')
     op.drop_table('reminder')
     op.drop_table('prescription')
