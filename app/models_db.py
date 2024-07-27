@@ -108,7 +108,7 @@ class Appointment(db.Model):
     notes = db.Column(db.Text)
     
     doctor = db.relationship('Doctor', backref='appointments')
-
+    client = db.relationship('ClientAccounts', backref='appointments')
 
 class LabTest(db.Model):
     test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -205,8 +205,9 @@ class Message(db.Model):
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    conversation_id = db.Column(db.String(255), unique=True, nullable=False)
-    conversation_data = db.Column(db.JSON, nullable=False)
+    # conversation_id = db.Column(db.String(255), unique=True, nullable=False)
+    # conversation_data = db.Column(db.JSON, nullable=False)
+    body = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
