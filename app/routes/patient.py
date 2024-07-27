@@ -5,6 +5,7 @@ from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
+import calendar
 
 bp = Blueprint('patient', __name__)
 
@@ -70,15 +71,36 @@ def generate_available_times(doctor_id, appointment_date):
     print("available_times: ",available_times)
     return available_times
 
+
+def day_of_week(day_name):
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    return days.index(day_name)  # Returns 0 for Monday, 1 for Tuesday, etc.
+
 @bp.route('/get-available-times', methods=['GET'])
 def get_available_times():
     doctor_id = request.args.get('doctor_id')
-    date = request.args.get('date')
-    if doctor_id and date:
-        available_times = generate_available_times(doctor_id, datetime.strptime(date, "%Y-%m-%d").date())
-        return jsonify(available_times)
-    return jsonify([])
+    date_str = request.args.get('date')
+    if doctor_id and date_str:
+        date = datetime.strptime(date_str, "%Y-%m-%d")
+        day_index = date.weekday()  # Monday is 0 and Sunday is 6
 
+        doctor = Doctor.query.get(doctor_id)
+        if not doctor or doctor.status != 'Active':
+            return jsonify([])
+
+        # Parse the doctor's schedule days
+        schedule_days = doctor.schedule.split(' to ')
+        start_day = day_of_week(schedule_days[0])
+        end_day = day_of_week(schedule_days[1])
+
+        # Check if the selected day falls within the doctor's schedule
+        if start_day <= day_index <= end_day or (end_day < start_day and (day_index >= start_day or day_index <= end_day)):
+            available_times = generate_available_times(doctor_id, date)
+            return jsonify(available_times)
+
+        return jsonify([])  # Return empty if the date is not within the doctor's working days
+
+    return jsonify([])
 
 
 @bp.route('/appointments', methods=['GET', 'POST'])
@@ -109,19 +131,21 @@ def appointments():
 
         return redirect(url_for('patient.appointments'))
 
-    doctors = Doctor.query.filter_by(status='Active').all()
+    doctors = Doctor.query.all()
     upcoming_appointments = Appointment.query.filter(
         Appointment.appointment_date >= datetime.now(),
         Appointment.status != 'Cancelled'
     ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
 
     doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, datetime.now().date()) for doctor in doctors}
+    today_date = datetime.now().strftime("%Y-%m-%d")
     
     print("Doctor timeslots: ", doctor_timeslots)
     return render_template('clients/appointments.html', 
                            upcoming_appointments=upcoming_appointments,
                            doctors=doctors,
-                           doctor_timeslots=doctor_timeslots)
+                           doctor_timeslots=doctor_timeslots,
+                           today_date=today_date)
 
 #<-------------------------- messages -------------------------------->
 

@@ -57,11 +57,12 @@
             >Select Date</label
           >
           <input
-            type="date"
-            id="date-select"
-            name="appointment_date"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          />
+          type="date"
+          id="date-select"
+          name="appointment_date"
+          min="{{ today_date }}"
+          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        />        
         </div>
         <div>
           <label
@@ -122,34 +123,40 @@ document.addEventListener("DOMContentLoaded", function () {
   const doctorSelect = document.getElementById('doctor-select');
   const dateSelect = document.getElementById('date-select');
   const timeSelect = document.getElementById('time-select');
+  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
   function updateAvailableTimes() {
     const doctorId = doctorSelect.value;
     const date = dateSelect.value;
+    const now = new Date();
 
-    if (doctorId && date) {
-      fetch(`{{ url_for('patient.get_available_times', _external=true) }}?doctor_id=${doctorId}&date=${date}`)
-        .then(response => response.json())
-        .then(times => {
-          timeSelect.innerHTML = '';
-          if (times.length > 0) {
-            times.forEach(time => {
+    fetch(`{{ url_for('patient.get_available_times', _external=true) }}?doctor_id=${doctorId}&date=${date}`)
+      .then(response => response.json())
+      .then(times => {
+        timeSelect.innerHTML = '';
+        if (times.length > 0) {
+          times.forEach(time => {
+            const timeValue = new Date(date + 'T' + time);
+            // Ensure time is in the future if today is the selected date
+            if (date !== today || timeValue > now) { 
               const option = document.createElement('option');
               option.value = time;
               option.textContent = time;
               timeSelect.appendChild(option);
-            });
-          } else {
-            const option = document.createElement('option');
-            option.textContent = 'No available times';
-            timeSelect.appendChild(option);
-          }
-        });
-    }
+            }
+          });
+        }
+        if (timeSelect.options.length === 0) {
+          const option = document.createElement('option');
+          option.textContent = 'No available times';
+          timeSelect.appendChild(option);
+        }
+      });
   }
 
   doctorSelect.addEventListener('change', updateAvailableTimes);
   dateSelect.addEventListener('change', updateAvailableTimes);
+  updateAvailableTimes(); // Call on initial load to populate times based on current date
 });
 
 </script>
