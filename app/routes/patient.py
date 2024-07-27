@@ -2,11 +2,8 @@
 from mailbox import Message
 import os
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
-<<<<<<< HEAD
-=======
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
->>>>>>> 4fcb532283ce3f11f237f9827c76a4954f9d4487
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message, Patient
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
