@@ -8,14 +8,24 @@ from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
+import google.generativeai as genai
+from dotenv import load_dotenv
 
 
 bp = Blueprint('patient', __name__)
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Now you can access the environment variable
+api_key = os.environ.get('GOOGLE_API_KEY1')
 
 
-if not os.path.exists('static/conversations'):
-    os.makedirs('static/conversations')
+# Configure Google Gemini API
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+
 
 #<-------------------------- dashboard -------------------------------->
 
@@ -117,7 +127,7 @@ def get_available_times():
     return jsonify([])
 
 
-
+#<-------------------------- appointments -------------------------------->
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
     if request.method == 'POST':
@@ -132,6 +142,14 @@ def appointments():
             flash('You must be logged in to schedule an appointment.')
             return redirect(url_for('auth.signin'))
 
+        # Generate AI-enhanced notes if the reason is provided
+        if reason:
+            ai_prompt = f"Summarize the following medical consultation reason and combine with existing notes: {reason}. Existing notes: {notes if notes else 'No additional notes provided. and use first person pronouns.'}"
+            response = model.generate_content(ai_prompt)
+            enhanced_notes = response.text.strip()
+        else:
+            enhanced_notes = notes  # Use existing notes if no reason is provided
+
         new_appointment = Appointment(
             client_id=client_id,
             doctor_id=doctor_id,
@@ -139,25 +157,19 @@ def appointments():
             appointment_time=datetime.strptime(appointment_time, "%I:%M %p").time(),
             status='Scheduled',
             reason=reason,
-            notes=notes
+            notes=enhanced_notes
         )
         db.session.add(new_appointment)
         db.session.commit()
-
-        # Redirect after POST to avoid duplicate submissions
         return redirect(url_for('patient.appointments'))
 
-    # Fetch all active doctors
     doctors = Doctor.query.all()
-
-    # Fetch upcoming appointments including today's past the current time
     now = datetime.now()
     upcoming_appointments = Appointment.query.filter(
         (Appointment.appointment_date > now.date()) | 
         ((Appointment.appointment_date == now.date()) & (Appointment.appointment_time >= now.time())),
         Appointment.status != 'Cancelled'
     ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
-
     doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, now.date()) for doctor in doctors}
     today_date = now.strftime("%Y-%m-%d")
     
@@ -166,6 +178,30 @@ def appointments():
                            doctors=doctors,
                            doctor_timeslots=doctor_timeslots,
                            today_date=today_date)
+
+
+
+@bp.route('/patient/view_appointment_details')
+def view_appointment_details():
+    appointment_id = request.args.get('appointment_id')
+    # Fetch appointment details from the database
+    # Render a detailed appointment view page
+    return render_template('appointment_details.html', appointment=appointment_details)
+
+@bp.route('/cancel_appointment/<int:appointment_id>', methods=['GET', 'POST'])
+def cancel_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    if request.method == 'POST':
+        db.session.delete(appointment)
+        db.session.commit()
+        flash('Appointment cancelled successfully.', 'success')
+        return redirect(url_for('show_appointments'))
+
+    return render_template('clients/confirm_cancellation.html', appointment=appointment)
+
+
+
 
 #<-------------------------- messages -------------------------------->
 
