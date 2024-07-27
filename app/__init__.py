@@ -33,10 +33,11 @@ def create_app():
     mail.init_app(app)
 
     # Import and register blueprints
-    from .routes import auth, dashboard, main, upload, patient, contact
+    from .routes import auth, doctor, main, upload, patient, contact, admin
     app.register_blueprint(auth.bp)
-    app.register_blueprint(dashboard.bp, url_prefix='/dashboard')
     app.register_blueprint(main.main_bp)
+    app.register_blueprint(admin.bp, url_prefix='/admin')
+    app.register_blueprint(doctor.bp, url_prefix='/doctor')
     app.register_blueprint(upload.bp, url_prefix='/upload')
     app.register_blueprint(patient.bp, url_prefix='/patient')
     app.register_blueprint(contact.bp, url_prefix='/contact')

@@ -14,7 +14,7 @@
 <section class="container px-4 mx-auto">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h2 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Edit Doctor</h2>
-        <form method="POST" action="{{ url_for('dashboard.edit_doctor', doctor_id=doctor.id) }}">
+        <form method="POST" action="{{ url_for('doctor.edit_doctor', doctor_id=doctor.id) }}">
             <div class="mb-4">
                 <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                 <input 

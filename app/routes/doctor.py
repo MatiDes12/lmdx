@@ -23,7 +23,7 @@ GOOGLE_API_KEY1 = ''
 genai.configure(api_key=GOOGLE_API_KEY1)
 
 
-bp = Blueprint('dashboard', __name__)
+bp = Blueprint('doctor', __name__)
 
 
 #<----------------------Firebase Authentication----------------------->
@@ -143,20 +143,29 @@ def test_notification():
     
     return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
 
-#<----------------------Dashboard Routes----------------------->
+#<---------------------- Dashboard Routes----------------------->
 @bp.route('/')
 def index():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
     
     if session.get('user_type') == 'organization':
-        return redirect(url_for('dashboard.organization_dashboard'))
+        return redirect(url_for('doctor.organization_dashboard'))
     elif session.get('user_type') == 'patient':
         return redirect(url_for('patient.patient_dashboard'))
+    elif session.get('user_type') == 'admin':
+        return redirect(url_for('admin.admin_dashboard'))
     return redirect(url_for('auth.signin'))
 
+#<---------------------- organization Dashboard Routes----------------------->
 
-#<----------------------Dashboard Routes----------------------->
+@bp.route('/admin')
+def admin_dashboard():
+    if 'user' not in session or session.get('user_type') != 'admin':
+        return render_template('auth/signin.html')
+    
+    return render_template('admin/dashboard.html')
+#<---------------------- organization Dashboard Routes----------------------->
 @bp.route('/organization')
 def organization_dashboard():
     if 'user' not in session or session.get('user_type') != 'organization':
@@ -193,6 +202,8 @@ def organization_dashboard():
                 showFlashMessage('Error accessing organization information.', 'red', 'error');
             </script>
         '''
+
+#<---------------------- Patient Dashboard Routes----------------------->
 
 @bp.route('/patient')
 def patient_dashboard():
@@ -437,7 +448,7 @@ def add_doctor():
         db.session.add(doctor)
         db.session.commit()
         flash('Doctor added successfully!', 'success')
-        return redirect(url_for('dashboard.doctors'))
+        return redirect(url_for('doctor.doctors'))
 
     return render_template('add_doctor.html')
 
@@ -462,7 +473,7 @@ def edit_doctor(doctor_id):
         doctor.specialization = request.form['specialization']
         db.session.commit()
         flash('Doctor updated successfully!', 'success')
-        return redirect(url_for('dashboard.doctors'))
+        return redirect(url_for('doctor.doctors'))
 
     return render_template('edit_doctor.html', doctor=doctor)
 
@@ -476,7 +487,7 @@ def delete_doctor(doctor_id):
     db.session.delete(doctor)
     db.session.commit()
     flash('Doctor deleted successfully!', 'success')
-    return redirect(url_for('dashboard.doctors'))
+    return redirect(url_for('doctor.doctors'))
 
 
 #<----------------------patients----------------------->
@@ -520,7 +531,7 @@ def edit_patient(patient_id):
         patient.gender = request.form['gender']
         patient.status = request.form['status']
         db.session.commit()
-        return redirect(url_for('dashboard.patients'))
+        return redirect(url_for('doctor.patients'))
     return render_template('edit_patient.html', patient=patient)
 
 @bp.route('/update_patient_status/<int:patient_id>/<string:status>', methods=['POST'])
@@ -529,7 +540,7 @@ def update_patient_status(patient_id, status):
     patient.status = status
     db.session.commit()
     flash('Patient status updated successfully.', 'success')
-    return redirect(url_for('dashboard.patients'))
+    return redirect(url_for('doctor.patients'))
 
 
 
@@ -641,7 +652,7 @@ def reschedule_appointment(appointment_id):
 
         if not new_date or not new_time:
             flash('Both date and time are required.', 'error')
-            return redirect(url_for('dashboard.reschedule_appointment', appointment_id=appointment_id))
+            return redirect(url_for('doctor.reschedule_appointment', appointment_id=appointment_id))
 
         try:
             appointment.date = datetime.strptime(new_date, '%Y-%m-%d')
@@ -649,11 +660,11 @@ def reschedule_appointment(appointment_id):
             appointment.status = 'Rescheduled'
             db.session.commit()
             flash('Appointment rescheduled successfully.', 'success')
-            return redirect(url_for('dashboard.appointments'))
+            return redirect(url_for('doctor.appointments'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error rescheduling appointment: {str(e)}', 'error')
-            return redirect(url_for('dashboard.reschedule_appointment', appointment_id=appointment_id))
+            return redirect(url_for('doctor.reschedule_appointment', appointment_id=appointment_id))
 
     return render_template('reschedule_appointment.html', appointment=appointment)
 
@@ -664,7 +675,7 @@ def edit_appointment(appointment_id):
         appointment.status = request.form['status']
         db.session.commit()
         # flash('Appointment status updated successfully.', 'success')
-        return redirect(url_for('dashboard.appointments'))
+        return redirect(url_for('doctor.appointments'))
     
     # Fetching patient's last visit or medical history if available
     patient = appointment.patient
@@ -687,7 +698,7 @@ def lab_results():
         patient.lab_results = results
         db.session.commit()
         flash('Lab results updated successfully!', 'success')
-        return redirect(url_for('dashboard.lab_results'))
+        return redirect(url_for('doctor.lab_results'))
 
     patients = Patient.query.all()
     return render_template('doctors/lab_results.html', patients=patients)
@@ -701,7 +712,7 @@ def update_status(appointment_id, status):
     appointment.status = status
     db.session.commit()
 
-    return redirect(url_for('dashboard.appointments'))
+    return redirect(url_for('doctor.appointments'))
 
 @bp.route('/monitor', methods=['GET'])
 def monitor():

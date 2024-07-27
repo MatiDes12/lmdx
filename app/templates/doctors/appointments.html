@@ -121,8 +121,8 @@
                             </span>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <a href="{{ url_for('dashboard.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Reschedule</a>
-                            <a href="{{ url_for('dashboard.edit_appointment', appointment_id=appointment.appointment_id) }}" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
+                            <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Reschedule</a>
+                            <a href="{{ url_for('doctor.edit_appointment', appointment_id=appointment.appointment_id) }}" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
                             <a href="#" class="text-red-600 hover:text-red-900">Cancel</a>
                         </td>
                     </tr>

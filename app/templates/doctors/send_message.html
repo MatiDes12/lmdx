@@ -24,7 +24,7 @@
         <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Send Message</h3>
         <p class="text-sm text-gray-600 dark:text-gray-400">Use this form to send an email or SMS to the patient. Please ensure the message content is appropriate and clear.</p>
         
-        <form method="POST" action="{{ url_for('dashboard.send_message') }}" class="mt-6">
+        <form method="POST" action="{{ url_for('doctor.send_message') }}" class="mt-6">
             <input type="hidden" name="patient_id" value="{{ patient.id }}">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
