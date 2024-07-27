@@ -44,7 +44,7 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
                         Date
                     </label>
-                    <input type="date" id="date" name="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="date" id="date" name="date" value="{{ date_filter }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
@@ -52,16 +52,16 @@
                     </label>
                     <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         <option value="">All</option>
-                        <option value="scheduled">Scheduled</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="Scheduled" {% if status_filter == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                        <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+                        <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">
                         Patient Name
                     </label>
-                    <input type="text" id="patient" name="patient" placeholder="Search by patient name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="patient" name="search" placeholder="Search by patient name" value="{{ search_query }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
             </div>
             <div class="flex justify-end">
@@ -106,13 +106,13 @@
                             <div class="flex items-center">
                                 <div class="ml-3">
                                     <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                                        {{ appointment.client.first_name }} {{ appointment.client.last_name }}
                                     </p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ appointment.date_time }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ appointment.appointment_date.strftime('%Y-%m-%d') }} {{ appointment.appointment_time.strftime('%I:%M %p') }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
@@ -121,8 +121,8 @@
                             </span>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-2">View</a>
-                            <a href="#" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
+                            <a href="{{ url_for('dashboard.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Reschedule</a>
+                            <a href="{{ url_for('dashboard.edit_appointment', appointment_id=appointment.appointment_id) }}" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
                             <a href="#" class="text-red-600 hover:text-red-900">Cancel</a>
                         </td>
                     </tr>

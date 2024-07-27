@@ -8,7 +8,7 @@ from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
-
+from sqlalchemy import and_, or_
 
 bp = Blueprint('patient', __name__)
 
@@ -174,82 +174,81 @@ def messages():
     if 'user' not in session or session.get('user_type') not in ['patient', 'client']:
         return redirect(url_for('auth.signin'))
 
-    doctors = Doctor.query.all()
     client_id = session.get('user_id')
-    messages = Message.query.filter_by(recipient_id=client_id).all()
-    message_details = []
-
-    for message in messages:
-        doctor = Doctor.query.filter_by(doctor_id=message.sender_id).first()
+    all_doctors = Doctor.query.all()
+    messages_sent = Message.query.filter_by(sender_id=client_id).all()
+    messages_received = Message.query.filter_by(recipient_id=client_id).all()
+    
+    doctor_ids = set([msg.recipient_id for msg in messages_sent] + [msg.sender_id for msg in messages_received])
+    print("doctor_ids: ",doctor_ids)
+    unique_doctors = {}
+    
+    for doctor_id in doctor_ids:
+        doctor = Doctor.query.filter_by(doctor_id=doctor_id).first()
         if doctor:
-            timestamp = message.timestamp
-            if isinstance(timestamp, str):
-                timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
-
-            message_details.append({
-                'doctor_name': f"{doctor.first_name} {doctor.last_name}",
-                'doctor_image': f"https://i.pravatar.cc/300?img={doctor.doctor_id % 70}",
-                'body': message.body,
-                'timestamp': timestamp
-            })
-
-    return render_template('clients/messages.html', doctors=doctors, messages=message_details)
+            last_message = Message.query.filter(
+                or_(
+                    and_(Message.sender_id == client_id, Message.recipient_id == doctor_id),
+                    and_(Message.sender_id == doctor_id, Message.recipient_id == client_id)
+                )
+            ).order_by(Message.timestamp.desc()).first()
+            
+            if last_message:
+                unique_doctors[doctor.doctor_id] = {
+                    'doctor_name': f"{doctor.first_name} {doctor.last_name}",
+                    'last_message': last_message.body,
+                    'timestamp': last_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+    unique_doctors_list = [{'doctor_id': k, **v} for k, v in unique_doctors.items()]
+    return render_template('clients/messages.html', all_doctors=all_doctors, unique_doctors=unique_doctors_list)
 
 
 @bp.route('/send_message', methods=['POST'])
 def send_message():
-    data = request.form
-    sender = data.get('sender')
-    receiver = data.get('receiver')
-    message = data.get('message')
-    timestamp = datetime.utcnow().isoformat()
+    try:
+        data = request.json
+        sender_id = session.get('user_id')
+        receiver_id = data.get('doctor_id')
+        body = data.get('message')
+        timestamp = datetime.utcnow()
 
-    if not sender or not receiver or not message:
-        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+        if not sender_id or not receiver_id or not body:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
-    # Create a unique filename for the conversation
-    filename = f"{sender}_{receiver}.json"
-    filepath = os.path.join('static/conversations', filename)
+        new_message = Message(
+            sender_id=sender_id,
+            recipient_id=receiver_id,
+            body=body,
+            timestamp=timestamp
+        )
+        db.session.add(new_message)
+        db.session.commit()
 
-    # Load existing conversation or create a new one
-    if os.path.exists(filepath):
-        with open(filepath, 'r') as file:
-            conversation = json.load(file)
-    else:
-        conversation = []
+        return jsonify({'success': True}), 200
 
-    # Append the new message
-    conversation.append({
-        'sender': sender,
-        'receiver': receiver,
-        'message': message,
-        'timestamp': timestamp
-    })
-
-    # Save the conversation back to the file
-    with open(filepath, 'w') as file:
-        json.dump(conversation, file, indent=4)
-
-    return jsonify({'success': True}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @bp.route('/get_messages', methods=['GET'])
 def get_messages():
-    sender = request.args.get('sender')
-    receiver = request.args.get('receiver')
+    sender_id = session.get('user_id')
+    receiver_id = request.args.get('doctor_id')
 
-    if not sender or not receiver:
+    if not sender_id or not receiver_id:
         return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
-    # Create a unique filename for the conversation
-    filename = f"{sender}_{receiver}.json"
-    filepath = os.path.join('static/conversations', filename)
+    messages = Message.query.filter(
+        (Message.sender_id == sender_id) & (Message.recipient_id == receiver_id) |
+        (Message.sender_id == receiver_id) & (Message.recipient_id == sender_id)
+    ).order_by(Message.timestamp.asc()).all()
 
-    # Load existing conversation or return an empty list
-    if os.path.exists(filepath):
-        with open(filepath, 'r') as file:
-            conversation = json.load(file)
-    else:
-        conversation = []
+    conversation = [{
+        'sender': 'You' if msg.sender_id == sender_id else 'Doctor',
+        'message': msg.body,
+        'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    } for msg in messages]
 
     return jsonify({'success': True, 'conversation': conversation}), 200
 

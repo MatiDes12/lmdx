@@ -6,7 +6,7 @@ import requests
 import pyrebase
 from app.config import Config
 from app.routes.auth import firebase_db
-from ..models_db import Patient, Doctor, Appointment, Message, Prescription, Settings, User
+from ..models_db import Patient, Doctor, Appointment, Message, Prescription, Settings, User, ClientAccounts
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from functools import wraps
@@ -534,11 +534,48 @@ def update_patient_status(patient_id, status):
 
 
 #<----------------------Messages----------------------->
-@bp.route('/messages')
+@bp.route('/messages', methods=['GET'])
 def messages():
     if 'user' not in session or session.get('user_type') != 'organization':
         return redirect(url_for('auth.signin'))
-    return render_template('doctors/messages.html')
+
+    doctor_id = session.get('user_id')
+    messages = Message.query.filter_by(recipient_id=doctor_id).all()
+    message_details = []
+
+    for message in messages:
+        patient = User.query.filter_by(user_id=message.sender_id).first()
+        if patient:
+            message_details.append({
+                'patient_name': f"{patient.first_name} {patient.last_name}",
+                'body': message.body,
+                'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            })
+
+    return render_template('doctors/messages.html', messages=message_details)
+
+@bp.route('/send_message', methods=['POST'])
+def send_message():
+    data = request.json
+    sender_id = session.get('user_id')
+    receiver_id = data.get('patient_id')
+    body = data.get('message')
+    timestamp = datetime.utcnow()
+
+    if not sender_id or not receiver_id or not body:
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    new_message = Message(
+        sender_id=sender_id,
+        recipient_id=receiver_id,
+        body=body,
+        timestamp=timestamp
+    )
+    db.session.add(new_message)
+    db.session.commit()
+
+    return jsonify({'success': True}), 200
+
 
 
 #<----------------------Reports----------------------->
@@ -562,30 +599,37 @@ def prescription():
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
     if 'user' not in session or session.get('user_type') != 'organization':
-        return redirect(url_for('auth.signin'))
-
-    search_query = request.args.get('search', '')
-    status_filter = request.args.get('status', '')
-    page = request.args.get('page', 1, type=int)
+            return redirect(url_for('auth.signin'))
 
     doctor_id = session.get('user_id')
-    appointments_query = Appointment.query.filter_by(doctor_id=doctor_id).join(Patient).join(Doctor)
+    search_query = request.args.get('search', '')
+    status_filter = request.args.get('status', '')
+    date_filter = request.args.get('date', '')
+    page = request.args.get('page', 1, type=int)
+
+    appointments_query = Appointment.query.filter_by(doctor_id=doctor_id).join(ClientAccounts)
 
     if search_query:
         search_pattern = f'%{search_query}%'
         appointments_query = appointments_query.filter(
-            (Patient.name.ilike(search_pattern)) |
-            (Doctor.name.ilike(search_pattern))
+            (ClientAccounts.first_name.ilike(search_pattern)) |
+            (ClientAccounts.last_name.ilike(search_pattern))
         )
 
     if status_filter:
         appointments_query = appointments_query.filter(Appointment.status == status_filter)
 
+    if date_filter:
+        try:
+            date_filter = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            appointments_query = appointments_query.filter(Appointment.appointment_date == date_filter)
+        except ValueError:
+            flash('Invalid date format', 'error')
+
     pagination = appointments_query.paginate(page=page, per_page=7)
     appointments = pagination.items
 
-    return render_template('doctors/appointments.html', appointments=appointments, pagination=pagination, search_query=search_query, status_filter=status_filter)
-
+    return render_template('doctors/appointments.html', appointments=appointments, pagination=pagination, search_query=search_query, status_filter=status_filter, date_filter=date_filter)
 
 @bp.route('/dashboard/reschedule_appointment/<int:appointment_id>', methods=['GET', 'POST'])
 def reschedule_appointment(appointment_id):
