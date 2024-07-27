@@ -1,210 +1,138 @@
 {% extends 'doctors/dashboard.html' %}
 
-{% block title %}Image Analytics{% endblock %}
+{% block title %}Image Analysis{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-    <div class="flex justify-between items-center mb-4">
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed" class="mr-4">
+            <path d="M80-720v-200h200v80H160v120H80Zm720 0v-120H680v-80h200v200h-80ZM80-40v-200h80v120h120v80H80Zm600 0v-80h120v-120h80v200H680ZM280-240h400v-480H280v480Zm0 80q-33 0-56.5-23.5T200-240v-480q0-33 23.5-56.5T280-800h400q33 0 56.5 23.5T760-720v480q0 33-23.5 56.5T680-160H280Zm80-400h240v-80H360v80Zm0 120h240v-80H360v80Zm0 120h240v-80H360v80Zm-80 80v-480 480Z"/>
+        </svg>
         <div>
-            <h1 class="text-3xl font-bold">Image Analytics</h1>
-            <p>Utilize advanced AI to analyze medical images for early detection of diseases.</p>
+            <h1 class="text-3xl font-bold">Image Analysis</h1>
+            <p class="text-lg">Utilize advanced AI to analyze medical images for early detection of diseases.</p>
         </div>
     </div>
 
-    <!-- Folders for different image types and Action Buttons -->
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex gap-4">
-            <div class="flex flex-col items-center">
-                <div class="bg-blue-100 p-4 rounded-lg">
-                    <svg class="w-8 h-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
-                    </svg>
+    <!-- Image Upload Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Upload Image
+        </h2>
+        <form action="" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="flex flex-col items-center justify-center w-full">
+                    <label class="flex flex-col border-4 border-dashed w-full h-32 hover:bg-gray-100 hover:border-gray-300 group">
+                        <div class="flex flex-col items-center justify-center pt-7">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 group-hover:text-gray-600" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect width="48" height="48" fill="none"/>
+                                <path d="M38.2141 31.3529C39.3553 29.1513 40 26.6509 40 24C40 15.1634 32.8366 8 24 8C15.1634 8 8 15.1634 8 24C8 26.651 8.6447 29.1513 9.78587 31.3529L8.73034 33.5354C7.00013 30.7706 6 27.5021 6 24C6 14.0589 14.0589 6 24 6C33.9411 6 42 14.0589 42 24C42 27.5021 40.9999 30.7706 39.2697 33.5354L38.2141 31.3529Z" fill="currentColor"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M24 17C21.2386 17 19 19.2386 19 22C19 24.7614 21.2386 27 24 27C26.7614 27 29 24.7614 29 22C29 19.2386 26.7614 17 24 17ZM21 22C21 20.3431 22.3431 19 24 19C25.6569 19 27 20.3431 27 22C27 23.6569 25.6569 25 24 25C22.3431 25 21 23.6569 21 22Z" fill="currentColor"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M14.0583 25.2531C14.0997 25.155 14.1447 25.0593 14.1932 24.9659C14.0665 24.3303 14 23.6729 14 23C14 17.4772 18.4772 13 24 13C29.5228 13 34 17.4772 34 23C34 23.6728 33.9335 24.3302 33.8069 24.9657C33.8553 25.0592 33.9004 25.155 33.9418 25.2531L38.6689 36.4438C39.7828 39.0808 37.8468 42.0002 34.9841 42.0002H31.5668C31.5235 42.001 31.4802 42.001 31.4371 42.0002H16.563C16.5198 42.001 16.4765 42.001 16.4332 42.0002H13.016C10.1533 42.0002 8.2173 39.0808 9.33122 36.4438L14.0583 25.2531ZM24 15C19.5817 15 16 18.5817 16 23C16 23.0695 16.0009 23.1388 16.0027 23.2079C16.4666 22.9836 16.9766 22.8476 17.5076 22.8165C17.5411 23.5155 17.685 24.1855 17.9223 24.8096H17.743C16.9392 24.8096 16.2134 25.2908 15.9006 26.0313L11.1736 37.222C10.6166 38.5405 11.5846 40.0002 13.016 40.0002H13.3378C12.9228 39.1246 12.8713 38.0819 13.283 37.1212L15.7637 31.3334C16.6304 29.3112 18.6188 28 20.8189 28H27.181C29.3812 28 31.3696 29.3112 32.2363 31.3334L34.7169 37.1212C35.1286 38.0819 35.0772 39.1246 34.6622 40.0002H34.9841C36.4155 40.0002 37.3835 38.5405 36.8265 37.222L32.0995 26.0313C31.7867 25.2908 31.0609 24.8096 30.2571 24.8096H30.0777C30.315 24.1855 30.4589 23.5155 30.4925 22.8165C31.0235 22.8476 31.5334 22.9836 31.9974 23.2079C31.9991 23.1388 32 23.0695 32 23C32 18.5817 28.4183 15 24 15ZM32.0908 39.8787C31.9066 39.9577 31.7151 39.997 31.5259 40.0002H31.4747C31.1182 39.9941 30.7734 39.8604 30.5053 39.6236C30.4692 39.5917 30.4312 39.5628 30.3918 39.5369L28.4285 34.6286C28.2234 34.1158 27.6414 33.8664 27.1286 34.0715C26.6158 34.2766 26.3664 34.8586 26.5715 35.3714L28.423 40H19.577L21.4285 35.3714C21.6336 34.8586 21.3842 34.2766 20.8714 34.0715C20.3586 33.8664 19.7766 34.1158 19.5715 34.6286L17.6083 39.5368C17.5688 39.5627 17.5309 39.5916 17.4947 39.6235C17.2266 39.8604 16.8817 39.9941 16.5252 40.0002H16.4741C16.285 39.997 16.0934 39.9577 15.9091 39.8787C15.1477 39.5524 14.795 38.6705 15.1213 37.9091L17.6019 32.1212C18.1535 30.8344 19.4188 30 20.8189 30H27.181C28.5811 30 29.8465 30.8344 30.398 32.1212L32.8787 37.9091C33.205 38.6705 32.8523 39.5524 32.0908 39.8787Z" fill="currentColor"/>
+                                <path d="M19.3762 12.3814C20.8363 11.7886 22.3989 11.4892 23.9747 11.5003C25.5505 11.5114 27.1087 11.8327 28.5604 12.446L29.3387 10.6037C27.6451 9.88819 25.8272 9.51327 23.9888 9.50035C22.1503 9.48742 20.3273 9.83673 18.6238 10.5283L19.3762 12.3814Z" fill="currentColor"/>
+                                </svg>
+                            <p class="text-sm text-gray-400 group-hover:text-gray-600 pt-1 tracking-wider">CT Scan</p>
+                        </div>
+                        <input type="file" class="hidden" name="ct_scan" accept="image/*">
+                    </label>
                 </div>
-                <span>CT Scan</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="bg-green-100 p-4 rounded-lg">
-                    <svg class="w-8 h-8 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
-                    </svg>
+                <div class="flex flex-col items-center justify-center w-full">
+                    <label class="flex flex-col border-4 border-dashed w-full h-32 hover:bg-gray-100 hover:border-gray-300 group">
+                        <div class="flex flex-col items-center justify-center pt-7">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 group-hover:text-gray-600" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect width="48" height="48" fill="none"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M29 9C29 11.7614 26.7614 14 24 14C21.2386 14 19 11.7614 19 9C19 6.23858 21.2386 4 24 4C26.7614 4 29 6.23858 29 9ZM27 9C27 10.6569 25.6569 12 24 12C22.3431 12 21 10.6569 21 9C21 7.34315 22.3431 6 24 6C25.6569 6 27 7.34315 27 9Z" fill="currentColor"/>
+                                <path d="M16.9998 41V34H18.9998V41C18.9998 41.5523 19.4475 42 19.9998 42H20.0865C20.6037 42 21.0356 41.6056 21.0824 41.0905L21.727 34H23.7353L23.0742 41.2716C23.069 41.3288 23.0622 41.3856 23.0539 41.4417C23.0357 41.5647 23.0101 41.6851 22.9776 41.8025C22.6242 43.0798 21.4549 44 20.0865 44H19.9998C18.3429 44 16.9998 42.6569 16.9998 41Z" fill="currentColor"/>
+                                <path d="M26.9171 41.0905L26.2725 34H24.2642L24.9253 41.2716C24.9305 41.3288 24.9373 41.3856 24.9456 41.4417C24.9638 41.5647 24.9894 41.6851 25.0219 41.8025C25.3753 43.0798 26.5446 44 27.913 44H27.9998C29.6566 44 30.9998 42.6569 30.9998 41V34H28.9998V41C28.9998 41.5523 28.552 42 27.9998 42H27.913C27.3958 42 26.9639 41.6056 26.9171 41.0905Z" fill="currentColor"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11 15C10.4477 15 10 15.4477 10 16V31C10 31.5523 10.4477 32 11 32H37C37.5523 32 38 31.5523 38 31V16C38 15.4477 37.5523 15 37 15H11ZM12 17V30H19.5C19.5 29.4424 19.7591 28.9572 20.0276 28.6006C20.3086 28.2276 20.6796 27.8883 21.0794 27.6016C21.6252 27.2103 22.2986 26.865 23 26.6678V24.5H22.2C21.5973 24.5 20.7535 24.8642 19.9433 25.3552C19.5638 25.5852 19.2337 25.8167 18.9984 25.9911C18.8812 26.0778 18.7888 26.1495 18.727 26.1984C18.6961 26.2228 18.673 26.2415 18.6582 26.2535L18.6426 26.2663L18.6399 26.2684C18.6399 26.2684 18.6402 26.2682 18 25.5C17.3598 24.7318 17.3601 24.7315 17.3601 24.7315L17.3614 24.7305L17.3638 24.7285L17.3713 24.7223L17.3966 24.7016C17.4179 24.6843 17.448 24.66 17.4863 24.6297C17.5627 24.5693 17.6719 24.4847 17.8079 24.3839C18.0788 24.1833 18.4612 23.9148 18.9067 23.6448C19.7465 23.1358 21.0027 22.5 22.2 22.5H23V20.5H22.5C21.9309 20.5 21.1909 20.6992 20.5292 20.9398C20.212 21.0552 19.937 21.1709 19.7421 21.2576C19.6449 21.3007 19.5685 21.3363 19.5176 21.3605C19.4922 21.3725 19.4732 21.3817 19.4613 21.3875L19.4487 21.3937L19.447 21.3945C19.447 21.3945 19.4472 21.3944 19 20.5C18.5528 19.6056 18.5531 19.6054 18.5531 19.6054L18.5564 19.6038L18.5629 19.6006L18.5844 19.59C18.6025 19.5812 18.6279 19.5689 18.6601 19.5536C18.7245 19.5231 18.816 19.4805 18.9298 19.4299C19.1567 19.3291 19.4755 19.1948 19.8458 19.0602C20.5591 18.8008 21.5691 18.5 22.5 18.5H23V17H12ZM25 24.5H26.1C26.8489 24.5 27.6186 24.8663 28.2631 25.3186C28.5735 25.5364 28.8285 25.7556 29.0048 25.9197C29.0925 26.0012 29.1594 26.0679 29.2026 26.1122C29.2241 26.1343 29.2397 26.1507 29.2488 26.1605L29.2574 26.1697C29.2574 26.1697 29.2567 26.169 30 25.5C30.7433 24.831 30.7429 24.8306 30.7429 24.8306L30.7414 24.829L30.7389 24.8262L30.7318 24.8184L30.7097 24.7946C30.6915 24.7751 30.6663 24.7485 30.6346 24.716C30.5711 24.6509 30.4809 24.5613 30.367 24.4553C30.1403 24.2444 29.814 23.9636 29.4119 23.6814C28.6314 23.1337 27.4511 22.5 26.1 22.5H25V20.5H25.75C26.4443 20.5 27.1193 20.7011 27.6432 20.9216C27.9003 21.0299 28.1092 21.1378 28.2509 21.2169C28.3215 21.2564 28.3747 21.2882 28.408 21.3087C28.4247 21.3189 28.4363 21.3263 28.4427 21.3304L28.4457 21.3323C28.4457 21.3323 28.4453 21.3321 29 20.5C29.5547 19.6679 29.5542 19.6676 29.5542 19.6676L29.5527 19.6666L29.5501 19.6649L29.5432 19.6604L29.5228 19.6472C29.5063 19.6366 29.484 19.6225 29.4562 19.6054C29.4007 19.5712 29.323 19.5249 29.2256 19.4706C29.0315 19.3622 28.7559 19.2201 28.4193 19.0784C27.7557 18.7989 26.8057 18.5 25.75 18.5H25V17H36V30H28.5C28.5 29.4379 28.2324 28.9452 27.9641 28.5875C27.6803 28.2092 27.3054 27.8606 26.9007 27.5663C26.3675 27.1785 25.6989 26.8257 25 26.6391V24.5ZM26.4929 30C26.4797 29.967 26.4457 29.8964 26.3641 29.7875C26.2259 29.6033 26.0071 29.3894 25.7243 29.1837C25.1478 28.7645 24.4937 28.5117 24.032 28.5004C23.4877 28.5464 22.8052 28.8252 22.2449 29.227C21.9657 29.4272 21.7556 29.6307 21.6252 29.8038C21.5496 29.9043 21.5184 29.9694 21.5063 30H26.4929Z" fill="currentColor"/>
+                                </svg>
+                            <p class="text-sm text-gray-400 group-hover:text-gray-600 pt-1 tracking-wider">X-ray</p>
+                        </div>
+                        <input type="file" class="hidden" name="xray" accept="image/*">
+                    </label>
                 </div>
-                <span>X-Ray</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="bg-red-100 p-4 rounded-lg">
-                    <svg class="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
-                    </svg>
+                <div class="flex flex-col items-center justify-center w-full">
+                    <label class="flex flex-col border-4 border-dashed w-full h-32 hover:bg-gray-100 hover:border-gray-300 group">
+                        <div class="flex flex-col items-center justify-center pt-7">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 group-hover:text-gray-600" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect width="48" height="48" fill="none"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.97786 8.35429C18.7472 5.21452 29.2538 5.21526 39.0227 8.3564C41.5057 9.15478 42.603 11.9037 41.6667 14.2306L35.3047 30.0405C35.2817 30.0977 35.2585 30.1559 35.2351 30.2147C35.0076 30.7852 34.7541 31.421 34.3672 31.908C33.8636 32.5419 33.1827 32.8943 32.2548 32.9942C31.7057 33.0534 31.2126 32.6562 31.1534 32.1071C31.0943 31.558 31.4915 31.0649 32.0406 31.0058C32.5173 30.9544 32.6779 30.8192 32.8012 30.664C32.9975 30.4169 33.1435 30.054 33.432 29.3369L39.8112 13.484C40.3543 12.1343 39.6886 10.6714 38.4105 10.2604C29.0396 7.24723 18.9611 7.24652 9.58981 10.2584C8.31163 10.6692 7.64573 12.132 8.18863 13.4817L14.5692 29.3444C14.8552 30.0556 15.0003 30.4163 15.1955 30.6626C15.3185 30.8177 15.4784 30.9528 15.9542 31.0045C16.5033 31.0641 16.9 31.5576 16.8404 32.1066C16.7807 32.6557 16.2873 33.0524 15.7382 32.9928C14.8108 32.892 14.1308 32.539 13.6282 31.905C13.2429 31.4189 12.9902 30.7846 12.7634 30.2156C12.7397 30.1559 12.7162 30.0969 12.6928 30.0389L6.33311 14.2281C5.39712 11.9011 6.49479 9.15232 8.97786 8.35429ZM18.6424 12.0657C20.341 11.3621 22.1615 11 24 11C25.8385 11 27.659 11.3621 29.3576 12.0657C31.0561 12.7693 32.5995 13.8005 33.8995 15.1005C34.29 15.491 34.29 16.1242 33.8995 16.5147C33.509 16.9052 32.8758 16.9052 32.4853 16.5147C31.371 15.4004 30.0481 14.5165 28.5922 13.9134C27.1363 13.3104 25.5759 13 24 13C22.4242 13 20.8637 13.3104 19.4078 13.9134C17.9519 14.5165 16.629 15.4004 15.5147 16.5147C15.1242 16.9052 14.491 16.9052 14.1005 16.5147C13.71 16.1242 13.71 15.491 14.1005 15.1005C15.4005 13.8005 16.9439 12.7693 18.6424 12.0657ZM18.0098 16.9927C19.7438 15.6955 21.852 14.9962 24.0175 15C26.183 15.0038 28.2887 15.7104 30.0182 17.0136C30.4592 17.346 30.5474 17.973 30.215 18.4141C29.8826 18.8552 29.2556 18.9433 28.8145 18.6109C27.431 17.5683 25.7464 17.003 24.014 17C22.2816 16.997 20.595 17.5564 19.2078 18.5941C18.7656 18.925 18.1389 18.8347 17.8081 18.3924C17.4772 17.9502 17.5675 17.3235 18.0098 16.9927ZM19 23.0639V24.8708C19.0485 24.8517 19.0982 24.8327 19.1489 24.8137C20.2535 24.3995 21.8722 24 24 24C26.1279 24 27.7465 24.3995 28.8511 24.8137C28.9019 24.8327 28.9515 24.8517 29 24.8708V23.0639C28.7943 22.9557 28.5106 22.822 28.1489 22.6863C27.2535 22.3505 25.8722 22 24 22C22.1279 22 20.7465 22.3505 19.8511 22.6863C19.4894 22.822 19.2057 22.9557 19 23.0639ZM30 22.5L30.6 21.7C30.8518 21.8889 31 22.1852 31 22.5V26.7889C31 27.776 30.7078 28.7411 30.1603 29.5624L29.5039 30.547C29.1753 31.0398 29 31.6188 29 32.2111V35.9792C29 37.2038 28.5506 38.3858 27.7371 39.301C26.9856 40.1464 26.0191 40.6723 25 40.8789V41C25 41.7693 25.8375 42.246 26.499 41.8533L28.6167 40.5958C30.6802 39.3707 33.3449 40.0275 34.6027 42.0713L34.8517 42.4759C35.1411 42.9463 34.9945 43.5622 34.5241 43.8517C34.0537 44.1411 33.4378 43.9945 33.1483 43.5241L32.8993 43.1195C32.2141 42.0059 30.7621 41.648 29.6378 42.3155L27.52 43.573C25.5254 44.7573 23 43.3198 23 41V40.8789C21.9809 40.6723 21.0144 40.1464 20.263 39.301C19.4494 38.3858 19 37.2038 19 35.9792V32.2111C19 31.6188 18.8247 31.0398 18.4962 30.547L17.8398 29.5624C17.2922 28.7411 17 27.776 17 26.7889V22.5C17 22.1852 17.1482 21.8889 17.4 21.7L18 22.5C17.4 21.7 17.3996 21.7003 17.4 21.7L17.4034 21.6975L17.4075 21.6944L17.4181 21.6867C17.4261 21.6808 17.4362 21.6736 17.4483 21.6651C17.4724 21.6481 17.5047 21.626 17.5451 21.5995C17.6259 21.5465 17.7391 21.476 17.8847 21.394C18.1761 21.2301 18.5975 21.0204 19.1489 20.8137C20.2535 20.3995 21.8722 20 24 20C26.1279 20 27.7465 20.3995 28.8511 20.8137C29.4025 21.0204 29.8239 21.2301 30.1153 21.394C30.261 21.476 30.3742 21.5465 30.4549 21.5995C30.4953 21.626 30.5276 21.6481 30.5517 21.6651C30.5638 21.6736 30.5739 21.6808 30.5819 21.6867L30.5925 21.6944L30.5966 21.6975L30.5984 21.6988L30.6 21.7C30.6004 21.7003 30.6 21.7 30 22.5ZM28.988 27.0576C28.7833 26.9505 28.5036 26.8193 28.1489 26.6863C27.2535 26.3505 25.8722 26 24 26C22.1279 26 20.7465 26.3505 19.8511 26.6863C19.4964 26.8193 19.2167 26.9505 19.0121 27.0576C19.0568 27.5551 19.2252 28.0351 19.5039 28.453L20.1603 29.4376C20.7078 30.2589 21 31.224 21 32.2111V35.9792C21 36.7139 21.2696 37.4231 21.7578 37.9723C22.9512 39.3148 25.0489 39.3148 26.2422 37.9723C26.7304 37.4231 27 36.7139 27 35.9792V32.2111C27 31.224 27.2922 30.2589 27.8398 29.4376L28.4962 28.453C28.7748 28.0351 28.9432 27.5551 28.988 27.0576ZM24 31C24.5523 31 25 31.4477 25 32V36C25 36.5523 24.5523 37 24 37C23.4477 37 23 36.5523 23 36V32C23 31.4477 23.4477 31 24 31Z" fill="currentColor"/>
+                                </svg>
+                            <p class="text-sm text-gray-400 group-hover:text-gray-600 pt-1 tracking-wider">Ultrasound</p>
+                        </div>
+                        <input type="file" class="hidden" name="ultrasound" accept="image/*">
+                    </label>
                 </div>
-                <span>MRI</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <div class="bg-yellow-100 p-4 rounded-lg">
-                    <svg class="w-8 h-8 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h6l7 7-4 4H3V7z" />
-                    </svg>
+                <div class="flex flex-col items-center justify-center w-full">
+                    <label class="flex flex-col border-4 border-dashed w-full h-32 hover:bg-gray-100 hover:border-gray-300 group">
+                        <div class="flex flex-col items-center justify-center pt-7">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 group-hover:text-gray-600" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect width="48" height="48" fill="none"/>
+                                <path d="M38.2141 31.3529C39.3553 29.1513 40 26.6509 40 24C40 15.1634 32.8366 8 24 8C15.1634 8 8 15.1634 8 24C8 26.651 8.6447 29.1513 9.78587 31.3529L8.73034 33.5354C7.00013 30.7706 6 27.5021 6 24C6 14.0589 14.0589 6 24 6C33.9411 6 42 14.0589 42 24C42 27.5021 40.9999 30.7706 39.2697 33.5354L38.2141 31.3529Z" fill="currentColor"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M24 17C21.2386 17 19 19.2386 19 22C19 24.7614 21.2386 27 24 27C26.7614 27 29 24.7614 29 22C29 19.2386 26.7614 17 24 17ZM21 22C21 20.3431 22.3431 19 24 19C25.6569 19 27 20.3431 27 22C27 23.6569 25.6569 25 24 25C22.3431 25 21 23.6569 21 22Z" fill="currentColor"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M14.0583 25.2531C14.0997 25.155 14.1447 25.0593 14.1932 24.9659C14.0665 24.3303 14 23.6729 14 23C14 17.4772 18.4772 13 24 13C29.5228 13 34 17.4772 34 23C34 23.6728 33.9335 24.3302 33.8069 24.9657C33.8553 25.0592 33.9004 25.155 33.9418 25.2531L38.6689 36.4438C39.7828 39.0808 37.8468 42.0002 34.9841 42.0002H31.5668C31.5235 42.001 31.4802 42.001 31.4371 42.0002H16.563C16.5198 42.001 16.4765 42.001 16.4332 42.0002H13.016C10.1533 42.0002 8.2173 39.0808 9.33122 36.4438L14.0583 25.2531ZM24 15C19.5817 15 16 18.5817 16 23C16 23.0695 16.0009 23.1388 16.0027 23.2079C16.4666 22.9836 16.9766 22.8476 17.5076 22.8165C17.5411 23.5155 17.685 24.1855 17.9223 24.8096H17.743C16.9392 24.8096 16.2134 25.2908 15.9006 26.0313L11.1736 37.222C10.6166 38.5405 11.5846 40.0002 13.016 40.0002H13.3378C12.9228 39.1246 12.8713 38.0819 13.283 37.1212L15.7637 31.3334C16.6304 29.3112 18.6188 28 20.8189 28H27.181C29.3812 28 31.3696 29.3112 32.2363 31.3334L34.7169 37.1212C35.1286 38.0819 35.0772 39.1246 34.6622 40.0002H34.9841C36.4155 40.0002 37.3835 38.5405 36.8265 37.222L32.0995 26.0313C31.7867 25.2908 31.0609 24.8096 30.2571 24.8096H30.0777C30.315 24.1855 30.4589 23.5155 30.4925 22.8165C31.0235 22.8476 31.5334 22.9836 31.9974 23.2079C31.9991 23.1388 32 23.0695 32 23C32 18.5817 28.4183 15 24 15ZM32.0908 39.8787C31.9066 39.9577 31.7151 39.997 31.5259 40.0002H31.4747C31.1182 39.9941 30.7734 39.8604 30.5053 39.6236C30.4692 39.5917 30.4312 39.5628 30.3918 39.5369L28.4285 34.6286C28.2234 34.1158 27.6414 33.8664 27.1286 34.0715C26.6158 34.2766 26.3664 34.8586 26.5715 35.3714L28.423 40H19.577L21.4285 35.3714C21.6336 34.8586 21.3842 34.2766 20.8714 34.0715C20.3586 33.8664 19.7766 34.1158 19.5715 34.6286L17.6083 39.5368C17.5688 39.5627 17.5309 39.5916 17.4947 39.6235C17.2266 39.8604 16.8817 39.9941 16.5252 40.0002H16.4741C16.285 39.997 16.0934 39.9577 15.9091 39.8787C15.1477 39.5524 14.795 38.6705 15.1213 37.9091L17.6019 32.1212C18.1535 30.8344 19.4188 30 20.8189 30H27.181C28.5811 30 29.8465 30.8344 30.398 32.1212L32.8787 37.9091C33.205 38.6705 32.8523 39.5524 32.0908 39.8787Z" fill="currentColor"/>
+                                <path d="M19.3762 12.3814C20.8363 11.7886 22.3989 11.4892 23.9747 11.5003C25.5505 11.5114 27.1087 11.8327 28.5604 12.446L29.3387 10.6037C27.6451 9.88819 25.8272 9.51327 23.9888 9.50035C22.1503 9.48742 20.3273 9.83673 18.6238 10.5283L19.3762 12.3814Z" fill="currentColor"/>
+                                </svg>
+                            <p class="text-sm text-gray-400 group-hover:text-gray-600 pt-1 tracking-wider">MRI</p>
+                        </div>
+                        <input type="file" class="hidden" name="mri" accept="image/*">
+                    </label>
                 </div>
-                <span>Ultrasound</span>
             </div>
-        </div>
-        <div class="flex overflow-hidden bg-white border divide-x rounded-lg rtl:flex-row-reverse dark:bg-gray-900 dark:border-gray-700 dark:divide-gray-700">
-          <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-200 sm:text-base sm:px-6 dark:hover:bg-gray-800 dark:text-gray-300 gap-x-3 hover:bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-              </svg>
-      
-              <span>Upload</span>
-          </button>
-      
-          <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-200 sm:text-base sm:px-6 dark:hover:bg-gray-800 dark:text-gray-300 gap-x-3 hover:bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-              </svg>
-      
-              <span>Drift</span>
-          </button>
-      
-          <button class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-200 sm:text-base sm:px-6 dark:hover:bg-gray-800 dark:text-gray-300 gap-x-3 hover:bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-      
-              <span>View</span>
-          </button>
-      </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Upload Image
+                </button>
+            </div>
+        </form>
     </div>
 
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Upload Section -->
-        <div class="bg-white border rounded-lg shadow-md p-4 w-full md:w-1/2">
-            <h2 class="text-xl font-semibold mb-4">Upload Medical Image</h2>
-            <form id="upload-form" action="{{ url_for('dashboard.image_analysis') }}" method="post" enctype="multipart/form-data">
-                <div id="upload-box" class="border-2 border-dotted border-blue-400 rounded-lg p-6 flex justify-center items-center flex-col cursor-pointer">
-                    <svg class="w-12 h-12 text-gray-500 mb-3" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M4 3H3C2.44772 3 2 3.44772 2 4V16C2 16.5523 2.44772 17 3 17H16C16.5523 17 17 16.5523 17 16V15H5C4.44772 15 4 14.5523 4 14V3Z" />
-                        <path d="M8 1H12C12.5523 1 13 1.44772 13 2V13C13 13.5523 12.5523 14 12 14H8C7.44772 14 7 13.5523 7 13V2C7 1.44772 7.44772 1 8 1Z" />
-                    </svg>
-                    <p class="text-gray-500 mb-3">Drag and drop files, or <span class="text-blue-500">Browse</span></p>
-                    <input type="file" name="image" class="hidden">
-                </div>
-                <p id="file-name" class="mt-2 text-sm text-gray-600"></p>
-                
-              <!-- Analysis Options inside the Upload Section -->
-              <div class="bg-white border rounded-lg shadow-md p-4 mt-6">
-                <h3 class="text-md font-semibold mb-2">Analysis Options</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <select name="image_type" class="w-full py-2 px-3 pr-6 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="" disabled selected>Select Image Type</option>
-                            <option value="ct">CT Scan</option>
-                            <option value="xray">X-Ray</option>
-                            <option value="mri">MRI</option>
-                            <option value="ultrasound">Ultrasound</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select name="analysis_type" class="w-full py-2 px-3 pr-6 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="" disabled selected>Analysis Type</option>
-                            <option value="detection">Disease Detection</option>
-                            <option value="segmentation">Segmentation</option>
-                            <option value="classification">Classification</option>
-                        </select>
-                    </div>
-                </div>
-              </div>
-                <button type="submit" class="mt-4 w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg">Analyze Image</button>
-            </form>
+    <!-- Image Display Section -->
+    {% if results %}
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Uploaded Image</h2>
+        <div class="flex items-center">
+            <img src="{{ results['image_url'] }}" alt="Uploaded Image" class="w-1/2 h-auto rounded-lg shadow-md">
+            <div class="ml-6">
+                <p class="text-lg font-semibold">File Name: {{ results['filename'] | truncate(20, True) }}</p>
+                <p class="text-lg font-semibold">File Size: {{ results['filesize'] }} KB</p>
+            </div>
         </div>
-        
+    </div>
 
-<!-- Uploaded Image Section -->
-<div class="bg-white border rounded-lg shadow-md p-4 w-full md:w-1/2 relative">
-  <h2 class="text-xl font-semibold mb-4">Uploaded Image</h2>
-  <div class="flex justify-between items-start mb-4">
-      <div class="w-1/2 h-48 border-2 border-dotted border-gray-300 flex items-center justify-center">
-          {% if results %}
-              <img src="{{ url_for('static', filename=results['image_url']) }}" alt="Uploaded Image" class="w-full h-full object-cover">
-          {% else %}
-              <p class="text-gray-500">No image uploaded yet.</p>
-          {% endif %}
-      </div>
-      <div class="w-1/2 pl-4">
-          <div class="h-48 border-2 border-dotted border-gray-300 p-4 flex justify-center items-center">
-              {% if results %}
-                  <p class="text-gray-700">{{ results['analysis'] }}</p>
-              {% else %}
-                  <p class="text-gray-500">No analysis results yet.</p>
-              {% endif %}
-          </div>
-      </div>
-  </div>
-  <div class="flex justify-between mt-5">
-      <p class="text-sm text-gray-600">{% if results %}File Name: {{ results['filename'] | truncate(20, True) }}{% else %}File Name: {% endif %}</p>
-      <p class="text-sm text-gray-600 m-6">{% if results %}File Size: {{ results['filesize'] }} KB{% else %}File Size: {% endif %}</p>
-  </div>
-  <div class="flex gap-4">
-    <button class="flex items-center gap-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onclick="showImageDetails()">
-        <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v1.5M12 9v.01M6 6h.01M6 18h.01M18 18h.01M18 6h.01M8.59 15.41L16.17 7.83M7.83 7.83L15.41 15.41" />
+    <!-- Analysis Results Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Analysis Results</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">CT Scan</h3>
+                <p>{{ results['ct_scan'] }}</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">X-ray</h3>
+                <p>{{ results['xray'] }}</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">Ultrasound</h3>
+                <p>{{ results['ultrasound'] }}</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">MRI</h3>
+                <p>{{ results['mri'] }}</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-8">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
         </svg>
-        View Details
-    </button>
-    <button class="flex items-center gap-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onclick="applyEnhancements()">
-        <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v1.5M12 9v.01M6 6h.01M6 18h.01M18 18h.01M18 6h.01M8.59 15.41L16.17 7.83M7.83 7.83L15.41 15.41" />
-        </svg>
-        Enhance Image
-    </button>
-    <button class="flex items-center gap-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onclick="generateReport()">
-        <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v1.5M12 9v.01M6 6h.01M6 18h.01M18 18h.01M18 6h.01M8.59 15.41L16.17 7.83M7.83 7.83L15.41 15.41" />
-        </svg>
-        Generate Report
-    </button>
+        <p class="text-lg">No image uploaded yet. Upload an image to get started.</p>
+    </div>
+    {% endif %}
 </div>
-</div>
-
-<!-- Flash message container -->
-<div id="flash-message-container" class="fixed top-32 right-10 z-50"></div>
-
-<!-- JavaScript to handle file upload click and flash messages -->
-<script>
-document.querySelector('#upload-box').addEventListener('click', function() {
-  document.querySelector('input[type="file"]').click();
-});
-
-document.querySelector('input[type="file"]').addEventListener('change', function() {
-  const fileName = this.files[0].name;
-  document.getElementById('file-name').textContent = `Selected file: ${fileName}`;
-});
-
-function showFlashMessage(message, category) {
-  const flashMessageContainer = document.getElementById('flash-message-container');
-  const flashMessage = document.createElement('div');
-  flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;
-  flashMessage.innerHTML = `
-      <div class="flex items-center justify-center w-12 bg-${category}-500">
-          <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
-      </svg>
-      </div>
-      <div class="px-4 py-2 -mx-3">
-          <div class="mx-3">
-              <span class="font-semibold text-${category}-500 dark:text-${category}-400">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
-              <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
-          </div>
-      </div>
-  `;
-  flashMessageContainer.appendChild(flashMessage);
-
-  setTimeout(() => {
-      flashMessage.remove();
-  }, 5000);
-}
-
-function hideLoading() {
-  // Implement logic to hide loading spinner or message
-}
-</script>
-
 {% endblock %}

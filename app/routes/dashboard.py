@@ -1,24 +1,147 @@
 import os
 from flask import Blueprint, flash, jsonify, render_template, request, session, redirect, url_for
+from flask_login import current_user, login_required
+import pytz
 import requests
 import pyrebase
 from app.config import Config
 from app.routes.auth import firebase_db
-from ..models_db import Patient, Doctor, Appointment, Message, Prescription
+from ..models_db import Patient, Doctor, Appointment, Message, Prescription, Settings, User
 from .. import sqlalchemy_db as db
 from datetime import datetime
+from functools import wraps
 from werkzeug.utils import secure_filename
 import google.generativeai as genai
 from PIL import Image
+from firebase_admin import auth, exceptions
 from flask_paginate import Pagination, get_page_parameter
 from app.helpers import send_email, send_sms
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 # Configure your Google Gemini API key
 GOOGLE_API_KEY1 = ''
 genai.configure(api_key=GOOGLE_API_KEY1)
 
+
 bp = Blueprint('dashboard', __name__)
+
+
+#<----------------------Firebase Authentication----------------------->
+
+def firebase_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        id_token = request.cookies.get('token')
+        if not id_token:
+            return redirect(url_for('auth.signin'))
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+            session['user_id'] = decoded_token['uid']
+            session['email'] = decoded_token['email']
+        except Exception as e:
+            flash('Authentication failed. Please sign in again.', 'error')
+            return redirect(url_for('auth.signin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@bp.route('/settings', methods=['GET', 'POST'])
+@firebase_login_required
+def settings():
+    user = User.query.filter_by(email=session.get('email')).first()
+
+    if not user:
+        user = User(email=session.get('email'), user_type='doctor')
+        db.session.add(user)
+        db.session.commit()
+
+    if not user.settings:
+        user.settings = Settings(user_id=user.user_id)
+        db.session.add(user.settings)
+        db.session.commit()
+
+    if request.method == 'POST':
+        try:
+            # General Settings
+            user.settings.language = request.form.get('language')
+            user.settings.timezone = request.form.get('timezone')
+            user.settings.dark_mode = 'dark_mode' in request.form
+            
+            # Patient Management Settings
+            user.settings.default_patient_view = request.form.get('default_view')
+            user.settings.show_inactive_patients = 'show_inactive' in request.form
+            user.settings.records_per_page = int(request.form.get('records_per_page', 20))
+            
+            # Doctor Management Settings
+            user.settings.default_specialization_filter = request.form.get('specialization_filter')
+            user.settings.show_doctor_schedules = 'show_schedule' in request.form
+            
+            # Analytics Settings
+            user.settings.default_chart_type = request.form.get('default_chart')
+            user.settings.auto_refresh_analytics = 'auto_refresh' in request.form
+            user.settings.refresh_interval = int(request.form.get('refresh_interval', 5))
+            
+            # Notification Settings
+            user.settings.email_notifications = 'email_notifications' in request.form
+            user.settings.sms_notifications = 'sms_notifications' in request.form
+            user.settings.notification_frequency = request.form.get('notification_frequency')
+            
+            # Security Settings
+            user.settings.two_factor_auth = 'two_factor_auth' in request.form
+            user.settings.session_timeout = int(request.form.get('session_timeout', 30))
+            user.settings.password_expiry = int(request.form.get('password_expiry', 90))
+            
+            db.session.commit()
+            flash('Settings updated successfully', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred while updating settings: {str(e)}', 'error')
+        
+        return redirect(url_for('doctors.settings'))
+    
+    timezones = pytz.all_timezones
+    specializations = ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'General Surgery', 'Psychiatry', 'Endocrinology']
+    
+    return render_template('doctors/settings.html', 
+                           settings=user.settings, 
+                           timezones=timezones, 
+                           specializations=specializations)
+
+@bp.route('/settings/toggle_dark_mode', methods=['POST'])
+@firebase_login_required
+def toggle_dark_mode():
+    user = User.query.filter_by(email=session.get('email')).first()
+    if user and user.settings:
+        user.settings.dark_mode = not user.settings.dark_mode
+        db.session.commit()
+        return jsonify({'success': True, 'dark_mode': user.settings.dark_mode})
+    return jsonify({'success': False}), 400
+
+@bp.route('/settings/update_timezone', methods=['POST'])
+@firebase_login_required
+def update_timezone():
+    user = User.query.filter_by(email=session.get('email')).first()
+    if user and user.settings:
+        new_timezone = request.json.get('timezone')
+        if new_timezone in pytz.all_timezones:
+            user.settings.timezone = new_timezone
+            db.session.commit()
+            return jsonify({'success': True, 'timezone': user.settings.timezone})
+    return jsonify({'success': False}), 400
+
+@bp.route('/settings/test_notification', methods=['POST'])
+@firebase_login_required
+def test_notification():
+    notification_type = request.json.get('type')
+    user = User.query.filter_by(email=session.get('email')).first()
+    
+    if notification_type == 'email' and user.settings.email_notifications:
+        # Implement email sending logic here
+        return jsonify({'success': True, 'message': 'Test email sent successfully'})
+    elif notification_type == 'sms' and user.settings.sms_notifications:
+        # Implement SMS sending logic here
+        return jsonify({'success': True, 'message': 'Test SMS sent successfully'})
+    
+    return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
 
 #<----------------------Dashboard Routes----------------------->
 @bp.route('/')
@@ -137,7 +260,7 @@ def image_analysis():
             '''
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file_path = os.path.join('app', 'static', 'uploads', filename)
+            file_path = os.path.join('static', 'uploads', filename)
 
             # Ensure the uploads directory exists
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -156,7 +279,7 @@ def image_analysis():
                     'filesize': f"{os.path.getsize(file_path) / 1024:.2f} KB",
                     'analysis': response.text
                 }
-                return render_template('doctors/nalysis.html', results=results) + '''
+                return render_template('doctors/image_analysis.html', results=results) + '''
                 <script>
                     hideLoading();
                     showFlashMessage('Image analyzed successfully!', 'green');
@@ -175,8 +298,6 @@ def image_analysis():
                 showFlashMessage('File type not allowed', 'red');
             </script>'''
     return render_template('doctors/image_analysis.html', results=results)
-
-
 
 
 
@@ -368,12 +489,14 @@ def patients():
     status_filter = request.args.get('status', '')
     page = request.args.get('page', 1, type=int)
 
-    patients_query = Patient.query.join(Doctor)
+    patients_query = Patient.query.join(Doctor, Patient.doctor_id == Doctor.doctor_id)
 
     if search_query:
         patients_query = patients_query.filter(
-            (Patient.name.ilike(f'%{search_query}%')) |
-            (Doctor.name.ilike(f'%{search_query}%'))
+            or_(Patient.first_name.ilike(f'%{search_query}%'),
+                Patient.last_name.ilike(f'%{search_query}%'),
+                Doctor.first_name.ilike(f'%{search_query}%'),
+                Doctor.last_name.ilike(f'%{search_query}%'))
         )
 
     if status_filter:
@@ -386,6 +509,7 @@ def patients():
                            pagination=pagination,
                            search_query=search_query,
                            status_filter=status_filter)
+
 
 @bp.route('/edit_patient/<int:patient_id>', methods=['GET', 'POST'])
 def edit_patient(patient_id):
@@ -506,6 +630,24 @@ def edit_appointment(appointment_id):
     return render_template('edit_appointment.html', appointment=appointment, last_visit=last_visit, medical_history=medical_history)
 
 
+#<----------------------Lab Results----------------------->
+@bp.route('/lab_results', methods=['GET', 'POST'])
+def lab_results():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+
+    if request.method == 'POST':
+        patient_id = request.form['patient_id']
+        results = request.form['results']
+        patient = Patient.query.get(patient_id)
+        patient.lab_results = results
+        db.session.commit()
+        flash('Lab results updated successfully!', 'success')
+        return redirect(url_for('dashboard.lab_results'))
+
+    patients = Patient.query.all()
+    return render_template('doctors/lab_results.html', patients=patients)
+
 @bp.route('/update_status/<int:appointment_id>/<status>', methods=['POST'])
 def update_status(appointment_id, status):
     if 'user' not in session:
@@ -524,91 +666,15 @@ def monitor():
     patients = Patient.query.all()
     return render_template('doctors/monitor.html', patients=patients)
 
-@bp.route('/settings', methods=['GET', 'POST'])
-def settings():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
 
-    user = User.query.filter_by(email=session['user']).first()
-
-    if request.method == 'POST':
-        user.username = request.form['username']
-        user.email = request.form['email']
-        if 'password' in request.form and request.form['password']:
-            user.password = request.form['password']  # Make sure to hash the password in a real app
-
-        db.session.commit()
-        flash('Settings updated successfully!', 'success')
-        return redirect(url_for('dashboard.settings'))
-
-    return render_template('doctors/settings.html', user=user)
-
-@bp.route('/update_preferences', methods=['POST'])
-def update_preferences():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
-    user = User.query.filter_by(email=session['user']).first()
-    user.theme = request.form['theme']
-    user.language = request.form['language']
-
-    db.session.commit()
-    flash('Preferences updated successfully!', 'success')
-    return redirect(url_for('dashboard.settings'))
-
-@bp.route('/update_notifications', methods=['POST'])
-def update_notifications():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
-    user = User.query.filter_by(email=session['user']).first()
-    user.email_notifications = request.form['email_notifications']
-    user.sms_notifications = request.form['sms_notifications']
-
-    db.session.commit()
-    flash('Notification preferences updated successfully!', 'success')
-    return redirect(url_for('dashboard.settings'))
-
-@bp.route('/update_security', methods=['POST'])
-def update_security():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
-    user = User.query.filter_by(email=session['user']).first()
-    user.two_factor = 'two_factor' in request.form
-    user.backup_email = request.form['backup_email']
-
-    db.session.commit()
-    flash('Security settings updated successfully!', 'success')
-    return redirect(url_for('dashboard.settings'))
-
-@bp.route('/patient/<int:patient_id>', methods=['GET', 'POST'])
-def patient_profile(patient_id):
-    patient = Patient.query.get_or_404(patient_id)
-    doctors = Doctor.query.all()
-
-    if request.method == 'POST':
-        try:
-            patient.name = request.form['name']
-            patient.age = request.form['age']
-            patient.gender = request.form['gender']
-            patient.status = request.form['status']
-            patient.email = request.form['email']
-            patient.phone_number = request.form['phone_number']
-            patient.admission_date = datetime.strptime(request.form['admission_date'], '%Y-%m-%d')
-            patient.last_visit = datetime.strptime(request.form['last_visit'], '%Y-%m-%d')
-            patient.doctor_id = Doctor.query.filter_by(name=request.form['doctor_id']).first().id
-            db.session.commit()
-            flash('Patient details updated successfully!', 'success')
-            return redirect(url_for('dashboard.patient_profile', patient_id=patient.id))
-        except Exception as e:
-            flash(f'Error updating patient details: {str(e)}', 'error')
-            return redirect(url_for('dashboard.patient_profile', patient_id=patient.id))
-
-    return render_template('patient_profile.html', patient=patient, doctors=doctors)
+    
+    if notification_type == 'email' and user.settings.email_notifications:
+        # Implement email sending logic here
+        return jsonify({'success': True, 'message': 'Test email sent successfully'})
+    elif notification_type == 'sms' and user.settings.sms_notifications:
+        # Implement SMS sending logic here
+        return jsonify({'success': True, 'message': 'Test SMS sent successfully'})
+    
+    return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
 
 
-@bp.route('/patient/<int:patient_id>')
-def patient_details(patient_id):
-    patient = Patient.query.get_or_404(patient_id)
-    return render_template('patient_details.html', patient=patient)

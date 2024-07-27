@@ -3,203 +3,192 @@
 {% block title %}Predictive Analytics{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-  <h1 class="text-3xl font-bold mb-4">Predictive Analytics</h1>
-  <p class="mb-4">Analyze patient data to predict outcomes and improve healthcare services.</p>
-
-  <div x-data="{ activeTab: 'data-input' }">
-    <!-- Tab Navigation -->
-    <div class="flex space-x-4 mb-4">
-      <button @click="activeTab = 'data-input'" :class="{ 'text-blue-600 border-blue-600': activeTab === 'data-input' }" class="py-2 px-4 border-b-2 focus:outline-none">
-        Data Input
-      </button>
-      <button @click="activeTab = 'predictions'" :class="{ 'text-blue-600 border-blue-600': activeTab === 'predictions' }" class="py-2 px-4 border-b-2 focus:outline-none">
-        Predictions
-      </button>
-      <button @click="activeTab = 'visualizations'" :class="{ 'text-blue-600 border-blue-600': activeTab === 'visualizations' }" class="py-2 px-4 border-b-2 focus:outline-none">
-        Visualizations
-      </button>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
+        <rect width="48" height="48" fill="none"/>
+          <path d="M12 24C11.4477 24 11 24.4477 11 25V40H8V7H6V41C6 41.5523 6.44772 42 7 42H41V40H39V13C39 12.4477 38.5523 12 38 12H32C31.4477 12 31 12.4477 31 13V40H29V21C29 20.4477 28.5523 20 28 20H22C21.4477 20 21 20.4477 21 21V40H19V25C19 24.4477 18.5523 24 18 24H12Z" fill="currentColor"/>
+    </svg>
+        <div>
+            <h1 class="text-3xl font-bold">Predictive Analytics</h1>
+            <p class="text-lg">Analyze patient data to predict outcomes and improve healthcare services</p>
+        </div>
     </div>
 
-    <!-- Tab Content -->
-    <div x-show="activeTab === 'data-input'" class="bg-white border rounded-lg shadow-md p-4">
-      <h2 class="text-2xl font-semibold mb-4">Data Input</h2>
-      <form id="data-input-form" action="{{ url_for('dashboard.predictive_analytics') }}" method="post" enctype="multipart/form-data">
-        <div class="grid grid-cols-1 gap-4 mb-4">
-          <div>
-            <label for="patient-select" class="block text-gray-700">Select Patient</label>
-            <select id="patient-select" name="patient_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-              <option value="" disabled selected>Select Patient</option>
-              {% for patient in patients %}
-                <option value="{{ patient.id }}">{{ patient.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="patient-age" class="block text-gray-700">Patient Age</label>
-            <input type="number" id="patient-age" name="patient_age" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-          </div>
-          <div>
-            <label for="patient-weight" class="block text-gray-700">Patient Weight (kg)</label>
-            <input type="number" id="patient-weight" name="patient_weight" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-          </div>
-          <div>
-            <label for="patient-height" class="block text-gray-700">Patient Height (cm)</label>
-            <input type="number" id="patient-height" name="patient_height" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-          </div>
-          <div>
-            <label for="patient-medical-history" class="block text-gray-700">Medical History</label>
-            <textarea id="patient-medical-history" name="patient_medical_history" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
-          </div>
-        </div>
-        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg">Submit Data</button>
-      </form>
+    <!-- Data Input Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Data Input
+        </h2>
+        <form action="" method="POST" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="patient_name">
+                        Patient Name
+                    </label>
+                    <input type="text" id="patient_name" name="patient_name" placeholder="Enter patient name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="age">
+                        Age
+                    </label>
+                    <input type="number" id="age" name="age" placeholder="Enter age" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">
+                        Gender
+                    </label>
+                    <select id="gender" name="gender" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="blood_pressure">
+                        Blood Pressure
+                    </label>
+                    <input type="text" id="blood_pressure" name="blood_pressure" placeholder="e.g., 120/80" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="cholesterol">
+                        Cholesterol
+                    </label>
+                    <input type="text" id="cholesterol" name="cholesterol" placeholder="e.g., 200 mg/dL" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="glucose">
+                        Glucose
+                    </label>
+                    <input type="text" id="glucose" name="glucose" placeholder="e.g., 100 mg/dL" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Submit Data
+                </button>
+            </div>
+        </form>
     </div>
 
-    <div x-show="activeTab === 'predictions'" class="bg-white border rounded-lg shadow-md p-4">
-      <h2 class="text-2xl font-semibold mb-4">Predictions</h2>
-      <div id="predictions" class="bg-gray-100 p-4 rounded-lg">
-        <p class="text-gray-500">No predictions yet.</p>
-      </div>
-    </div>
-
-    <div x-show="activeTab === 'visualizations'" class="bg-white border rounded-lg shadow-md p-4">
-      <h2 class="text-2xl font-semibold mb-4">Visualizations</h2>
-      <div id="charts" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-gray-100 p-4 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Patient Age Distribution</h3>
-          <canvas id="age-distribution-chart"></canvas>
+    <!-- Predictive Analytics Results Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            Predictive Analytics Results
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Patient
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Prediction
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Confidence
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in predictions %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex items-center">
+                                <div class="ml-3">
+                                    <p class="text-gray-900 whitespace-no-wrap">
+                                        {{ result.patient.name }}
+                                    </p>
+                                    <p class="text-gray-600 whitespace-no-wrap">{{ result.patient.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.prediction }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.confidence }}%</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.date }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex space-x-2">
+                                <a href="#" class="text-indigo-600 hover:text-indigo-900">View</a>
+                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
+                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="bg-gray-100 p-4 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Weight vs. Height Scatter Plot</h3>
-          <canvas id="weight-height-chart"></canvas>
-        </div>
-        <div class="bg-gray-100 p-4 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">BMI Distribution</h3>
-          <canvas id="bmi-distribution-chart"></canvas>
-        </div>
-        <div class="bg-gray-100 p-4 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Condition Prediction</h3>
-          <canvas id="condition-prediction-chart"></canvas>
-        </div>
-      </div>
+  <!-- Pagination -->
+  {% if predictions|length > 0 %}
+  <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+    <span class="text-xs xs:text-sm text-gray-900">
+        Showing {{ pagination.page }} to {{ pagination.pages }} of {{ pagination.total }} Entries
+    </span>
+    <div class="inline-flex mt-2 xs:mt-0">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('doctors.predictive_analytics', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+            Prev
+        </a>
+        {% else %}
+        <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-l cursor-not-allowed" disabled>
+            Prev
+        </button>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != pagination.page %}
+                    <a href="{{ url_for('doctors.predictive_analytics', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="text-sm bg-blue-500 text-white font-semibold py-2 px-4">
+                        {{ page_num }}
+                    </span>
+                {% endif %}
+            {% else %}
+                <span class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4">...</span>
+            {% endif %}
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+        <a href="{{ url_for('doctors.predictive_analytics', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+            Next
+        </a>
+        {% else %}
+        <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-r cursor-not-allowed" disabled>
+            Next
+        </button>
+        {% endif %}
     </div>
   </div>
+  {% else %}
+  <div class="text-center py-8">
+    <!-- No predictions message here -->
+  </div>
+  {% endif %}
 </div>
-
-<script>
-  document.getElementById('data-input-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    // Handle form submission and data processing here
-    document.getElementById('predictions').innerHTML = '<p class="text-gray-700">Predictions will be displayed here.</p>';
-    document.getElementById('results').innerHTML = '<p class="text-gray-700">Results will be displayed here.</p>';
-  });
-
-  // Sample chart setup using Chart.js (include Chart.js library in your template or project)
-  const ageDistributionCtx = document.getElementById('age-distribution-chart').getContext('2d');
-  const weightHeightCtx = document.getElementById('weight-height-chart').getContext('2d');
-  const bmiDistributionCtx = document.getElementById('bmi-distribution-chart').getContext('2d');
-  const conditionPredictionCtx = document.getElementById('condition-prediction-chart').getContext('2d');
-
-  new Chart(ageDistributionCtx, {
-    type: 'bar',
-    data: {
-      labels: ['0-18', '19-35', '36-50', '51-65', '65+'],
-      datasets: [{
-        label: 'Number of Patients',
-        data: [5, 10, 15, 20, 25],
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
-  new Chart(weightHeightCtx, {
-    type: 'scatter',
-    data: {
-      datasets: [{
-        label: 'Weight vs. Height',
-        data: [
-          { x: 160, y: 60 },
-          { x: 170, y: 70 },
-          { x: 180, y: 80 },
-          { x: 190, y: 90 },
-        ],
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          type: 'linear',
-          position: 'bottom'
-        }
-      }
-    }
-  });
-
-  new Chart(bmiDistributionCtx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Underweight', 'Normal weight', 'Overweight', 'Obesity'],
-      datasets: [{
-        label: 'BMI Distribution',
-        data: [5, 15, 10, 7],
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(255, 99, 132, 0.2)'
-        ],
-        borderColor: [
-          'rgba(75, 192, 192, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(255, 99, 132, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true
-    }
-  });
-
-  new Chart(conditionPredictionCtx, {
-    type: 'pie',
-    data: {
-      labels: ['Condition A', 'Condition B', 'Condition C'],
-      datasets: [{
-        label: 'Condition Prediction',
-        data: [10, 5, 3],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)'
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true
-    }
-  });
-</script>
 {% endblock %}

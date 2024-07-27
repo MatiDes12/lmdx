@@ -11,7 +11,11 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     user_type = db.Column(db.Enum('patient', 'doctors', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False)
+    active = db.Column(db.Boolean, default=True)
+    last_login = db.Column(db.DateTime , default=datetime.utcnow)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    settings = db.relationship('Settings', backref='user', uselist=False)
 
 class Role(db.Model):
     role_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -64,10 +68,14 @@ class Patient(ClientAccounts):
     dob = db.Column(db.Date)
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
+
+    doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
 
     __mapper_args__ = {
         'polymorphic_identity': 'patient'
     }
+
 
 class Doctor(db.Model):
     __tablename__ = 'doctors'
@@ -228,3 +236,42 @@ class Organization(db.Model):
         self.state = state
         self.department = department
         self.license_number = license_number
+
+class OrganizationStaff(db.Model):
+    org_staff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    org_id = db.Column(db.Integer, db.ForeignKey('organization.org_id'))
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'))
+
+
+class OrganizationDoctor(db.Model):
+    org_doctor_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    org_id = db.Column(db.Integer, db.ForeignKey('organization.org_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+
+
+class OrganizationPatient(db.Model):
+    org_patient_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    org_id = db.Column(db.Integer, db.ForeignKey('organization.org_id'))
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+
+
+class Settings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    language = db.Column(db.String(20), default='en')
+    timezone = db.Column(db.String(20), default='UTC')
+    dark_mode = db.Column(db.Boolean, default=False)
+    default_patient_view = db.Column(db.String(20), default='list')
+    show_inactive_patients = db.Column(db.Boolean, default=False)
+    records_per_page = db.Column(db.Integer, default=20)
+    default_specialization_filter = db.Column(db.String(50), default='all')
+    show_doctor_schedules = db.Column(db.Boolean, default=False)
+    default_chart_type = db.Column(db.String(20), default='bar')
+    auto_refresh_analytics = db.Column(db.Boolean, default=False)
+    refresh_interval = db.Column(db.Integer, default=5)
+    email_notifications = db.Column(db.Boolean, default=False)
+    sms_notifications = db.Column(db.Boolean, default=False)
+    notification_frequency = db.Column(db.String(20), default='immediately')
+    two_factor_auth = db.Column(db.Boolean, default=False)
+    session_timeout = db.Column(db.Integer, default=30)
+    password_expiry = db.Column(db.Integer, default=90)

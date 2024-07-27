@@ -493,3 +493,6 @@ def health_tips():
 #         return redirect(url_for('profile_settings'))
 
 #     return render_template('profile_settings.html', patient=patient)
+
+
+
