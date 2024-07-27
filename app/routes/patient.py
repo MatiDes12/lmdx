@@ -145,7 +145,15 @@ def appointments():
 
         # Generate AI-enhanced notes if the reason is provided
         if reason:
-            ai_prompt = f"Summarize the following medical consultation reason and combine with existing notes: {reason}. Existing notes: {notes if notes else 'No additional notes provided. and use first person pronouns.'}"
+            ai_prompt = (
+                "Summarize the following medical consultation reason and integrate any existing notes into a personal narrative. "
+                "You are the patient describing your symptoms and experiences. Keep the summary concise, within 20 words. "
+                "Use first-person pronouns like 'I', 'my', and 'me'. "
+                f"Reason for visit: '{reason}'. "
+                f"Existing notes: '{notes if notes else 'No additional notes provided'}'."
+            )
+
+
             response = model.generate_content(ai_prompt)
             enhanced_notes = response.text.strip()
         else:
