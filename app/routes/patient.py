@@ -189,27 +189,16 @@ def appointments():
                            today_date=today_date)
 
 
-
-@bp.route('/patient/view_appointment_details')
-def view_appointment_details():
-    appointment_id = request.args.get('appointment_id')
-    # Fetch appointment details from the database
-    # Render a detailed appointment view page
-    return render_template('appointment_details.html', appointment=appointment_details)
-
-@bp.route('/cancel_appointment/<int:appointment_id>', methods=['GET', 'POST'])
+@bp.route('/cancel_appointment/<int:appointment_id>', methods=['POST'])
 def cancel_appointment(appointment_id):
-    appointment = Appointment.query.get_or_404(appointment_id)
-
-    if request.method == 'POST':
-        db.session.delete(appointment)
+    appointment = Appointment.query.get(appointment_id)
+    if appointment:
+        db.session.delete(appointment)  # This deletes the appointment from the database
         db.session.commit()
-        flash('Appointment cancelled successfully.', 'success')
-        return redirect(url_for('show_appointments'))
-
-    return render_template('clients/confirm_cancellation.html', appointment=appointment)
-
-
+        flash('Appointment cancelled and removed successfully.')
+    else:
+        flash('Appointment not found.')
+    return redirect(url_for('patient.appointments'))
 
 
 #<-------------------------- messages -------------------------------->
