@@ -31,27 +31,21 @@ bp = Blueprint('doctor', __name__)
 def index():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
-    
     if session.get('user_type') == 'organization':
-        return redirect(url_for('doctor.organization_dashboard'))
+        return redirect(url_for('admin.admin_dashboard'))
     elif session.get('user_type') == 'patient':
         return redirect(url_for('patient.patient_dashboard'))
     return redirect(url_for('auth.signin'))
 
-#<---------------------- organization Dashboard Routes----------------------->
+
+# Dashboard Overview
 @bp.route('/admin')
 def admin_dashboard():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
 
-    total_doctors = Doctor.query.count()
-    total_departments = Department.query.count()
-    total_patients = Patient.query.count()
+    return render_template('admin/dashboard.html')
 
-    return render_template('admin/dashboard.html',
-                           total_doctors=total_doctors,
-                           total_departments=total_departments,
-                           total_patients=total_patients)
 
 
 #<---------------------- organization Dashboard Routes----------------------->

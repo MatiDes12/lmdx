@@ -204,7 +204,10 @@ def signin():
                 session['user_id_token'] = id_token
                 session['refresh_token'] = refresh_token  # Store refresh token in session
                 session['user_id'] = user_id  # Store user_id in session
-                return redirect(url_for(f'doctor.{user_type}_dashboard'))
+                if user_type == 'organization':
+                    return redirect(url_for('admin.admin_dashboard'))
+                elif user_type == 'patient':
+                    return redirect(url_for('patient.patient_dashboard'))
             else:
                 return render_template('auth/signin.html') + '''
                     <script>
