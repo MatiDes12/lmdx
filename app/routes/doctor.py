@@ -86,44 +86,6 @@ def organization_dashboard():
             </script>
         '''
 
-#<---------------------- Patient Dashboard Routes----------------------->
-
-@bp.route('/patient')
-def patient_dashboard():
-    if 'user' not in session or session.get('user_type') != 'patient':
-        return render_template('auth/signin.html') + '''
-            <script>
-                showFlashMessage('You must be signed in to access this page.', 'red', 'error');
-            </script>
-        '''
-
-    user_id = session.get('user_id')
-    id_token = session.get('user_id_token')
-
-    try:
-        # Fetch user data from Firebase
-        user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
-        if user_data:
-            first_name = user_data.get('first_name')
-            last_name = user_data.get('last_name')
-            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
-        else:
-            return render_template('auth/signin.html') + '''
-                <script>
-                    showFlashMessage('Unable to fetch user details.', 'red', 'error');
-                </script>
-            '''
-    except Exception as e:
-        print(f"Firebase fetch error: {e}")
-        return render_template('auth/signin.html') + '''
-            <script>
-                showFlashMessage('Error accessing user information.', 'red', 'error');
-            </script>
-        '''
-
-
-
-
 
 #<----------------------Image Analysis----------------------->
 # Allowed extensions for image upload
