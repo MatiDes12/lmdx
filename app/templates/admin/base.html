@@ -18,10 +18,10 @@
 <body class="bg-gray-100 dark:bg-gray-900">
     <div class="flex h-screen">
         <!-- Navbar included here -->
-        {% include 'doctors/sidebar.html' %}
+        {% include 'admin/sidebar.html' %}
         <!-- Main content area -->
         <div class="flex-1 overflow-y-auto">
-          {% include 'doctors/dashboard_navbar.html' %}
+          {% include 'admin/dashboard_navbar.html' %}
             {% block content %}
             <!-- Content will be injected here -->
             {% endblock content %}
