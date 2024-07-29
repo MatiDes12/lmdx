@@ -1,5 +1,6 @@
 from app import sqlalchemy_db as db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
@@ -8,6 +9,7 @@ from datetime import datetime
 
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)  # Add username field
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     user_type = db.Column(db.Enum('patient', 'doctors', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False)
@@ -16,6 +18,12 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     settings = db.relationship('Settings', backref='user', uselist=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Role(db.Model):
     role_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -75,6 +83,26 @@ class Patient(ClientAccounts):
     __mapper_args__ = {
         'polymorphic_identity': 'patient'
     }
+
+
+class Compliance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)  # Corrected ForeignKey reference
+    status = db.Column(db.String(20), nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    doctor = db.relationship('Doctor', backref=db.backref('compliance', lazy=True))
+
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    status = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    last_login = db.Column(db.DateTime, nullable=True)
+
+    doctor = db.relationship('Doctor', backref=db.backref('accounts', lazy=True))
+
 
 
 class Doctor(db.Model):
@@ -199,6 +227,14 @@ class PatientRoom(db.Model):
 #     body = db.Column(db.Text)
 #     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Facility(db.Model):
+    __tablename__ = 'facilities'
+    facility_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
+    location = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.Enum('Operational', 'Maintenance', 'Closed', name='facility_status_enum'), nullable=False, default='Operational')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -213,6 +249,51 @@ class Message(db.Model):
 class Department(db.Model):
     __tablename__ = 'department'
     department_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    head = db.Column(db.String(100), nullable=False)
+
+
+
+class Project(db.Model):
+    __tablename__ = 'projects'
+    
+    project_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+    status = db.Column(db.Enum('Active', 'Completed', 'On Hold', name='project_status_enum'), default='Active')
+    department_id = db.Column(db.Integer, db.ForeignKey('department.department_id'), nullable=False)
+    
+    # Relationship
+    department = db.relationship('Department', backref=db.backref('projects', lazy=True))
+
+    def __repr__(self):
+        return f'<Project {self.name}>'
+    
+
+
+class BudgetCategory(db.Model):
+    __tablename__ = 'budget_category'
+    category_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    allocated = db.Column(db.Float, nullable=False, default=0.0)
+    spent = db.Column(db.Float, nullable=False, default=0.0)
+    description = db.Column(db.Text, nullable=True)
+
+    def __init__(self, name, allocated, spent=0.0, description=None):
+        self.name = name
+        self.allocated = allocated
+        self.spent = spent
+        self.description = description
+
+class Revenue(db.Model):
+    __tablename__ = 'revenue'
+    revenue_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    source = db.Column(db.String(255), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    date_received = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
 
 class Organization(db.Model):
     __tablename__ = 'organization'
