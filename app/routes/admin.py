@@ -111,52 +111,90 @@ def patient_dashboard():
 #<---------------------- Doctor Management Routes----------------------->
 
 # Doctor Management
-@bp.route('/admin/doctors')
+@bp.route('/doctors', methods=['GET', 'POST'])
 def admin_doctors():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
     
-    doctors = Doctor.query.all()
-    return render_template('admin/doctors.html', doctors=doctors)
-
-
-
-
-
-@bp.route('/admin/doctors/add', methods=['GET', 'POST'])
-def admin_add_doctor():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
     if request.method == 'POST':
-        name = request.form['name']
-        specialization = request.form['specialization']
-        doctor = Doctor(name=name, specialization=specialization)
-        db.session.add(doctor)
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        specialization = request.form.get('specialization')
+        license_number = request.form.get('license_number')
+        phone_number = request.form.get('phone_number')
+        status = request.form.get('status')
+        schedule = request.form.get('schedule')
+        time = request.form.get('time')
+
+        new_doctor = Doctor(
+            first_name=first_name,
+            last_name=last_name,
+            specialization=specialization,
+            license_number=license_number,
+            phone_number=phone_number,
+            status=status,
+            schedule=schedule,
+            time=time
+        )
+        db.session.add(new_doctor)
         db.session.commit()
         flash('Doctor added successfully!', 'success')
         return redirect(url_for('admin.admin_doctors'))
 
-    return render_template('admin/add_doctor.html')
+    doctors = Doctor.query.all()
+    return render_template('admin/doctors.html', doctors=doctors)
 
-@bp.route('/admin/doctors/edit/<int:doctor_id>', methods=['GET', 'POST'])
-def admin_edit_doctor(doctor_id):
+@bp.route('/doctors/edit/<int:doctor_id>', methods=['GET', 'POST'])
+def edit_doctor(doctor_id):
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
-
+    
     doctor = Doctor.query.get_or_404(doctor_id)
 
     if request.method == 'POST':
-        doctor.name = request.form['name']
-        doctor.specialization = request.form['specialization']
+        doctor.first_name = request.form.get('first_name')
+        doctor.last_name = request.form.get('last_name')
+        doctor.specialization = request.form.get('specialization')
+        doctor.license_number = request.form.get('license_number')
+        doctor.phone_number = request.form.get('phone_number')
+        doctor.status = request.form.get('status')
+        doctor.schedule = request.form.get('schedule')
+        doctor.time = request.form.get('time')
+
         db.session.commit()
         flash('Doctor updated successfully!', 'success')
         return redirect(url_for('admin.admin_doctors'))
 
     return render_template('admin/edit_doctor.html', doctor=doctor)
 
+
+
+
+@bp.route('/admin/doctors/add', methods=['GET', 'POST'])
+def add_doctor():
+    if request.method == 'POST':
+        new_doctor = Doctor(
+            first_name=request.form['first_name'],
+            last_name=request.form['last_name'],
+            specialization=request.form['specialization'],
+            license_number=request.form['license_number'],
+            phone_number=request.form['phone_number'],
+            schedule=request.form['schedule'],
+            time=request.form['time']
+        )
+        db.session.add(new_doctor)
+        db.session.commit()
+        flash('Doctor added successfully!', 'success')
+        return redirect(url_for('admin.admin_doctors'))
+    
+
+
+@bp.route('/admin/doctors/edit/<int:doctor_id>', methods=['GET', 'POST'])
+
+
+
 @bp.route('/admin/doctors/delete/<int:doctor_id>', methods=['POST'])
-def admin_delete_doctor(doctor_id):
+def delete_doctor(doctor_id):
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
 
@@ -219,6 +257,19 @@ def admin_delete_doctor(doctor_id):
 #     return redirect(url_for('admin.admin_departments'))
 
 # Resource Management (Budget, Inventory, Facility)
+
+
+@bp.route('/admin/roles-permissions')
+def admin_roles_permissions():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    # Logic to display roles and permissions
+    return render_template('admin/roles_permissions.html')
+
+
+
+
+
 @bp.route('/admin/resources')
 def admin_resources():
     if 'user' not in session:

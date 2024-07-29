@@ -1,0 +1,149 @@
+{% extends 'doctors/dashboard.html' %}
+
+{% block title %}Healthcare Dashboard Settings{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
+    <!-- Header -->
+    <header class="bg-white rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between">
+        <div class="flex items-center">
+            <svg class="h-12 w-12 text-indigo-600 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <h1 class="text-3xl font-bold text-gray-800">Dashboard Settings</h1>
+        </div>
+        <button class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
+            Save Changes
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- General Settings -->
+        <div class="bg-white rounded-xl shadow-lg p-6 space-y-4">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">General Settings</h2>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="language">Language</label>
+                <select id="language" name="language" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="timezone">Timezone</label>
+                <select id="timezone" name="timezone" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option>UTC</option>
+                    <option>EST</option>
+                    <option>PST</option>
+                </select>
+            </div>
+            <div class="flex items-center">
+                <input id="dark_mode" name="dark_mode" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                <label for="dark_mode" class="ml-2 block text-sm text-gray-900">Enable Dark Mode</label>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="bg-white rounded-xl shadow-lg p-6 space-y-4">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Notification Settings</h2>
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-700">Email Notifications</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-700">SMS Notifications</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="notification_frequency">Notification Frequency</label>
+                <select id="notification_frequency" name="notification_frequency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option>Immediately</option>
+                    <option>Daily Digest</option>
+                    <option>Weekly Summary</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="bg-white rounded-xl shadow-lg p-6 space-y-4">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Security Settings</h2>
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-700">Two-Factor Authentication</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="session_timeout">Session Timeout (minutes)</label>
+                <input type="number" id="session_timeout" name="session_timeout" min="5" max="120" value="30" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="password_expiry">Password Expiry (days)</label>
+                <input type="number" id="password_expiry" name="password_expiry" min="30" max="365" value="90" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: #6366F1;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
