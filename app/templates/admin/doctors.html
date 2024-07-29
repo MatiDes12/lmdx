@@ -7,6 +7,25 @@
 {% endblock %}
 
 {% block content %}
+<style>
+    .custom-dropdown {
+        appearance: none;
+        background: url('data:image/svg+xml;utf8,<svg fill="%23999" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 0.75rem center/1.5em 1.5em;
+        background-color: white;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        padding-right: 2.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .custom-dropdown:focus {
+        border-color: #4c51bf;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+    }
+    .custom-dropdown option:first-child {
+        color: #9ca3af;
+    }
+</style>
 <div class="container mx-auto px-4 py-8">
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-lg mb-8 text-white">
@@ -78,48 +97,236 @@
     <div id="AddDoctor" class="tab-content">
         <div class="bg-gradient-to-r from-green-400 to-blue-500 p-8 rounded-xl shadow-2xl mb-10">
             <div class="flex items-center">
-              <div class="bg-white p-3 rounded-full mr-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <div>
-                <h2 class="text-4xl font-extrabold text-white mb-2">Add a New Doctor</h2>
-                <p class="text-white text-xl opacity-80">Streamline the process of adding new doctors to your healthcare system with this intuitive form.</p>
-              </div>
-            </div>
-          </div>
-          
-    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
-        <form id="doctor-form" action="{{ url_for('admin.add_doctor') }}" method="POST" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                    <input type="text" id="first_name" name="first_name" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
+                <div class="bg-white p-3 rounded-full mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
                 </div>
                 <div>
-                    <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                    <input type="text" id="last_name" name="last_name" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
+                    <h2 class="text-4xl font-extrabold text-white mb-2">Add a New Doctor</h2>
+                    <p class="text-white text-xl opacity-80">Streamline the process of adding new doctors to your healthcare system with this intuitive form.</p>
                 </div>
             </div>
-            <div>
-                <label for="specialization" class="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
-                <input type="text" id="specialization" name="specialization" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-            </div>
-            <div>
-                <label for="license_number" class="block text-sm font-medium text-gray-700 mb-1">License Number</label>
-                <input type="text" id="license_number" name="license_number" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-            </div>
-            <div>
-                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                <input type="tel" id="phone_number" name="phone_number" placeholder="XXX-XXX-XXXX" pattern="\d{3}-\d{3}-\d{4}" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-            </div>
-            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
-                Add Doctor
-            </button>
-        </form>
-    </div>
-
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <form id="doctor-form" action="{{ url_for('admin.add_doctor') }}" method="POST" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" id="first_name" name="first_name" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
+                    </div>
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
+                    </div>
+                </div>
+                <div class="relative" id="specializationContainer">
+                    <label for="specialization" class="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
+                    <button onclick="toggleDropdown()" type="button" id="specialization" name="specialization" class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <span id="selectedSpecialization" class="block truncate text-gray-700">Select Specialization</span>
+                      <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                          <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                      </span>
+                    </button>
+                    <ul id="specializationDropdown" class="hidden absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Allergy and Immunology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Allergy and Immunology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Anesthesiology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Anesthesiology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Cardiology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Cardiology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Dermatology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Dermatology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Diagnostic Radiology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Diagnostic Radiology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Emergency Medicine', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Emergency Medicine</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Endocrinology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Endocrinology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Family Medicine', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Family Medicine</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Gastroenterology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Gastroenterology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Geriatrics', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Geriatrics</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Hematology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Hematology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Infectious Disease', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Infectious Disease</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Internal Medicine', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Internal Medicine</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Nephrology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Nephrology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Neurology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Neurology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Obstetrics and Gynecology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Obstetrics and Gynecology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Oncology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Oncology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Ophthalmology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Ophthalmology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Orthopedic Surgery', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Orthopedic Surgery</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Otolaryngology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Otolaryngology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Pathology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Pathology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Pediatrics', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Pediatrics</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Physical Medicine and Rehabilitation', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Physical Medicine and Rehabilitation</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Plastic Surgery', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Plastic Surgery</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Psychiatry', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Psychiatry</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Pulmonology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Pulmonology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Radiation Oncology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Radiation Oncology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Rheumatology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Rheumatology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Surgery', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Surgery</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Urology', this)">
+                        <div class="flex items-center">
+                          <span class="font-normal ml-3 block truncate">Urology</span>
+                        </div>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                <div>
+                    <label for="license_number" class="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                    <input type="text" id="license_number" name="license_number" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
+                </div>
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input type="tel" id="phone_number" name="phone_number" placeholder="XXX-XXX-XXXX" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-md">
+                    Add Doctor
+                </button>
+            </form>
+        </div>
     </div>
 
 <!------------------------------------- Doctor List Tab ------------------------------------->
@@ -181,14 +388,6 @@
         </div>
     </section>
 </div>
-
-
-
-
-    
-    
-    
-
 
       <!------------------------------------- Schedule Management Tab ------------------------------------->
       <div id="ScheduleManagement" class="tab-content hidden">
@@ -263,11 +462,20 @@
                                     </select>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <input type="time" name="time_start" value="{{ doctor.time.split('-')[0].strip()[:5] }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    {% if doctor.time %}
+                                        <input type="time" name="time_start" value="{{ doctor.time.split('-')[0].strip()[:5] }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    {% else %}
+                                        <input type="time" name="time_start" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="HH:MM">
+                                    {% endif %}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <input type="time" name="time_end" value="{{ doctor.time.split('-')[1].strip()[:5] }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    {% if doctor.time %}
+                                        <input type="time" name="time_end" value="{{ doctor.time.split('-')[1].strip()[:5] }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    {% else %}
+                                        <input type="time" name="time_end" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="HH:MM">
+                                    {% endif %}
                                 </td>
+                                
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                     <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                         Update
@@ -535,6 +743,7 @@
 </div>
 
 </div>
+<div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
 <script>
 function openTab(evt, tabName) {
     var i, tabcontent, tabs;
@@ -567,6 +776,120 @@ function updateSchedule(doctorId, value, field) {
         console.error('Error:', error);
     });
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+        var phoneInput = document.getElementById('phone_number');
+        
+        phoneInput.addEventListener('input', function (event) {
+            var input = event.target.value.replace(/\D/g, '').substring(0, 10);
+            var formatted = '';
+
+            if (input.length > 0) {
+                formatted += input.substring(0, 3);
+            }
+            if (input.length >= 4) {
+                formatted += '-' + input.substring(3, 6);
+            }
+            if (input.length >= 7) {
+                formatted += '-' + input.substring(6, 10);
+            }
+
+            event.target.value = formatted;
+        });
+    });
+    document.addEventListener('click', function(event) {
+  let container = document.getElementById('specializationContainer');
+  if (!container.contains(event.target)) {
+    document.getElementById('specializationDropdown').classList.add('hidden');
+  }
+});
+
+function toggleDropdown() {
+  const dropdown = document.getElementById('specializationDropdown');
+  dropdown.classList.toggle('hidden');
+}
+
+function selectSpecialization(specialization, element) {
+  const selectedSpecialization = document.getElementById('selectedSpecialization');
+  selectedSpecialization.textContent = specialization;
+  const checkmarks = document.querySelectorAll('#specializationDropdown svg');
+  checkmarks.forEach(svg => svg.style.display = 'none'); // Hide all checkmarks
+  const checkmark = element.querySelector('svg');
+  checkmark.style.display = 'block'; // Show the checkmark for the selected item
+  document.getElementById('specializationDropdown').classList.add('hidden'); // Close dropdown after selection
+}
+
+document.getElementById('doctor-form').addEventListener('submit', function(event) {
+    event.preventDefault();  // Prevent default form submission
+    var formData = new FormData(this);
+
+    fetch("{{ url_for('admin.add_doctor') }}", {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+            // Update the UI to show the new doctor
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function selectSpecialization(specialization, element) {
+  const hiddenInput = document.createElement('input');
+  hiddenInput.type = 'hidden';
+  hiddenInput.name = 'specialization';
+  hiddenInput.value = specialization;
+  document.getElementById('doctor-form').appendChild(hiddenInput);
+
+  const selectedSpecialization = document.getElementById('selectedSpecialization');
+  selectedSpecialization.textContent = specialization;
+
+  document.getElementById('specializationDropdown').classList.add('hidden');
+}
+function resetForm() {
+    document.getElementById('doctor-form').reset();
+    document.getElementById('selectedSpecialization').textContent = 'Select Specialization';
+}
+function showFlashMessage(message, category, error) {
+        const flashMessageContainer = document.getElementById('flash-message-container');
+        const flashMessage = document.createElement('div');
+        flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;
+        flashMessage.innerHTML = `
+            <div class="flex items-center justify-center w-12 bg-${category}-500">
+                <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
+                </svg>
+            </div>
+            <div class="px-4 py-2 -mx-3">
+                <div class="mx-3">
+                    <span class="font-semibold text-${category}-500 dark:text-${category}-400">${error.charAt(0).toUpperCase() + error.slice(1)}</span>
+                    <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
+                </div>
+            </div>
+        `;
+        flashMessageContainer.appendChild(flashMessage);
+
+        setTimeout(() => {
+            flashMessage.remove();
+        }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for any flash messages in session and display them
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        showFlashMessage("{{ message }}", "{{ category }}");
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    });
 
 </script>
 
