@@ -12,6 +12,7 @@ from ..models_db import Appointment, AuditLog, BudgetCategory, Compliance, Depar
 from ..helpers import send_email, send_sms
 import google.generativeai as genai
 from werkzeug.security import generate_password_hash
+from werkzeug.exceptions import BadRequestKeyError
 
 
 bp = Blueprint('admin', __name__)
@@ -175,22 +176,39 @@ def edit_doctor(doctor_id):
 
 
 
+from flask import jsonify
+
 @bp.route('/admin/doctors/add', methods=['GET', 'POST'])
 def add_doctor():
     if request.method == 'POST':
-        new_doctor = Doctor(
-            first_name=request.form['first_name'],
-            last_name=request.form['last_name'],
-            specialization=request.form['specialization'],
-            license_number=request.form['license_number'],
-            phone_number=request.form['phone_number'],
-            schedule=request.form['schedule'],
-            time=request.form['time']
-        )
-        db.session.add(new_doctor)
-        db.session.commit()
-        flash('Doctor added successfully!', 'success')
-        return redirect(url_for('admin.admin_doctors'))
+        try:
+            required_fields = ['first_name', 'last_name', 'specialization', 'license_number', 'phone_number']
+            for field in required_fields:
+                if field not in request.form or not request.form[field].strip():
+                    return jsonify({'status': 'error', 'message': f'{field.replace("_", " ").capitalize()} is required.'}), 400
+
+            new_doctor = Doctor(
+                first_name=request.form['first_name'].strip(),
+                last_name=request.form['last_name'].strip(),
+                specialization=request.form['specialization'].strip(),
+                license_number=request.form['license_number'].strip(),
+                phone_number=request.form['phone_number'].strip(),
+                schedule=request.form.get('schedule', '').strip()
+            )
+            db.session.add(new_doctor)
+            db.session.commit()
+            # Refresh the page to show the newly added doctor
+            return jsonify({'status': 'success', 'message': 'Doctor added successfully.'}), 200
+        
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': str(e)}), 500
+
+    # Normal GET request
+    return render_template('admin/admin_doctors.html')
+
+
+
     
 
 
