@@ -5,7 +5,7 @@ import re
 from flask import Blueprint, jsonify, render_template, request, redirect, send_file, url_for, session, flash
 from sqlalchemy import func
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
 from .. import sqlalchemy_db as db
 from ..models_db import Appointment, AuditLog, BudgetCategory, Compliance, Department, Facility, Patient, Doctor, Permission, Project, Revenue, Role, RolePermission, Staff, User, UserRole
@@ -13,13 +13,14 @@ from ..helpers import send_email, send_sms
 import google.generativeai as genai
 from werkzeug.security import generate_password_hash
 from werkzeug.exceptions import BadRequestKeyError
-
+from flask import request
 
 bp = Blueprint('admin', __name__)
 
 GOOGLE_API_KEY1 = ''
 genai.configure(api_key=GOOGLE_API_KEY1)
 
+#<---------------------- index Routes----------------------->
 @bp.route('/')
 def index():
     if 'user' not in session:
@@ -113,23 +114,116 @@ def patient_dashboard():
         '''
 
 
+# <---------------------- Doctor Management Routes ----------------------->
+@bp.route('/doctors')
+def admin_doctors():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
 
-#<---------------------- Doctor Management Routes----------------------->
+    page = request.args.get('page', 1, type=int)
+    per_page = 7
+    doctors_pagination = Doctor.query.paginate(page=page, per_page=per_page, error_out=False)
+    doctors = doctors_pagination.items
+    
+    # Generate time slots
+    time_slots = [(datetime(2000, 1, 1, hour, 0).strftime('%I:%M %p')) for hour in range(24)]
+
+    # Days of the week
+    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    
+    return render_template('admin/doctors.html', doctors=doctors, doctors_pagination=doctors_pagination, time_slots=time_slots, days_of_week=days_of_week)
+
+
+@bp.route('/add_doctor', methods=['POST'])
+def add_doctor():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    
+    data = request.form
+    try:
+        new_doctor = Doctor(
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            specialization=data.get('specialization'),
+            license_number=data.get('license_number'),
+            phone_number=data.get('phone_number'),
+            status=data.get('status'),
+            schedule=f"{data.get('start_schedule')} to {data.get('end_schedule')}",  # Store schedule as "day to day"
+            time=f"{data.get('start_time')} - {data.get('end_time')}"  # Combine start and end times
+        )
+        db.session.add(new_doctor)
+        db.session.commit()
+        flash('Doctor added successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error adding doctor: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.admin_doctors'))
+
+@bp.route('/edit_doctor/<int:doctor_id>', methods=['POST'])
+def edit_doctor(doctor_id):
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    
+    doctor = Doctor.query.get_or_404(doctor_id)
+    data = request.form
+    try:
+        doctor.first_name = data.get('first_name')
+        doctor.last_name = data.get('last_name')
+        doctor.specialization = data.get('specialization')
+        doctor.license_number = data.get('license_number')
+        doctor.phone_number = data.get('phone_number')
+        doctor.status = data.get('status')
+        doctor.schedule = f"{data.get('start_schedule')} to {data.get('end_schedule')}"  # Store schedule as "day to day"
+        doctor.time = f"{data.get('start_time')} - {data.get('end_time')}"  # Combine start and end times
+        db.session.commit()
+        flash('Doctor updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating doctor: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.admin_doctors'))
 
 
 
-
-
-
-
-
-
+def delete_doctor(doctor_id):
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    
+    doctor = Doctor.query.get_or_404(doctor_id)
+    try:
+        db.session.delete(doctor)
+        db.session.commit()
+        flash('Doctor deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting doctor: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.admin_doctors'))
 # <---------------------- Doctor Management Endpoints ----------------------->
 
 
+@bp.route('/get_doctor/<int:doctor_id>', methods=['GET'])
+def get_doctor(doctor_id):
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    
+    doctor = Doctor.query.get_or_404(doctor_id)
+    return jsonify({
+        'doctor_id': doctor.doctor_id,
+        'first_name': doctor.first_name,
+        'last_name': doctor.last_name,
+        'specialization': doctor.specialization,
+        'license_number': doctor.license_number,
+        'phone_number': doctor.phone_number,
+        'status': doctor.status,
+        'schedule': doctor.schedule,
+        'time': doctor.time
+    })
 
 
-# <-------------------- Departments Management Endpoints -------------------->
+
+# <-------------------- Departments Management Routes -------------------->
 @bp.route('/admin/departments')
 def admin_departments():
     if 'user' not in session:
@@ -193,17 +287,6 @@ def admin_assign_staff():
     # Implement staff assignment logic here
     flash('Staff assigned to department successfully!', 'success')
     return redirect(url_for('admin.admin_departments'))
-
-
-# <---------------------- Doctor Management Endpoints ----------------------->
-@bp.route('/doctors')
-def admin_doctors():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
-    doctors = Doctor.query.all()
-    return render_template('admin/doctors.html', doctors=doctors)
-
 
 
 
