@@ -1,8 +1,8 @@
-"""empty message
+"""updated the dotor table
 
-Revision ID: 8014b76e5278
+Revision ID: 4cdcd2de47a4
 Revises: 
-Create Date: 2024-07-29 12:41:01.379217
+Create Date: 2024-07-29 19:46:08.529310
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8014b76e5278'
+revision = '4cdcd2de47a4'
 down_revision = None
 branch_labels = None
 depends_on = None
