@@ -7,894 +7,271 @@
 {% endblock %}
 
 {% block content %}
-<style>
-    .custom-dropdown {
-        appearance: none;
-        background: url('data:image/svg+xml;utf8,<svg fill="%23999" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 0.75rem center/1.5em 1.5em;
-        background-color: white;
-        border-radius: 0.5rem;
-        border: 1px solid #d1d5db;
-        padding-right: 2.5rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .custom-dropdown:focus {
-        border-color: #4c51bf;
-        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-    }
-    .custom-dropdown option:first-child {
-        color: #9ca3af;
-    }
-
-    .custom-dropdown option {
-        color: #1a202c;
-    }
-</style>
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-lg mb-8 text-white">
-        <h1 class="text-3xl font-bold">Doctor Management</h1>
-        <p>Streamline and enhance all aspects of managing doctors within your healthcare system.</p>
-    </div>
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-            <div class="rounded-full bg-blue-100 p-3 mr-4">
-                <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Total Doctors</p>
-                <p class="text-2xl font-bold text-gray-500">{{ docters |length }}</p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-            <div class="rounded-full bg-green-100 p-3 mr-4">
-                <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Active Doctors</p>
-                <p class="text-2xl font-bold text-gray-500">{{ active_doctors|length }}</p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-            <div class="rounded-full bg-purple-100 p-3 mr-4">
-                <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Specializations</p>
-                <p class="text-2xl font-bold text-gray-500">{{ total_specializations|length }}</p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-            <div class="rounded-full bg-yellow-100 p-3 mr-4">
-                <svg class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm">Today's Appointments</p>
-                <p class="text-2xl font-bold text-gray-500">{{ appointments_today|length }}</p>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Navigation Tabs -->
-    <div class="border-b-2 border-gray-200 mb-4">
-        <div class="flex space-x-4 -mb-px text-sm">
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'AddDoctor')">Add New Doctor</button>
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'DoctorList')">Doctor List</button>
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'ScheduleManagement')">Schedule Management</button>
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'PatientFeedback')">Patient Feedback</button>
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'ComplianceTracking')">Compliance Tracking</button>
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'AccountLogins')">Account Logins</button>
-        </div>
-    </div>
-
-    <!------------------------------------- Add Doctor Tab ------------------------------------->
-    <div id="AddDoctor" class="tab-content">
-        <div class="bg-gradient-to-r from-green-400 to-blue-500 p-8 rounded-xl shadow-2xl mb-10">
+    <!-- Stylish Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-teal-500 p-8 rounded-xl shadow-2xl mb-10">
+        <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="bg-white p-3 rounded-full mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zM12 13c-2.21 0-4 1.79-4 4v1h8v-1c0-2.21-1.79-4-4-4z" />
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-4xl font-extrabold text-white mb-2">Add a New Doctor</h2>
-                    <p class="text-white text-xl opacity-80">Streamline the process of adding new doctors to your healthcare system with this intuitive form.</p>
+                    <h2 class="text-4xl font-extrabold text-white mb-2">Doctor Management</h2>
+                    <p class="text-white text-xl opacity-80">Manage all doctor information, schedules, and appointments</p>
                 </div>
             </div>
-        </div>
-        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
-            <form id="doctor-form" action="{{ url_for('admin.add_doctor') }}" method="POST" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input type="text" id="first_name" name="first_name" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-                    </div>
-                    <div>
-                        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-                    </div>
-                </div>
-                <div class="relative" id="specializationContainer">
-                    <label for="specialization" class="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
-                    <button onclick="toggleDropdown()" type="button" id="specialization" name="specialization" class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <span id="selectedSpecialization" class="block truncate text-gray-700">Select Specialization</span>
-                      <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor">
-                          <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                      </span>
-                    </button>
-                    <ul id="specializationDropdown" class="hidden absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Allergy and Immunology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Allergy and Immunology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Anesthesiology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Anesthesiology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Cardiology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Cardiology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Dermatology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Dermatology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Diagnostic Radiology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Diagnostic Radiology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Emergency Medicine', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Emergency Medicine</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Endocrinology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Endocrinology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Family Medicine', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Family Medicine</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Gastroenterology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Gastroenterology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Geriatrics', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Geriatrics</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Hematology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Hematology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Infectious Disease', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Infectious Disease</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Internal Medicine', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Internal Medicine</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Nephrology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Nephrology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Neurology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Neurology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Obstetrics and Gynecology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Obstetrics and Gynecology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Oncology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Oncology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Ophthalmology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Ophthalmology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Orthopedic Surgery', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Orthopedic Surgery</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Otolaryngology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Otolaryngology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Pathology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Pathology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Pediatrics', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Pediatrics</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Physical Medicine and Rehabilitation', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Physical Medicine and Rehabilitation</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Plastic Surgery', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Plastic Surgery</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Psychiatry', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Psychiatry</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Pulmonology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Pulmonology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Radiation Oncology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Radiation Oncology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Rheumatology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Rheumatology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Surgery', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Surgery</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                      <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white" onclick="selectSpecialization('Urology', this)">
-                        <div class="flex items-center">
-                          <span class="font-normal ml-3 block truncate">Urology</span>
-                        </div>
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-4"></span>
-                      </li>
-                    </ul>
-                  </div>
-                  
-                <div>
-                    <label for="license_number" class="block text-sm font-medium text-gray-700 mb-1">License Number</label>
-                    <input type="text" id="license_number" name="license_number" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-                </div>
-                <div>
-                    <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="tel" id="phone_number" name="phone_number" placeholder="XXX-XXX-XXXX" class="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" required>
-                </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-md">
+            <div class="flex space-x-4">
+                <button onclick="showModal('addDoctorModal')" class="bg-white text-blue-600 hover:bg-blue-100 font-bold py-2 px-4 rounded-full flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
                     Add Doctor
                 </button>
+                <button onclick="showModal('viewAppointmentsModal')" class="bg-white text-teal-600 hover:bg-teal-100 font-bold py-2 px-4 rounded-full flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                    </svg>
+                    View Appointments
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor List Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full leading-normal">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Doctor</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Specialization</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Schedule</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-10 h-10">
+                                <img class="w-full h-full rounded-full" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Doctor Name">
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                                <p class="text-gray-600 whitespace-no-wrap">john.doe@example.com</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">Cardiologist</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                            <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                            <span class="relative">Active</span>
+                        </span>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap">Mon, Wed, Fri 9AM-5PM</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <div class="flex items-center space-x-4">
+                            <button class="text-gray-500 transition-colors duration-200 dark:hover:text-yellow-500 dark:text-gray-300 hover:text-yellow-500 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                </svg>
+                            </button>
+                            <button class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- More doctor rows can be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+        <span class="text-xs xs:text-sm text-gray-900">
+            Showing 1 to 1 of 1 Entries
+        </span>
+        <div class="inline-flex mt-2 xs:mt-0">
+            <button class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                Prev
+            </button>
+            <button class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                Next
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Doctor Modal -->
+<div id="addDoctorModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <form id="addDoctorForm">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Add New Doctor</h3>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="mb-4">
+                            <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input type="text" name="first_name" id="first_name" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input type="text" name="last_name" id="last_name" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label for="specialization" class="block text-sm font-medium text-gray-700">Specialization</label>
+                            <input type="text" name="specialization" id="specialization" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label for="license_number" class="block text-sm font-medium text-gray-700">License Number</label>
+                            <input type="text" name="licensenumber" id="licensenumber" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                            <input type="text" name="phonenumber" id="phonenumber" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                            <select name="status" id="status" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="mb-4 col-span-2">
+                            <label for="schedule" class="block text-sm font-medium text-gray-700">Schedule</label>
+                            <input type="text" name="schedule" id="schedule" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="mb-4 col-span-2">
+                            <label for="time" class="block text-sm font-medium text-gray-700">Time</label>
+                            <input type="text" name="time" id="time" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Add Doctor
+                    </button>
+                    <button type="button" onclick="hideModal('addDoctorModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     </div>
-
-<!------------------------------------- Doctor List Tab ------------------------------------->
-<div id="DoctorList" class="tab-content hidden">
-    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 rounded-xl shadow-2xl mb-10">
-        <div class="flex items-center">
-          <div class="bg-white p-3 rounded-full mr-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7v4H5V7H3v10h2v-4h14v4h2V7h-2zM5 11h14v2H5v-2z" />
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-4xl font-extrabold text-white mb-2">Doctor List</h2>
-            <p class="text-white text-xl opacity-80">View and manage the profiles of all doctors within your healthcare system.</p>
-          </div>
-        </div>
-      </div>
-    <section class="container mx-auto">
-        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialization</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">License</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for doctor in doctors %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ doctor.first_name }} {{ doctor.last_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ doctor.specialization }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ doctor.license_number }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ doctor.schedule }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ doctor.time }}</td>
-                        <td class="px-6 py-4 text-center whitespace-nowrap">
-                            <div class="flex items-center gap-x-6 justify-center">
-                                <!-- Edit Button -->
-                                <a href="{{ url_for('admin.edit_doctor', doctor_id=doctor.doctor_id) }}" class="text-indigo-600 hover:text-indigo-800 focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0 a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                    </svg>
-                                </a>
-                                <!-- Delete Button -->
-                                <a href="{{ url_for('admin.delete_doctor', doctor_id=doctor.doctor_id) }}" class="text-red-600 hover:text-red-800 focus:outline-none" onclick="return confirm('Are you sure you want to delete this doctor?');">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
 </div>
 
-      <!------------------------------------- Schedule Management Tab ------------------------------------->
-      <div id="ScheduleManagement" class="tab-content hidden">
-<div class="bg-gradient-to-r from-blue-500 to-teal-400 p-8 rounded-xl shadow-2xl mb-10">
-  <div class="flex items-center">
-    <div class="bg-white p-3 rounded-full mr-6">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
+
+<!-- Edit Doctor Modal -->
+<div id="editDoctorModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <form id="editDoctorForm">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Edit Doctor</h3>
+                    <div class="mb-4">
+                        <label for="editFirstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                        <input type="text" name="first_name" id="editFirstName" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editLastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                        <input type="text" name="last_name" id="editLastName" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" id="editEmail" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editSpecialization" class="block text-sm font-medium text-gray-700">Specialization</label>
+                        <input type="text" name="specialization" id="editSpecialization" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editSchedule" class="block text-sm font-medium text-gray-700">Schedule</label>
+                        <input type="text" name="schedule" id="editSchedule" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Update Doctor
+                    </button>
+                    <button type="button" onclick="hideModal('editDoctorModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div>
-      <h2 class="text-4xl font-extrabold text-white mb-2">Doctor Schedule Hub</h2>
-      <p class="text-white text-xl opacity-80">Orchestrate your medical team's time with precision and care</p>
+</div>
+
+<!-- Security Policy Modal -->
+<div id="securityPolicyModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Security Policy</h3>
+                <div class="mb-4">
+                    <h4 class="text-md font-medium text-gray-700 mb-2">Password Requirements</h4>
+                    <ul class="list-disc list-inside text-sm text-gray-600">
+                        <li>Minimum 8 characters</li>
+                        <li>At least one uppercase letter</li>
+                        <li>At least one lowercase letter</li>
+                        <li>At least one number</li>
+                        <li>At least one special character</li>
+                    </ul>
+                </div>
+                <div class="mb-4">
+                    <h4 class="text-md font-medium text-gray-700 mb-2">Account Lockout Policy</h4>
+                    <p class="text-sm text-gray-600">Accounts will be locked after 5 failed login attempts. Contact an administrator to unlock your account.</p>
+                </div>
+                <div class="mb-4">
+                    <h4 class="text-md font-medium text-gray-700 mb-2">Two-Factor Authentication</h4>
+                    <p class="text-sm text-gray-600">Two-factor authentication is required for all admin accounts and recommended for all users.</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="hideModal('securityPolicyModal')" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Close
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-          
-        <!-- Schedule Management Tab -->
-        <section class="container mx-auto">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Name
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Specialization
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Schedule Start
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Schedule End
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Time Start
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Time End
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {% for doctor in doctors %}
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ doctor.first_name }} {{ doctor.last_name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ doctor.specialization }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <select name="schedule_start" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                        {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
-                                        <option value="{{ day }}" {% if day in doctor.schedule %}selected{% endif %}>
-                                            {{ day }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <select name="schedule_end" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                        {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
-                                        <option value="{{ day }}" {% if day in doctor.schedule %}selected{% endif %}>
-                                            {{ day }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {% if doctor.time %}
-                                        <input type="time" name="time_start" value="{{ doctor.time.split('-')[0].strip()[:5] }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    {% else %}
-                                        <input type="time" name="time_start" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="HH:MM">
-                                    {% endif %}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {% if doctor.time %}
-                                        <input type="time" name="time_end" value="{{ doctor.time.split('-')[1].strip()[:5] }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    {% else %}
-                                        <input type="time" name="time_end" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="HH:MM">
-                                    {% endif %}
-                                </td>
-                                
-                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        Update
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-        
-    
-
-
-        <div id="PatientFeedback" class="tab-content hidden">
-            <!-- Stylish Header -->
-            <div class="bg-gradient-to-br from-pink-400 to-purple-500 p-8 rounded-xl shadow-2xl mb-10">
-                <div class="flex items-center">
-                    <div class="bg-white p-3 rounded-full mr-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-4xl font-extrabold text-white mb-2">Patient Feedback Hub</h2>
-                        <p class="text-white text-xl opacity-80">Analyze and leverage patient insights to elevate healthcare quality</p>
-                    </div>
-                </div>
-                <div class="mt-6 bg-white bg-opacity-20 p-4 rounded-lg">
-                    <p class="text-white text-lg">
-                        Review and analyze patient feedback on doctor performance. Use this valuable data to improve patient care and enhance doctor-patient interactions.
-                    </p>
-                </div>
-            </div>
-        
-            <!-- Feedback List -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-2xl font-semibold mb-4">Recent Feedback</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full leading-normal">
-                        <thead>
-                            <tr>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient Name</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Doctor Name</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Feedback</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Loop through feedback entries -->
-                            {% for feedback in feedbacks %}
-                            <tr>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ feedback.patient_name }}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ feedback.doctor_name }}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ feedback.feedback }}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ feedback.date }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        
-            <!-- Feedback Analytics -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-2xl font-semibold mb-4">Feedback Analytics</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Feedback Sentiment</h4>
-                        <canvas id="sentimentChart"></canvas>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Feedback Over Time</h4>
-                        <canvas id="feedbackTimeChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-
-        <div id="ComplianceTracking" class="tab-content hidden">
-            <!-- Stylish Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-cyan-400 p-8 rounded-xl shadow-2xl mb-10">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="bg-white p-3 rounded-full mr-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 class="text-4xl font-extrabold text-white mb-2">Compliance Tracker</h2>
-                            <p class="text-white text-xl opacity-80">Ensuring excellence through continuous education</p>
-                        </div>
-                    </div>
-                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                        <p class="text-white font-semibold">Compliance Rate</p>
-                        <p class="text-4xl font-bold text-white">{{ compliance_rate }}%</p>
-                    </div>
-                </div>
-                <div class="mt-6 bg-white bg-opacity-20 p-4 rounded-lg">
-                    <p class="text-white text-lg">
-                        Monitor and manage ongoing education requirements and certifications for all doctors. Efficiently track compliance statuses to maintain the highest standards of care.
-                    </p>
-                </div>
-            </div>
-        
-            <!-- Compliance Status List -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-2xl font-semibold mb-4">Compliance Status</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full leading-normal">
-                        <thead>
-                            <tr>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Doctor Name</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Specialization</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Compliance Status</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Last Updated</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if compliances %}
-                                {% for compliance in compliances %}
-                                <tr>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ compliance.doctor.first_name }} {{ compliance.doctor.last_name }}</td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ compliance.doctor.specialization }}</td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if compliance.status == 'Compliant' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                            {{ compliance.status }}
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ compliance.last_updated.strftime('%Y-%m-%d') }}</td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                        <a href="{{ url_for('admin.update_compliance', compliance_id=compliance.id) }}" class="text-indigo-600 hover:text-indigo-900">Update</a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="5" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center text-gray-500">
-                                        No compliance records found. Please add compliance data to track statuses.
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        
-            <!-- Compliance Summary -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-2xl font-semibold mb-4">Compliance Summary</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Total Doctors</h4>
-                        <p class="text-3xl font-bold">{{ total_doctors }}</p>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Compliant Doctors</h4>
-                        <p class="text-3xl font-bold text-green-600">{{ compliant_doctors }}</p>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Non-Compliant Doctors</h4>
-                        <p class="text-3xl font-bold text-red-600">{{ non_compliant_doctors }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-
-
-
-
-        <div id="AccountLogins" class="tab-content hidden">
-            <!-- Stylish Header -->
-            <div class="bg-gradient-to-r from-red-500 to-yellow-500 p-8 rounded-xl shadow-2xl mb-10">
-                <div class="flex items-center">
-                    <div class="bg-white p-3 rounded-full mr-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zM12 13c-2.21 0-4 1.79-4 4v1h8v-1c0-2.21-1.79-4-4-4z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-4xl font-extrabold text-white mb-2">Account Logins</h2>
-                        <p class="text-white text-xl opacity-80">Manage doctor account logins and access permissions. Ensure secure access to patient data and healthcare systems.</p>
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Account Logins List -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-2xl font-semibold mb-4">Doctor Account Logins</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full leading-normal">
-                        <thead>
-                            <tr>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Doctor Name</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Last Login</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Password</th>
-                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if accounts %}
-                                {% for account in accounts %}
-                                <tr>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ account.doctor.first_name }} {{ account.doctor.last_name }}</td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ account.email }}</td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ account.last_login.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if account.status == 'Active' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                            {{ account.status }}
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                        <a href="{{ url_for('admin.edit_account', account_id=account.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                        <form action="{{ url_for('admin.delete_account', account_id=account.id) }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this account?');">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="5" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center text-gray-500">
-                                        No account records found. Please add account data to manage logins.
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        
-            <!-- Account Summary -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-2xl font-semibold mb-4">Account Summary</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Total Accounts</h4>
-                        <p class="text-3xl font-bold">{{ total_accounts }}</p>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Active Accounts</h4>
-                        <p class="text-3xl font-bold text-green-600">{{ active_accounts }}</p>
-                    </div>
-                    <div class="bg-gray-100 p-4 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold mb-2">Inactive Accounts</h4>
-                        <p class="text-3xl font-bold text-red-600">{{ inactive_accounts }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-          
-
 </div>
 
-</div>
-<div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
 <script>
-function openTab(evt, tabName) {
-    var i, tabcontent, tabs;
-    tabcontent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-    tabs = document.getElementsByClassName("tabs");
-    for (i = 0; i < tabs.length; i++) {
-        tabs[i].className = tabs[i].className.replace(" text-blue-600 border-blue-500", "");
-        tabs[i].className += " border-transparent";
-    }
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " text-blue-600 border-blue-500";
+function showModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
 }
 
-function updateSchedule(doctorId, value, field) {
-    fetch('/admin/update_schedule/' + doctorId, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({field: field, value: value}),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+function hideModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
 }
 
-
-document.addEventListener('DOMContentLoaded', function () {
-        var phoneInput = document.getElementById('phone_number');
-        
-        phoneInput.addEventListener('input', function (event) {
-            var input = event.target.value.replace(/\D/g, '').substring(0, 10);
-            var formatted = '';
-
-            if (input.length > 0) {
-                formatted += input.substring(0, 3);
-            }
-            if (input.length >= 4) {
-                formatted += '-' + input.substring(3, 6);
-            }
-            if (input.length >= 7) {
-                formatted += '-' + input.substring(6, 10);
-            }
-
-            event.target.value = formatted;
-        });
-    });
-    document.addEventListener('click', function(event) {
-  let container = document.getElementById('specializationContainer');
-  if (!container.contains(event.target)) {
-    document.getElementById('specializationDropdown').classList.add('hidden');
-  }
+document.getElementById('addDoctorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    hideModal('addDoctorModal');
 });
-
-function toggleDropdown() {
-  const dropdown = document.getElementById('specializationDropdown');
-  dropdown.classList.toggle('hidden');
-}
-
-function selectSpecialization(specialization, element) {
-  const selectedSpecialization = document.getElementById('selectedSpecialization');
-  selectedSpecialization.textContent = specialization;
-  const checkmarks = document.querySelectorAll('#specializationDropdown svg');
-  checkmarks.forEach(svg => svg.style.display = 'none'); // Hide all checkmarks
-  const checkmark = element.querySelector('svg');
-  checkmark.style.display = 'block'; // Show the checkmark for the selected item
-  document.getElementById('specializationDropdown').classList.add('hidden'); // Close dropdown after selection
-}
-
-document.getElementById('doctor-form').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevent default form submission
-    var formData = new FormData(this);
-
-    fetch("{{ url_for('admin.add_doctor') }}", {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-            // Update the UI to show the new doctor
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
-
-function selectSpecialization(specialization, element) {
-  const hiddenInput = document.createElement('input');
-  hiddenInput.type = 'hidden';
-  hiddenInput.name = 'specialization';
-  hiddenInput.value = specialization;
-  document.getElementById('doctor-form').appendChild(hiddenInput);
-
-  const selectedSpecialization = document.getElementById('selectedSpecialization');
-  selectedSpecialization.textContent = specialization;
-
-  document.getElementById('specializationDropdown').classList.add('hidden');
-}
-function resetForm() {
-    document.getElementById('doctor-form').reset();
-    document.getElementById('selectedSpecialization').textContent = 'Select Specialization';
-}
-function showFlashMessage(message, category, error) {
-        const flashMessageContainer = document.getElementById('flash-message-container');
-        const flashMessage = document.createElement('div');
-        flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;
-        flashMessage.innerHTML = `
-            <div class="flex items-center justify-center w-12 bg-${category}-500">
-                <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
-                </svg>
-            </div>
-            <div class="px-4 py-2 -mx-3">
-                <div class="mx-3">
-                    <span class="font-semibold text-${category}-500 dark:text-${category}-400">${error.charAt(0).toUpperCase() + error.slice(1)}</span>
-                    <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
-                </div>
-            </div>
-        `;
-        flashMessageContainer.appendChild(flashMessage);
-
-        setTimeout(() => {
-            flashMessage.remove();
-        }, 5000);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check for any flash messages in session and display them
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        showFlashMessage("{{ message }}", "{{ category }}");
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-    });
-
 </script>
 
 {% endblock %}
+

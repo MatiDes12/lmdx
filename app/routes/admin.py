@@ -116,114 +116,20 @@ def patient_dashboard():
 
 #<---------------------- Doctor Management Routes----------------------->
 
-# Doctor Management
-@bp.route('/doctors', methods=['GET', 'POST'])
-def admin_doctors():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-    
-    if request.method == 'POST':
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        specialization = request.form.get('specialization')
-        license_number = request.form.get('license_number')
-        phone_number = request.form.get('phone_number')
-        status = request.form.get('status')
-        schedule = request.form.get('schedule')
-        time = request.form.get('time')
-
-        new_doctor = Doctor(
-            first_name=first_name,
-            last_name=last_name,
-            specialization=specialization,
-            license_number=license_number,
-            phone_number=phone_number,
-            status=status,
-            schedule=schedule,
-            time=time
-        )
-        db.session.add(new_doctor)
-        db.session.commit()
-        flash('Doctor added successfully!', 'success')
-        return redirect(url_for('admin.admin_doctors'))
-
-    doctors = Doctor.query.all()
-    return render_template('admin/doctors.html', doctors=doctors)
-
-@bp.route('/doctors/edit/<int:doctor_id>', methods=['GET', 'POST'])
-def edit_doctor(doctor_id):
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-    
-    doctor = Doctor.query.get_or_404(doctor_id)
-
-    if request.method == 'POST':
-        doctor.first_name = request.form.get('first_name')
-        doctor.last_name = request.form.get('last_name')
-        doctor.specialization = request.form.get('specialization')
-        doctor.license_number = request.form.get('license_number')
-        doctor.phone_number = request.form.get('phone_number')
-        doctor.status = request.form.get('status')
-        doctor.schedule = request.form.get('schedule')
-        doctor.time = request.form.get('time')
-
-        db.session.commit()
-        flash('Doctor updated successfully!', 'success')
-        return redirect(url_for('admin.admin_doctors'))
-
-    return render_template('admin/edit_doctor.html', doctor=doctor)
 
 
 
 
-from flask import jsonify
-
-@bp.route('/admin/doctors/add', methods=['GET', 'POST'])
-def add_doctor():
-    if request.method == 'POST':
-        try:
-            required_fields = ['first_name', 'last_name', 'specialization', 'license_number', 'phone_number']
-            for field in required_fields:
-                if field not in request.form or not request.form[field].strip():
-                    return jsonify({'status': 'error', 'message': f'{field.replace("_", " ").capitalize()} is required.'}), 400
-
-            new_doctor = Doctor(
-                first_name=request.form['first_name'].strip(),
-                last_name=request.form['last_name'].strip(),
-                specialization=request.form['specialization'].strip(),
-                license_number=request.form['license_number'].strip(),
-                phone_number=request.form['phone_number'].strip(),
-                schedule=request.form.get('schedule', '').strip()
-            )
-            db.session.add(new_doctor)
-            db.session.commit()
-            # Refresh the page to show the newly added doctor
-            return jsonify({'status': 'success', 'message': 'Doctor added successfully.'}), 200
-        
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'status': 'error', 'message': str(e)}), 500
-
-    # Normal GET request
-    return render_template('admin/admin_doctors.html')
 
 
 
-    
+
+# <---------------------- Doctor Management Endpoints ----------------------->
 
 
 
-@bp.route('/admin/doctors/delete/<int:doctor_id>', methods=['POST'])
-def delete_doctor(doctor_id):
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
 
-    doctor = Doctor.query.get_or_404(doctor_id)
-    db.session.delete(doctor)
-    db.session.commit()
-    flash('Doctor deleted successfully!', 'success')
-    return redirect(url_for('admin.admin_doctors'))
-
+# <-------------------- Departments Management Endpoints -------------------->
 @bp.route('/admin/departments')
 def admin_departments():
     if 'user' not in session:
@@ -289,34 +195,20 @@ def admin_assign_staff():
     return redirect(url_for('admin.admin_departments'))
 
 
-@bp.route('/manage_schedules', methods=['GET', 'POST'])
-def manage_schedules():
+# <---------------------- Doctor Management Endpoints ----------------------->
+@bp.route('/doctors')
+def admin_doctors():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+
     doctors = Doctor.query.all()
-    parsed_schedules = []
-    
-    for doctor in doctors:
-        schedule_data = parse_schedule(doctor.schedule)
-        parsed_schedules.append({
-            'doctor': doctor,
-            'schedule_data': schedule_data
-        })
-
-    if request.method == 'POST':
-        for doctor in doctors:
-            schedule_start = request.form.get(f'schedule_start_{doctor.doctor_id}')
-            schedule_end = request.form.get(f'schedule_end_{doctor.doctor_id}')
-            time_start = request.form.get(f'time_start_{doctor.doctor_id}')
-            time_end = request.form.get(f'time_end_{doctor.doctor_id}')
-            
-            # Update doctor's schedule (pseudo-code, depends on your actual implementation)
-            doctor.schedule = f"{schedule_start} to {schedule_end} {time_start} - {time_end}"
-            db.session.commit()
-        
-        return redirect(url_for('manage_schedules'))
-    
-    return render_template('manage_schedules.html', parsed_schedules=parsed_schedules)
+    return render_template('admin/doctors.html', doctors=doctors)
 
 
+
+
+
+# <---------------------- Doctor Management Routes ----------------------->
 @bp.route('/compliance-tracking')
 def compliance_tracking():
     compliances = Compliance.query.join(Doctor).all()
@@ -356,21 +248,6 @@ def parse_schedule(schedule_str):
     
     return schedule
 
-@bp.route('/admin/doctors/update_schedule/<int:doctor_id>', methods=['POST'])
-def update_schedule(doctor_id):
-    doctor = Doctor.query.get_or_404(doctor_id)
-    schedule_start = request.form['schedule_start']
-    schedule_end = request.form['schedule_end']
-    time_start = request.form['time_start']
-    time_end = request.form['time_end']
-
-    # Updating the schedule and time as a single string
-    doctor.schedule = f"{schedule_start} to {schedule_end}"
-    doctor.time = f"{time_start} - {time_end}"
-    db.session.commit()
-
-    flash('Schedule updated successfully!', 'success')
-    return redirect(url_for('admin.display_doctors'))
 
 def parse_schedule_and_time(doctor):
     schedule_parts = doctor.schedule.split(" to ")
@@ -382,11 +259,11 @@ def parse_schedule_and_time(doctor):
         'time_end': time_parts[1]
     }
 
-@bp.route('/doctors')
-def display_doctors():
-    doctors = Doctor.query.all()
-    parsed_doctors = [{**doctor.__dict__, **parse_schedule_and_time(doctor)} for doctor in doctors]
-    return render_template('doctors.html', doctors=parsed_doctors)
+# @bp.route('/doctors')
+# def display_doctors():
+#     doctors = Doctor.query.all()
+#     parsed_doctors = [{**doctor.__dict__, **parse_schedule_and_time(doctor)} for doctor in doctors]
+#     return render_template('doctors.html', doctors=parsed_doctors)
 
 
 @bp.route('/admin/roles-permissions')
