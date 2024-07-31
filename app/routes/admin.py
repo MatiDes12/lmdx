@@ -185,7 +185,6 @@ def edit_doctor(doctor_id):
     return redirect(url_for('admin.admin_doctors'))
 
 
-
 @bp.route('/delete_doctor/<int:doctor_id>', methods=['POST'])
 def delete_doctor(doctor_id):
     if 'user' not in session:
