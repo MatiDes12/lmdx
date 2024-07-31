@@ -31,7 +31,7 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 #<-------------------------- dashboard -------------------------------->
 
 @bp.route('/dashboard')
-def dashboard():
+def patient_dashboard():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
