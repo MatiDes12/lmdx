@@ -367,10 +367,10 @@ document.querySelectorAll('.edit-doctor-btn').forEach(button => {
                 document.getElementById('editLicenseNumber').value = data.license_number;
                 document.getElementById('editPhoneNumber').value = data.phone_number;
                 document.getElementById('editStatus').value = data.status;
-                document.getElementById('editStartSchedule').value = data.schedule.split(' to ')[0];  // Assuming schedule is stored as "day to day"
-                document.getElementById('editEndSchedule').value = data.schedule.split(' to ')[1];  // Assuming schedule is stored as "day to day"
-                document.getElementById('editStartTime').value = data.time.split(' - ')[0];  // Assuming time is stored as "start_time - end_time"
-                document.getElementById('editEndTime').value = data.time.split(' - ')[1];  // Assuming time is stored as "start_time - end_time"
+                document.getElementById('editStartSchedule').value = data.schedule.split(' to ')[0]; 
+                document.getElementById('editEndSchedule').value = data.schedule.split(' to ')[1];  
+                document.getElementById('editStartTime').value = data.time.split(' - ')[0];  
+                document.getElementById('editEndTime').value = data.time.split(' - ')[1]; 
                 showModal('editDoctorModal');
             });
     });
