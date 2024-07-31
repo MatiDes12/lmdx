@@ -714,25 +714,10 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', deleteDoct
 
 function submitDoctorForm(e) {
     e.preventDefault();
-<<<<<<< HEAD
-    submitForm(this, '{{ url_for("admin.add_doctor") }}');
-}
-
-function submitEditDoctorForm(e) {
-    e.preventDefault();
-    var doctorId = this.dataset.id;
-    submitForm(this, `/admin/edit_doctor/${doctorId}`);
-}
-
-function submitForm(form, url) {
-    const formData = new FormData(form);
-    fetch(url, {
-=======
     
     const formData = new FormData(this);
     
     fetch('{{ url_for("admin.add_doctor") }}', {
->>>>>>> 3f82fbba0964a37ed4558cab6259a729dbff33de
         method: 'POST',
         body: formData,
     })
@@ -748,10 +733,6 @@ function submitForm(form, url) {
 
 function editDoctor() {
     const doctorId = this.dataset.id;
-<<<<<<< HEAD
-    fetch(`/admin/get_doctor/${doctorId}`)
-        .then(response => response.json())
-=======
     const formData = new FormData(this);
 
     fetch(`/admin/edit_doctor/${doctorId}`, {
@@ -782,7 +763,6 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function()
             method: 'POST',
         })
         .then(response => response.text())
->>>>>>> 3f82fbba0964a37ed4558cab6259a729dbff33de
         .then(data => {
             populateEditForm(data);
             showModal('editDoctorModal');
