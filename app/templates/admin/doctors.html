@@ -41,11 +41,11 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-700">Total Doctors: {{ docter|length }}</h3>
-                    <p class="text-sm font-semibold text-gray-500">AI genereted value</p>
+                    <h3 class="text-lg font-semibold text-gray-700">Total Doctors: {{ total_doctors }}</h3>
+                    <p class="text-sm font-semibold text-gray-500">Total number of doctors</p>
                 </div>
             </div>
-    
+
             <!-- Total Accounts -->
             <div class="bg-white p-6 rounded-lg shadow-md flex items-center">
                 <div class="p-3 bg-green-100 rounded-full">
@@ -54,8 +54,8 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-700">Total Accounts: {{ accounts|length }}</h3>
-                    <p class="text-sm font-semibold text-gray-500">AI genereted value</p>
+                    <h3 class="text-lg font-semibold text-gray-700">Total Accounts: {{ total_accounts }}</h3>
+                    <p class="text-sm font-semibold text-gray-500">Total number of accounts</p>
                 </div>
             </div>
         </div>
@@ -75,10 +75,8 @@
 
 
 
-
     <!-- Doctor List Table -->
     <div class="overflow-x-auto tab-content hidden bg-gradient-to-r from-blue-600 to-teal-500 p-8 rounded-xl shadow-2xl mb-10" id="doctorTable">
-    
         <table class="min-w-full leading-normal">
             <thead>
                 <tr>
@@ -91,7 +89,6 @@
                 </tr>
             </thead>
             <tbody>
-                
                 {% for doctor in doctors %}
                 <tr>
                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -101,7 +98,11 @@
                             </div>
                             <div class="ml-3">
                                 <p class="text-gray-900 whitespace-no-wrap">{{ doctor.first_name }} {{ doctor.last_name }}</p>
-                                <p class="text-gray-600 whitespace-no-wrap">@{{ doctor.first_name }}lmdx.com</p>
+                                {% if doctor.accounts %}
+                                    <p class="text-gray-600 whitespace-no-wrap">{{ doctor.accounts[0].email }}</p>
+                                {% else %}
+                                    <p class="text-gray-600 whitespace-no-wrap">No Email</p>
+                                {% endif %}
                             </div>
                         </div>
                     </td>
@@ -109,10 +110,17 @@
                         <p class="text-gray-900 whitespace-no-wrap">{{ doctor.specialization }}</p>
                     </td>
                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                            <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-                            <span class="relative">{{ doctor.status }}</span>
-                        </span>
+                        {% if doctor.accounts %}
+                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                                <span class="relative">Active</span>
+                            </span>
+                        {% else %}
+                            <span class="relative inline-block px-3 py-1 font-semibold text-red-900 leading-tight">
+                                <span aria-hidden class="absolute inset-0 bg-red-200 opacity-50 rounded-full"></span>
+                                <span class="relative">Inactive</span>
+                            </span>
+                        {% endif %}
                     </td>
                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                         <p class="text-gray-900 whitespace-no-wrap">{{ doctor.schedule }}</p>
@@ -132,13 +140,25 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                 </svg>
                             </button>
+
+                            {% if doctor.accounts %}
+                                <span class="text-gray-500 flex text-right">Generated</span>
+                            {% else %}
+                                <button class="generate-account-btn bg-blue-500 text-white hover:bg-blue-700 font-bold py-2 px-4 rounded-full flex items-center" data-id="{{ doctor.doctor_id }}">
+                                    Generate Account
+                                </button>
+                            {% endif %}
+
                         </div>
+                        
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    
 
     <div id="accountTable" class="tab-content hidden">
         <!-- Account List Table -->
@@ -147,67 +167,71 @@
                 <table class="min-w-full">
                     <thead>
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Doctor Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Email address <span class="text-xs text-red-500">(Auto-generated)</span></th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">pasassword <span class="text-xs text-red-500">(Auto-generated)</span></th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Generate</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Doctor Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Email Address</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Password</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Generate</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
+                        {% for doctor in doctors %}
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Doctor Name">
+                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ url_for('static', filename='images/profilePic.jpg') }}" alt="{{ doctor.first_name }} {{ doctor.last_name }}">
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">Dr. Arthur Melo</div>
-                                        <div class="text-sm text-gray-500">@authurmelo</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ doctor.first_name }} {{ doctor.last_name }}</div>
+                                        <div class="text-sm text-gray-500">{{ doctor.specialization }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if doctor.accounts %}
+                                    {{ doctor.accounts[0].email }}
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Design Director</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="bg-blue-500 text-white hover:bg-blue-700 font-bold py-2 px-4 rounded-full flex items-center" onclick="generateAccount('authurmelo')">
-                                    Generate
-                                </button>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if doctor.accounts %}
+                                    {{ doctor.accounts[0].plain_password }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if doctor.accounts %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        {{ doctor.accounts[0].status }}
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Not Generated
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                {% if doctor.accounts %}
+                                    <span class="text-gray-500">Generated</span>
+                                {% else %}
+                                    <div class="flex ">
+                                        <button class="generate-account-btn bg-blue-500 text-white hover:bg-blue-700 font-bold py-2 px-4 rounded-full" data-id="{{ doctor.doctor_id }}">
+                                            Generate
+                                        </button>
+                                    </div>
+                                {% endif %}
                             </td>
                         </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-                                        <img class="h-10 w-10 rounded-full object-cover" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Doctor Name">
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">Dr. Amelia Anderson</div>
-                                        <div class="text-sm text-gray-500">@ameliaanderson</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Lead Developer</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="bg-blue-500 text-white hover:bg-blue-700 font-bold py-2 px-4 rounded-full flex items-center" onclick="generateAccount('ameliaanderson')">
-                                    Generate
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- More rows can be added here following the same structure -->
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
+    
     <div id="appointmentTable" class="tab-content hidden">
         <!-- Appointment List Table -->
         <div class="bg-gradient-to-r from-blue-600 to-teal-500 p-8 rounded-xl shadow-2xl mb-10">
@@ -455,8 +479,6 @@
             {% endif %}
         </div>
     </div>
-</div>
-
     <!-- Add Doctor Modal -->
     <div id="addDoctorModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -752,7 +774,27 @@ function editDoctor() {
 function populateEditForm(data) {
     // Populate the form fields based on the data fetched
 }
-
+document.querySelectorAll('.edit-doctor-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const doctorId = this.dataset.id;
+        fetch(`/admin/get_doctor/${doctorId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editDoctorForm').dataset.id = doctorId;
+                document.getElementById('editFirstName').value = data.first_name;
+                document.getElementById('editLastName').value = data.last_name;
+                document.getElementById('editSpecialization').value = data.specialization;
+                document.getElementById('editLicenseNumber').value = data.license_number;
+                document.getElementById('editPhoneNumber').value = data.phone_number;
+                document.getElementById('editStatus').value = data.status;
+                document.getElementById('editStartSchedule').value = data.schedule.split(' to ')[0]; 
+                document.getElementById('editEndSchedule').value = data.schedule.split(' to ')[1];  
+                document.getElementById('editStartTime').value = data.time.split(' - ')[0];  
+                document.getElementById('editEndTime').value = data.time.split(' - ')[1];  // Assuming time is stored as "start_time - end_time"
+                showModal('editDoctorModal');
+            });
+    });
+});
 function prepareDeleteDoctor() {
     doctorIdToDelete = this.dataset.id;
     showModal('deleteDoctorModal');
@@ -771,6 +813,28 @@ function deleteDoctor() {
     }
 }
 
+document.querySelectorAll('.generate-account-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const doctorId = this.dataset.id;
+        fetch(`/admin/generate_account/${doctorId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error generating account: ' + data.error);
+            } else {
+                alert('Email: ' + data.email + '\nPassword: ' + data.password);
+                // Reload to reflect the changes in the UI
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error generating the account.');
+        });
+    });
+});
 </script>
 
 {% endblock %}
