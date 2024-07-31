@@ -238,6 +238,10 @@ def get_patient(patient_id):
 
 @bp.route('/dashboard/doctors', methods=['GET'])
 def doctors():
+    doctor_name = request.args.get('doctor_name', '').strip()
+    specialization = request.args.get('specialization', '')
+    status = request.args.get('status', '')
+
     search_query = request.args.get('search', '').strip()
     specialization_filter = request.args.get('specialization', 'All')
     status_filter = request.args.get('status', 'All').lower()  # Convert to lowercase
@@ -246,23 +250,25 @@ def doctors():
     per_page = 10  # Number of items per page
     
     doctors_query = Doctor.query
-    
-    if search_query:
-        doctors_query = doctors_query.filter(Doctor.name.ilike(f'{search_query}%'))
-    
-    if specialization_filter != 'All':
-        doctors_query = doctors_query.filter_by(specialization=specialization_filter)
-    
-    if status_filter != 'all':  # Convert to lowercase
-        doctors_query = doctors_query.filter(func.lower(Doctor.status) == status_filter)
-    
     total = doctors_query.count()
     pagination = doctors_query.paginate(page=page, per_page=per_page, error_out=False)
     doctors = pagination.items
-    
-    specializations = Doctor.query.with_entities(Doctor.specialization).distinct().all()
+    query = Doctor.query
+    if doctor_name:
+        query = query.filter(Doctor.first_name.ilike(f'%{doctor_name}%') | Doctor.last_name.ilike(f'%{doctor_name}%'))
+
+    if specialization and specialization != "All":
+        query = query.filter(Doctor.specialization == specialization)
+
+    if status and status != "All":
+        query = query.filter(Doctor.status == status)
+    doctors = query.all()
+    specializations = [s.specialization for s in Doctor.query.with_entities(Doctor.specialization).distinct()]
     
     return render_template('doctors/doctors.html', doctors=doctors, search_query=search_query, specialization_filter=specialization_filter, status_filter=status_filter, pagination=pagination, specializations=specializations)
+
+
+
 
 
 
@@ -440,7 +446,7 @@ def prescription():
 #<----------------------Appointments----------------------->
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
-    if 'user' not in session or session.get('user_type') != 'organization':
+    if 'user' not in session or session.get('user_type') != 'doctors':
             return redirect(url_for('auth.signin'))
 
     doctor_id = session.get('user_id')

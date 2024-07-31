@@ -18,14 +18,6 @@ bp = Blueprint('patient', __name__)
 # Load environment variables from .env file
 load_dotenv()
 
-# Now you can access the environment variable
-api_key = os.environ.get('GOOGLE_API_KEY1')
-
-
-# Configure Google Gemini API
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-flash')
-
 
 
 #<-------------------------- dashboard -------------------------------->
@@ -152,8 +144,11 @@ def appointments():
                 f"Reason for visit: '{reason}'. "
                 f"Existing notes: '{notes if notes else 'No additional notes provided'}'."
             )
-
-
+                
+            # Access your API key as an environment variable.
+            genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+            # Choose a model that's appropriate for your use case.
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(ai_prompt)
             enhanced_notes = response.text.strip()
         else:

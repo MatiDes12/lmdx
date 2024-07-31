@@ -25,22 +25,14 @@
     {% endblock %}
   </head>
   <body class="bg-gray-100 dark:bg-gray-900">
-    <div class="flex">
+    <div class="flex h-screen bg-gray-100 dark:bg-gray-900">
       {% block sidebar %}{% endblock %}
-      <div class="flex-1">
+      <div class="flex-1 overflow-y-auto">
         {% block navbar %}{% endblock %}
-        <div>
-          {% with messages = get_flashed_messages(with_categories=true) %} {% if
-          messages %}
-          <div class="flash-container">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} flash-message">
-              {{ message }}
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %} {% endwith %} {% block content %}{% endblock %}
-        </div>
+        
+          {% block content %}
+          <!-- Content will be injected here -->
+          {% endblock content %}
       </div>
     </div>
     <script
