@@ -714,6 +714,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', deleteDoct
 
 function submitDoctorForm(e) {
     e.preventDefault();
+<<<<<<< HEAD
     submitForm(this, '{{ url_for("admin.add_doctor") }}');
 }
 
@@ -726,6 +727,12 @@ function submitEditDoctorForm(e) {
 function submitForm(form, url) {
     const formData = new FormData(form);
     fetch(url, {
+=======
+    
+    const formData = new FormData(this);
+    
+    fetch('{{ url_for("admin.add_doctor") }}', {
+>>>>>>> 3f82fbba0964a37ed4558cab6259a729dbff33de
         method: 'POST',
         body: formData,
     })
@@ -741,8 +748,41 @@ function submitForm(form, url) {
 
 function editDoctor() {
     const doctorId = this.dataset.id;
+<<<<<<< HEAD
     fetch(`/admin/get_doctor/${doctorId}`)
         .then(response => response.json())
+=======
+    const formData = new FormData(this);
+
+    fetch(`/admin/edit_doctor/${doctorId}`, {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.text())
+    .then(data => {
+        hideModal('editDoctorModal');
+        window.location.reload();  // Reload to show the updated doctor list
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error updating the doctor.');
+    });
+});
+
+document.querySelectorAll('.delete-doctor-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        doctorIdToDelete = this.dataset.id;
+        showModal('deleteDoctorModal');
+    });
+});
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (doctorIdToDelete) {
+        fetch(`/admin/delete_doctor/${doctorIdToDelete}`, {
+            method: 'POST',
+        })
+        .then(response => response.text())
+>>>>>>> 3f82fbba0964a37ed4558cab6259a729dbff33de
         .then(data => {
             populateEditForm(data);
             showModal('editDoctorModal');
@@ -773,4 +813,8 @@ function deleteDoctor() {
 
 </script>
 
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 3f82fbba0964a37ed4558cab6259a729dbff33de
