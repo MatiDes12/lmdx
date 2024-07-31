@@ -26,65 +26,51 @@ genai.configure(api_key=GOOGLE_API_KEY1)
 bp = Blueprint('doctor', __name__)
 
 
-#<---------------------- Dashboard Routes----------------------->
-@bp.route('/')
-def index():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-    if session.get('user_type') == 'organization':
-        return redirect(url_for('admin.admin_dashboard'))
-    elif session.get('user_type') == 'patient':
-        return redirect(url_for('patient.patient_dashboard'))
-    return redirect(url_for('auth.signin'))
-
-
-# Dashboard Overview
-@bp.route('/admin')
-def admin_dashboard():
+#<---------------------- doctor Dashboard Routes----------------------->
+@bp.route('/doctor')
+def doctor_dashboard():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
 
-    return render_template('admin/dashboard.html')
+    return render_template('doctors/dashboard.html')
+# @bp.route('/doctor')
+# def doctor_dashboard():
+#     if 'user' not in session or session.get('user_type') != 'doctors':
+#         return render_template('auth/signin.html') + '''
+#             <script>
+#                 showFlashMessage('You must be signed in to access this page.', 'red', 'error');
+#             </script>
+#         '''
 
+#     user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
+#     id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
 
+#     try:
+#         # Fetch doctor data from Firebase
+#         doctor_data = firebase_db.child("Doctors").child(user_id).get(token=id_token).val()
+#         if doctor_data:
+#             first_name = doctor_data.get('first_name')
+#             last_name = doctor_data.get('last_name')
+#             total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
+#             total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
 
-#<---------------------- organization Dashboard Routes----------------------->
-@bp.route('/organization')
-def organization_dashboard():
-    if 'user' not in session or session.get('user_type') != 'organization':
-        return render_template('auth/signin.html') + '''
-            <script>
-                showFlashMessage('You must be signed in to access this page.', 'red', 'error');
-            </script>
-        '''
-
-    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
-
-    try:
-        # Fetch doctor data from Firebase
-        doctor_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
-        if doctor_data:
-            full_name = doctor_data.get('full_name')
-            total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
-            total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
-
-            return render_template('doctors/dashboard.html',
-                                      full_name=full_name,
-                                   )
-        else:
-            return render_template('auth/signin.html') + '''
-                <script>
-                    showFlashMessage('Unable to fetch organization details.', 'red', 'error');
-                </script>
-            '''
-    except Exception as e:
-        print(f"Firebase fetch error: {e}")
-        return render_template('auth/signin.html') + '''
-            <script>
-                showFlashMessage('Error accessing organization information.', 'red', 'error');
-            </script>
-        '''
+#             return render_template('doctors/dashboard.html',
+#                                       first_name=first_name,
+#                                       last_name = last_name
+#                                    )
+#         else:
+#             return render_template('auth/signin.html') + '''
+#                 <script>
+#                     showFlashMessage('Unable to fetch organization details.', 'red', 'error');
+#                 </script>
+#             '''
+#     except Exception as e:
+#         print(f"Firebase fetch error: {e}")
+#         return render_template('auth/signin.html') + '''
+#             <script>
+#                 showFlashMessage('Error accessing organization information.', 'red', 'error');
+#             </script>
+#         '''
 
 
 #<----------------------Image Analysis----------------------->

@@ -7,7 +7,7 @@ from firebase_admin import auth
 import requests
 from app.config import Config
 from app import sqlalchemy_db as db
-from ..models_db import ClientAccounts, Organization, User
+from ..models_db import ClientAccounts, Organization, User, Account
 
 bp = Blueprint('auth', __name__)
 
@@ -62,7 +62,7 @@ def signup():
                     </script>
                 '''
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            new_user = User(email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
+            new_user = User(username = name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
             db.session.add(new_user)
             db.session.commit()
             user_data = {'full_name': name, 'email': email, 'organization': org_name, 'phone_number': phone_number}
@@ -77,7 +77,7 @@ def signup():
                 '''
             user_data = {'first_name': first_name, 'last_name': last_name, 'email': email, 'phone_number': phone_number}
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            new_user = User(email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
+            new_user = User(username = first_name +" "+last_name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
             db.session.add(new_user)
             db.session.commit()
 
@@ -164,12 +164,14 @@ def signup():
     return render_template('auth/signup.html', user_type=user_type)
 
 
-
 @bp.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        
+        print(f"Attempting sign-in for email: {email}")  # Debugging line
+        
         try:
             # Attempt to sign in with the provided email and password
             user = firebase.auth().sign_in_with_email_and_password(email, password)
@@ -178,36 +180,45 @@ def signin():
             user_info = firebase.auth().get_account_info(id_token)
             user_id = user_info['users'][0]['localId']
 
-            # Check if the user is a doctor
-            doctor_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
-            if doctor_data:
-                user_type = 'organization'
+            print(f"Sign-in successful for email: {email}")  # Debugging line
 
+            # Check if the user is a doctor
+            doctor_data = firebase_db.child("Doctors").child(user_id).get(token=id_token).val()
+            if doctor_data:
+                user_type = 'doctors'
             else:
                 # If not a doctor, check if it's a client
                 client_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
                 if client_data:
                     user_type = 'patient'
                 else:
-                    return render_template('auth/signin.html') + '''
-                        <script>
-                            showFlashMessage('Invalid email or password', 'red');
-                        </script>
-                    '''
+                    # Check if it's an organization user
+                    org_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
+                    if org_data:
+                        user_type = 'organization'
+                    else:
+                        return render_template('auth/signin.html') + '''
+                            <script>
+                                showFlashMessage('Invalid email or password', 'red');
+                            </script>
+                        '''
 
-            # Check if email is verified
+            # Check if email is verified, but skip this for doctors
             email_verified = user_info['users'][0]['emailVerified']
-
-            if email_verified:
+            print("user type: ", user_type)
+            if email_verified or user_type == 'doctors':
                 session['user'] = email
                 session['user_type'] = user_type
                 session['user_id_token'] = id_token
                 session['refresh_token'] = refresh_token  # Store refresh token in session
                 session['user_id'] = user_id  # Store user_id in session
+
                 if user_type == 'organization':
                     return redirect(url_for('admin.admin_dashboard'))
                 elif user_type == 'patient':
                     return redirect(url_for('patient.patient_dashboard'))
+                elif user_type == 'doctors':
+                    return redirect(url_for('doctor.doctor_dashboard'))
             else:
                 return render_template('auth/signin.html') + '''
                     <script>
@@ -223,6 +234,8 @@ def signin():
                 </script>
             '''
     return render_template('auth/signin.html')
+
+
 
 @bp.route('/logout')
 def logout():
