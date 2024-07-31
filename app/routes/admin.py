@@ -277,18 +277,24 @@ def admin_delete_department(department_id):
     flash('Department deleted successfully!', 'success')
     return redirect(url_for('admin.admin_departments'))
 
+
 @bp.route('/admin/departments/assign-staff', methods=['POST'])
 def admin_assign_staff():
-    if 'user' not in session:
+    if 'user' not in session:  # Check if user is logged in
         return redirect(url_for('auth.signin'))
 
     department_id = request.form['department']
     staff_id = request.form['staff']
-    # Implement staff assignment logic here
+
+    # Logic to assign the staff to the department
+    # Example: find department and staff in database and update relationship
+    department = Department.query.get(department_id)
+    staff = Staff.query.get(staff_id)
+    department.staff.append(staff)  # Assuming a many-to-many relationship
+    db.session.commit()
+
     flash('Staff assigned to department successfully!', 'success')
-    return redirect(url_for('admin.admin_departments'))
-
-
+    return redirect(url_for('admin.admin_departments'))  # Redirect to a relevant page
 
 
 # <---------------------- Doctor Management Routes ----------------------->

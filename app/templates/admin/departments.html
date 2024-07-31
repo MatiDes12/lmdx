@@ -23,21 +23,41 @@
                 </div>
             </div>
             <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                <p class="text-white font-semibold">Total Departments</p>
-                <p class="text-4xl font-bold text-white">{{ total_departments }}</p>
+                <p class="text-white font-semibold">Total Departments: {{ total_departments }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter section with updated style -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-8 rounded-lg shadow-lg mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-3xl font-bold text-white">Filter Departments</h3>
+            <button id="addDepartmentBtn" class="bg-white hover:bg-gray-100 text-blue-600 font-bold py-2 px-5 rounded-full flex items-center shadow-lg transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Add New Department
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex-1">
+                <label for="searchDepartment" class="block text-sm font-medium text-white mb-2">Search Departments</label>
+                <input type="text" id="searchDepartment" oninput="searchDepartment(this.value)" class="block w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 border-0 focus:ring-2 focus:ring-blue-400 text-gray-900 placeholder-gray-500 shadow-md transition duration-300" placeholder="Search by department name...">
+            </div>
+            <div class="flex-1">
+                <label for="departmentFilter" class="block text-sm font-medium text-white mb-2">Filter by Department Head</label>
+                <select id="departmentFilter" onchange="filterByHead(this.value)" class="block w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 border-0 focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-md appearance-none cursor-pointer transition duration-300">
+                    <option value="">All Heads</option>
+                    {% for department in departments %}
+                    <option value="{{ department.head }}">{{ department.head }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
     </div>
 
     <!-- Department List Section -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h3 class="text-2xl font-semibold mb-4">Departments</h3>
-        <div class="mb-4 flex justify-between items-center">
-            <button id="addDepartmentBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Add New Department
-            </button>
-            <input type="text" id="searchDepartment" placeholder="Search departments..." class="w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-        </div>
         <div class="overflow-x-auto">
             <table class="min-w-full leading-normal">
                 <thead>
@@ -124,7 +144,7 @@
     <!-- Staff Assignment Section -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
         <h3 class="text-2xl font-semibold mb-4">Staff Assignment</h3>
-        <form id="staffAssignmentForm" class="space-y-4">
+        <form id="staffAssignmentForm" class="space-y-4" action="{{ url_for('admin.admin_assign_staff') }}" method="POST">
             <div>
                 <label for="departmentSelect" class="block text-sm font-medium text-gray-700">Select Department</label>
                 <select id="departmentSelect" name="department" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -147,6 +167,7 @@
                 </button>
             </div>
         </form>
+        
     </div>
 
     <!-- Reports Section -->
