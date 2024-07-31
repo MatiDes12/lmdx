@@ -8,12 +8,15 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
 from .. import sqlalchemy_db as db
-from ..models_db import Appointment, AuditLog, BudgetCategory, Compliance, Department, Facility, Patient, Doctor, Permission, Project, Revenue, Role, RolePermission, Staff, User, UserRole
+from ..models_db import Appointment, AuditLog, BudgetCategory, Compliance, Department, Facility, Patient, Doctor, Permission, Project, Revenue, Role, RolePermission, Staff, User, UserRole, Account
 from ..helpers import send_email, send_sms
 import google.generativeai as genai
 from werkzeug.security import generate_password_hash
 from werkzeug.exceptions import BadRequestKeyError
 from flask import request
+import random
+import string
+from werkzeug.security import generate_password_hash
 
 bp = Blueprint('admin', __name__)
 
@@ -124,6 +127,10 @@ def admin_doctors():
     per_page = 7
     doctors_pagination = Doctor.query.paginate(page=page, per_page=per_page, error_out=False)
     doctors = doctors_pagination.items
+
+    # Get total counts
+    total_doctors = Doctor.query.count()
+    total_accounts = Account.query.count()
     
     # Generate time slots
     time_slots = [(datetime(2000, 1, 1, hour, 0).strftime('%I:%M %p')) for hour in range(24)]
@@ -131,8 +138,13 @@ def admin_doctors():
     # Days of the week
     days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     
-    return render_template('admin/doctors.html', doctors=doctors, doctors_pagination=doctors_pagination, time_slots=time_slots, days_of_week=days_of_week)
-
+    return render_template('admin/doctors.html', 
+                           doctors=doctors, 
+                           doctors_pagination=doctors_pagination, 
+                           time_slots=time_slots, 
+                           days_of_week=days_of_week, 
+                           total_doctors=total_doctors, 
+                           total_accounts=total_accounts)
 
 @bp.route('/add_doctor', methods=['POST'])
 def add_doctor():
@@ -201,6 +213,54 @@ def delete_doctor(doctor_id):
     
     return redirect(url_for('admin.admin_doctors'))
 # <---------------------- Doctor Management Endpoints ----------------------->
+
+
+# <---------------------- Account Management -------------------------------->
+# Function to generate a random string
+def generate_random_string(length=8):
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for i in range(length))
+
+# Function to generate a unique email
+def generate_unique_email(first_name):
+    number = random.randint(100, 999)
+    email = f"{first_name.lower()}.{number}@lmdx.com"
+    while Account.query.filter_by(email=email).first() is not None:
+        number = random.randint(100, 999)
+        email = f"{first_name.lower()}.{number}@lmdx.com"
+    return email
+
+@bp.route('/generate_account/<int:doctor_id>', methods=['POST'])
+def generate_account(doctor_id):
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+    
+    doctor = Doctor.query.get_or_404(doctor_id)
+    try:
+        email = generate_unique_email(doctor.first_name)
+        password = generate_random_string(12)
+        hashed_password = generate_password_hash(password)
+
+        new_account = Account(
+            doctor_id=doctor_id,
+            email=email,
+            password=hashed_password,
+            plain_password=password,  # Store plain text password temporarily
+            status='Active'
+        )
+        db.session.add(new_account)
+        db.session.commit()
+        return jsonify({
+            'email': email,
+            'password': password
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+
+# <---------------------- Account Management Endpoints------------------------------->
 
 
 @bp.route('/get_doctor/<int:doctor_id>', methods=['GET'])

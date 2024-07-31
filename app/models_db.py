@@ -99,10 +99,10 @@ class Account(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     status = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    plain_password = db.Column(db.String(255), nullable=True)  # Temporary field to store plain text password
     last_login = db.Column(db.DateTime, nullable=True)
 
     doctor = db.relationship('Doctor', backref=db.backref('accounts', lazy=True))
-
 
 
 class Doctor(db.Model):
