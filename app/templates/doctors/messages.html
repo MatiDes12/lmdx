@@ -11,105 +11,182 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 48 48" fill="none" class="mr-4">
-            <rect width="48" height="48" fill="none"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M26 33H29.5C36.4036 33 42 27.4036 42 20.5C42 13.5964 36.4036 8 29.5 8H18.5C11.5964 8 6 13.5964 6 20.5C6 28.4145 11.2167 33.2537 16.9239 36.2262C19.7585 37.7025 22.6136 38.6566 24.7728 39.2414C25.2149 39.3611 25.626 39.4649 26 39.5542V33ZM28 42C28 42 27.2439 41.8897 26 41.6077C20.2362 40.3007 4 35.305 4 20.5C4 12.4919 10.4919 6 18.5 6H29.5C37.5081 6 44 12.4919 44 20.5C44 28.5081 37.5081 35 29.5 35H28V42Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M24 22C24.5523 22 25 21.5523 25 21C25 20.4477 24.5523 20 24 20C23.4477 20 23 20.4477 23 21C23 21.5523 23.4477 22 24 22ZM24 24C25.6569 24 27 22.6569 27 21C27 19.3431 25.6569 18 24 18C22.3431 18 21 19.3431 21 21C21 22.6569 22.3431 24 24 24Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M32 22C32.5523 22 33 21.5523 33 21C33 20.4477 32.5523 20 32 20C31.4477 20 31 20.4477 31 21C31 21.5523 31.4477 22 32 22ZM32 24C33.6569 24 35 22.6569 35 21C35 19.3431 33.6569 18 32 18C30.3431 18 29 19.3431 29 21C29 22.6569 30.3431 24 32 24Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M16 22C16.5523 22 17 21.5523 17 21C17 20.4477 16.5523 20 16 20C15.4477 20 15 20.4477 15 21C15 21.5523 15.4477 22 16 22ZM16 24C17.6569 24 19 22.6569 19 21C19 19.3431 17.6569 18 16 18C14.3431 18 13 19.3431 13 21C13 22.6569 14.3431 24 16 24Z" fill="currentColor"/>
-        </svg>
-        Messages
-    </h1>
-
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Patient List -->
-        <div class="w-full md:w-1/3 bg-white rounded-lg shadow-md p-4">
-            <h2 class="text-xl font-semibold mb-4">Patients</h2>
-            <div class="space-y-2">
-                {% for patient in patients %}
-                <div class="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer" onclick="loadConversation({{ patient.id }})">
-                    <img src="{{ patient.avatar }}" alt="{{ patient.name }}" class="w-10 h-10 rounded-full mr-3">
-                    <div>
-                        <p class="font-semibold">{{ patient.name }}</p>
-                        <p class="text-sm text-gray-500">{{ patient.last_message_preview }}</p>
-                    </div>
-                    {% if patient.unread_messages > 0 %}
-                    <span class="ml-auto bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ patient.unread_messages }}</span>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
+<div class="px-6 py-4 bg-gray-100 min-h-screen">
+  <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 rounded-lg mb-6 text-white">
+    <h1 class="text-3xl font-bold text-white">Your Messages</h1>
+    <p class="text-white text-sm mt-2">Communicate with your healthcare providers securely and conveniently.</p>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 bg-white p-6 rounded-lg mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Send a Message</h2>
+      <form id="message-form">
+        <div class="mb-6">
+          <label for="doctor-select" class="block text-sm font-medium text-gray-700 mb-2">Choose your doctor:</label>
+          <select id="doctor-select" name="doctor_id" class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 text-gray-700" required>
+            <option value="">Select a doctor</option>
+            {% for doctor in all_doctors  %}
+              <option value="{{ doctor.doctor_id }}">{{ doctor.first_name }} {{ doctor.last_name }}</option>
+            {% endfor %}
+          </select>
         </div>
-
-        <!-- Message Area -->
-        <div class="w-full md:w-2/3 bg-white rounded-lg shadow-md flex flex-col h-[600px]">
-            <!-- Conversation Header -->
-            <div class="p-4 border-b flex items-center">
-                <img src="{{ selected_patient.avatar }}" alt="{{ selected_patient.name }}" class="w-10 h-10 rounded-full mr-3">
-                <div>
-                    <p class="font-semibold">{{ selected_patient.name }}</p>
-                    <p class="text-sm text-gray-500">{{ selected_patient.status }}</p>
-                </div>
-            </div>
-
-            <!-- Message History -->
-            <div id="messageHistory" class="flex-grow p-4 overflow-y-auto space-y-4">
-                {% for message in messages %}
-                <div class="flex {% if message.sender == 'doctor' %}justify-end{% endif %}">
-                    <div class="max-w-xs md:max-w-md {% if message.sender == 'doctor' %}bg-blue-500 text-white{% else %}bg-gray-200 text-gray-800{% endif %} rounded-lg p-3">
-                        <p>{{ message.content }}</p>
-                        <p class="text-xs text-right mt-1 {% if message.sender == 'doctor' %}text-blue-200{% else %}text-gray-500{% endif %}">{{ message.timestamp }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Message Input -->
-            <div class="p-4 border-t">
-                <form id="messageForm" class="flex items-center">
-                    <input type="text" id="messageInput" placeholder="Type your message..." class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button type="submit" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
+        <div id="message-display" class="mb-6 bg-gray-50 p-4 rounded-lg h-64 overflow-y-auto">
+          <!-- Message display area -->
         </div>
+        <div class="mb-6">
+          <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Your Message:</label>
+          <textarea id="message" name="message" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-lg p-4 bg-gray-50 h-24" placeholder="Type your message here..." required></textarea>
+        </div>
+        <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+          Send Message
+          <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </button>
+      </form>
     </div>
+
+    <div class="lg:col-span-1 bg-white p-6 rounded-lg mb-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Message History</h2>
+      <div class="relative mb-4">
+        <input type="text" id="search-messages" placeholder="Search messages..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+
+      <div id="message-history" class="overflow-y-auto max-h-96 space-y-4">
+        {% for doctor in unique_doctors %}
+          <div class="message-preview p-4 bg-gray-100 rounded-lg cursor-pointer" data-doctor-id="{{ doctor['doctor_id'] }}">
+            <p class="text-sm font-medium">{{ doctor['doctor_name'] }}</p>
+            <p class="text-xs text-gray-400">{{ doctor['timestamp'] }}</p>
+            <p class="text-sm text-gray-500">{{ doctor['last_message'] }}</p>
+          </div>
+        {% endfor %}
+    </div>
+    
+    
+    
+
+  </div>
 </div>
-
 <script>
-    function loadConversation(patientId) {
-        // AJAX call to load conversation with the selected patient
-        // Update the message history and conversation header
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    const messageHistoryContainer = document.getElementById('message-history');
 
-    document.getElementById('messageForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const message = document.getElementById('messageInput').value;
-        if (message.trim()) {
-            // AJAX call to send the message
-            // On success, append the message to the message history
-            appendMessage(message, 'doctor');
-            document.getElementById('messageInput').value = '';
+    messageHistoryContainer.addEventListener('click', function(event) {
+        const targetElement = event.target.closest('.message-preview[data-doctor-id]');
+        if (targetElement) {
+            const doctorId = targetElement.getAttribute('data-doctor-id');
+            if (doctorId) {
+                loadConversation(doctorId);
+                selectDoctorInDropdown(doctorId); // Function to select the doctor in the dropdown
+            } else {
+                alert("Doctor ID is undefined!");
+            }
         }
     });
 
-    function appendMessage(content, sender) {
-        const messageHistory = document.getElementById('messageHistory');
-        const messageElement = document.createElement('div');
-        messageElement.className = `flex ${sender === 'doctor' ? 'justify-end' : ''}`;
-        messageElement.innerHTML = `
-            <div class="max-w-xs md:max-w-md ${sender === 'doctor' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg p-3">
-                <p>${content}</p>
-                <p class="text-xs text-right mt-1 ${sender === 'doctor' ? 'text-blue-200' : 'text-gray-500'}">${new Date().toLocaleTimeString()}</p>
-            </div>
-        `;
-        messageHistory.appendChild(messageElement);
-        messageHistory.scrollTop = messageHistory.scrollHeight;
+    function loadConversation(doctorId) {
+        fetch(`/patient/get_messages?doctor_id=${doctorId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const messageContainer = document.getElementById('message-display');
+                    messageContainer.innerHTML = '';
+                    data.conversation.forEach(msg => {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
+                        messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
+                        messageContainer.appendChild(messageElement);
+                    });
+                } else {
+                    alert('Failed to load messages.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('An error occurred. Please try again.');
+            });
     }
+
+    function selectDoctorInDropdown(doctorId) {
+        const selectElement = document.getElementById('doctor-select');
+        selectElement.value = doctorId;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sender = '{{ session["user_id"] }}';
+
+    document.getElementById('doctor-select').addEventListener('change', function() {
+        const receiver = this.value;
+        fetch(`/patient/get_messages?doctor_id=${receiver}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const messageContainer = document.getElementById('message-display');
+                    messageContainer.innerHTML = '';
+                    data.conversation.forEach(msg => {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
+                        messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
+                        messageContainer.appendChild(messageElement);
+                    });
+                } else {
+                    alert('Failed to load messages.');
+                }
+            });
+    });
+
+    document.getElementById('message-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const messageInput = document.getElementById('message');
+        const receiver = document.getElementById('doctor-select').value;
+        const message = messageInput.value;
+        if (message.trim() !== '') {
+          fetch('/patient/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    doctor_id: receiver,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const messageContainer = document.getElementById('message-display');
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message receiver-message';
+                    messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">You</p><p class="text-sm text-gray-600">${message}</p>`;
+                    messageContainer.appendChild(messageElement);
+                    messageInput.value = '';
+                } else {
+                    console.error('Error response:', data);
+                    alert('Failed to send message. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    });
+
+    document.getElementById('search-messages').addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('.message-preview').forEach(function(message) {
+            const doctorName = message.querySelector('.text-sm.font-medium').textContent.toLowerCase();
+            const messageBody = message.querySelector('.text-sm.text-gray-500').textContent.toLowerCase();
+            if (doctorName.includes(query) || messageBody.includes(query)) {
+                message.style.display = 'block';
+            } else {
+                message.style.display = 'none';
+            }
+        });
+    });
+    
+});
+
+
 </script>
 {% endblock %}

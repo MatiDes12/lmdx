@@ -16,7 +16,7 @@ from PIL import Image
 from firebase_admin import auth, exceptions
 from flask_paginate import Pagination, get_page_parameter
 from app.helpers import send_email, send_sms
-from sqlalchemy import func, or_
+from sqlalchemy import and_, func, or_
 
 # Configure your Google Gemini API key
 GOOGLE_API_KEY1 = ''
@@ -27,50 +27,53 @@ bp = Blueprint('doctor', __name__)
 
 
 #<---------------------- doctor Dashboard Routes----------------------->
-@bp.route('/doctor')
-def doctor_dashboard():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
-    return render_template('doctors/dashboard.html')
 # @bp.route('/doctor')
 # def doctor_dashboard():
-#     if 'user' not in session or session.get('user_type') != 'doctors':
-#         return render_template('auth/signin.html') + '''
-#             <script>
-#                 showFlashMessage('You must be signed in to access this page.', 'red', 'error');
-#             </script>
-#         '''
+#     if 'user' not in session:
+#         return redirect(url_for('auth.signin'))
 
-#     user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-#     id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
+#     return render_template('doctors/dashboard.html')
+@bp.route('/doctor')
+def doctor_dashboard():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return render_template('auth/signin.html') + '''
+            <script>
+                showFlashMessage('You must be signed in to access this page.', 'red', 'error');
+            </script>
+        '''
 
-#     try:
-#         # Fetch doctor data from Firebase
-#         doctor_data = firebase_db.child("Doctors").child(user_id).get(token=id_token).val()
-#         if doctor_data:
-#             first_name = doctor_data.get('first_name')
-#             last_name = doctor_data.get('last_name')
-#             total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
-#             total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
+    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
+    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
 
-#             return render_template('doctors/dashboard.html',
-#                                       first_name=first_name,
-#                                       last_name = last_name
-#                                    )
-#         else:
-#             return render_template('auth/signin.html') + '''
-#                 <script>
-#                     showFlashMessage('Unable to fetch organization details.', 'red', 'error');
-#                 </script>
-#             '''
-#     except Exception as e:
-#         print(f"Firebase fetch error: {e}")
-#         return render_template('auth/signin.html') + '''
-#             <script>
-#                 showFlashMessage('Error accessing organization information.', 'red', 'error');
-#             </script>
-#         '''
+    try:
+        # Fetch doctor data from Firebase
+        doctor_data = firebase_db.child("Doctors").child(user_id).get(token=id_token).val()
+        if doctor_data:
+            first_name = doctor_data.get('first_name')
+            last_name = doctor_data.get('last_name')
+            doctor_id = doctor_data.get('doctor_id')
+            total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
+            total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
+            total_messages = len(doctor_data.get('messages', []))  # Assuming messages are stored similarly
+
+
+            return render_template('doctors/dashboard.html',
+                                      first_name=first_name,
+                                      last_name = last_name
+                                   )
+        else:
+            return render_template('auth/signin.html') + '''
+                <script>
+                    showFlashMessage('Unable to fetch organization details.', 'red', 'error');
+                </script>
+            '''
+    except Exception as e:
+        print(f"Firebase fetch error: {e}")
+        return render_template('auth/signin.html') + '''
+            <script>
+                showFlashMessage('Error accessing organization information.', 'red', 'error');
+            </script>
+        '''
 
 
 #<----------------------Image Analysis----------------------->
@@ -381,49 +384,90 @@ def update_patient_status(patient_id, status):
 
 
 
-#<----------------------Messages----------------------->
+#<-------------------------- messages -------------------------------->
+
 @bp.route('/messages', methods=['GET'])
 def messages():
-    if 'user' not in session or session.get('user_type') != 'organization':
+    if 'user' not in session or session.get('user_type') not in ['patient', 'doctors']:
         return redirect(url_for('auth.signin'))
 
-    doctor_id = session.get('user_id')
-    messages = Message.query.filter_by(recipient_id=doctor_id).all()
-    message_details = []
+    client_id = session.get('user_id')
+    all_patient = Patient.query.all()
+    messages_sent = Message.query.filter_by(sender_id=client_id).all()
+    messages_received = Message.query.filter_by(recipient_id=client_id).all()
+    
+    patient_ids = set([msg.recipient_id for msg in messages_sent] + [msg.sender_id for msg in messages_received])
 
-    for message in messages:
-        patient = User.query.filter_by(user_id=message.sender_id).first()
-        if patient:
-            message_details.append({
-                'patient_name': f"{patient.first_name} {patient.last_name}",
-                'body': message.body,
-                'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-            })
+    unique_patient = {}
+    
+    for patient_id in patient_ids:
+        doctor = Doctor.query.filter_by(doctor_id=patient_id).first()
+        if doctor:
+            last_message = Message.query.filter(
+                or_(
+                    and_(Message.sender_id == client_id, Message.recipient_id == patient_id),
+                    and_(Message.sender_id == patient_id, Message.recipient_id == client_id)
+                )
+            ).order_by(Message.timestamp.desc()).first()
+            
+            if last_message:
+                unique_patient[doctor.doctor_id] = {
+                    'doctor_name': f"{doctor.first_name} {doctor.last_name}",
+                    'last_message': last_message.body,
+                    'timestamp': last_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+    unique_doctors_list = [{'doctor_id': k, **v} for k, v in unique_patient.items()]
+    return render_template('clients/messages.html', all_doctors=all_patient, unique_doctors=unique_doctors_list)
 
-    return render_template('doctors/messages.html', messages=message_details)
 
 @bp.route('/send_message', methods=['POST'])
 def send_message():
-    data = request.json
-    sender_id = session.get('user_id')
-    receiver_id = data.get('patient_id')
-    body = data.get('message')
-    timestamp = datetime.utcnow()
+    try:
+        data = request.json
+        sender_id = session.get('user_id')
+        receiver_id = data.get('doctor_id')
+        body = data.get('message')
+        timestamp = datetime.utcnow()
 
-    if not sender_id or not receiver_id or not body:
+        if not sender_id or not receiver_id or not body:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+        new_message = Message(
+            sender_id=sender_id,
+            recipient_id=receiver_id,
+            body=body,
+            timestamp=timestamp
+        )
+        db.session.add(new_message)
+        db.session.commit()
+
+        return jsonify({'success': True}), 200
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/get_messages', methods=['GET'])
+def get_messages():
+    sender_id = session.get('user_id')
+    receiver_id = request.args.get('doctor_id')
+
+    if not sender_id or not receiver_id:
         return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
-    new_message = Message(
-        sender_id=sender_id,
-        recipient_id=receiver_id,
-        body=body,
-        timestamp=timestamp
-    )
-    db.session.add(new_message)
-    db.session.commit()
+    messages = Message.query.filter(
+        (Message.sender_id == sender_id) & (Message.recipient_id == receiver_id) |
+        (Message.sender_id == receiver_id) & (Message.recipient_id == sender_id)
+    ).order_by(Message.timestamp.asc()).all()
 
-    return jsonify({'success': True}), 200
+    conversation = [{
+        'sender': 'You' if msg.sender_id == sender_id else 'Doctor',
+        'message': msg.body,
+        'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    } for msg in messages]
 
+    return jsonify({'success': True, 'conversation': conversation}), 200
 
 
 #<----------------------Reports----------------------->

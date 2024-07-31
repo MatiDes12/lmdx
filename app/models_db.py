@@ -63,16 +63,12 @@ class ClientAccounts(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     phone_number = db.Column(db.String(20), nullable=True)
     address = db.Column(db.Text, nullable=True)
-
-    __mapper_args__ = {
-        'polymorphic_on': 'type',
-        'polymorphic_identity': 'client'
-    }
     type = db.Column(db.String(50), nullable=False)
 
-class Patient(ClientAccounts):
+class Patient(db.Model):
     __tablename__ = 'patients'
-    patient_id = db.Column(db.Integer, db.ForeignKey('client_accounts.client_id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('client_accounts.client_id'), nullable=False)
     dob = db.Column(db.Date)
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
@@ -80,9 +76,6 @@ class Patient(ClientAccounts):
 
     doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'patient'
-    }
 
 
 class Compliance(db.Model):
