@@ -10,7 +10,7 @@ import google.generativeai as genai
 from PIL import Image
 from firebase_admin import auth, exceptions
 from flask_paginate import Pagination, get_page_parameter
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, and_, or_
 
 # Configure your Google Gemini API key
 GOOGLE_API_KEY1 = ''

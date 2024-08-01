@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)  # Add username field
+    username = db.Column(db.String(50), unique=False, nullable=False)  # Add username field
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     user_type = db.Column(db.Enum('patient', 'doctors', 'staff', 'admin', 'organization', name='user_type_enum'), nullable=False)
@@ -70,7 +70,7 @@ class ClientAccounts(db.Model):
         'polymorphic_identity': 'client'
     }
 
-class Patient(ClientAccounts):
+class Patient(db.Model):
     __tablename__ = 'patients'
     patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'), primary_key=True) 
     dob = db.Column(db.Date)
@@ -80,9 +80,6 @@ class Patient(ClientAccounts):
 
     doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'patient'
-    }
 
 
 class Compliance(db.Model):

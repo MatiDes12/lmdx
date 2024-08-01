@@ -18,6 +18,11 @@ bp = Blueprint('patient', __name__)
 # Load environment variables from .env file
 load_dotenv()
 
+# # Now you can access the environment variable
+# genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+
+# # Configure Google Gemini API
+# model = genai.GenerativeModel('gemini-1.5-flash')
 
 
 #<-------------------------- dashboard -------------------------------->
