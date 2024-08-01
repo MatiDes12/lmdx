@@ -12,44 +12,23 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
     <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
-            <rect width="48" height="48" fill="none"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C10.8954 21 10 21.8954 10 23V25C10 26.1046 10.8954 27 12 27H14C15.1046 27 16 26.1046 16 25V23C16 21.8954 15.1046 21 14 21H12ZM12 23V25H14V23H12Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M18 23C18 21.8954 18.8954 21 20 21H22C23.1046 21 24 21.8954 24 23V25C24 26.1046 23.1046 27 22 27H20C18.8954 27 18 26.1046 18 25V23ZM20 23H22V25H20V23Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M28 21C26.8954 21 26 21.8954 26 23V25C26 26.1046 26.8954 27 28 27H30C31.1046 27 32 26.1046 32 25V23C32 21.8954 31.1046 21 30 21H28ZM28 23V25H30V23H28Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 31C10 29.8954 10.8954 29 12 29H14C15.1046 29 16 29.8954 16 31V33C16 34.1046 15.1046 35 14 35H12C10.8954 35 10 34.1046 10 33V31ZM14 31V33H12V31H14Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M20 29C18.8954 29 18 29.8954 18 31V33C18 34.1046 18.8954 35 20 35H22C23.1046 35 24 34.1046 24 33V31C24 29.8954 23.1046 29 22 29H20ZM22 31H20V33H22V31Z" fill="currentColor"/>
-            <path d="M36 32.5C36 31.9477 35.5523 31.5 35 31.5C34.4477 31.5 34 31.9477 34 32.5V35.4142L35.2929 36.7071C35.6834 37.0976 36.3166 37.0976 36.7071 36.7071C37.0976 36.3166 37.0976 35.6834 36.7071 35.2929L36 34.5858V32.5Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 7C12 6.44772 12.4477 6 13 6C13.5523 6 14 6.44772 14 7V12C14 12.5523 14.4477 13 15 13C15.5523 13 16 12.5523 16 12V9H26V7C26 6.44772 26.4477 6 27 6C27.5523 6 28 6.44772 28 7V12C28 12.5523 28.4477 13 29 13C29.5523 13 30 12.5523 30 12V9H33C34.6569 9 36 10.3432 36 12V28.0709C39.3923 28.5561 42 31.4735 42 35C42 38.866 38.866 42 35 42C32.6213 42 30.5196 40.8135 29.2547 39H9C7.34315 39 6 37.6569 6 36V12C6 10.3431 7.34315 9 9 9H12V7ZM28 35C28 31.4735 30.6077 28.5561 34 28.0709V18H8V36C8 36.5523 8.44772 37 9 37H28.2899C28.1013 36.3663 28 35.695 28 35ZM40 35C40 37.7614 37.7614 40 35 40C32.2386 40 30 37.7614 30 35C30 32.2386 32.2386 30 35 30C37.7614 30 40 32.2386 40 35Z" fill="currentColor"/>
-        </svg>
         <div>
             <h1 class="text-3xl font-bold">Appointment Management</h1>
             <p>View and manage your patient appointments</p>
         </div>
     </div>
 
-    <!-- Appointment Filter Section -->
     <div class="bg-white shadow-md rounded-lg p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            Filter Appointments
-        </h2>
+        <h2 class="text-2xl font-semibold mb-4">Filter Appointments</h2>
         <form action="" method="GET" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
-                        Date
-                    </label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="date">Date</label>
                     <input type="date" id="date" name="date" value="{{ date_filter }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
-                        Status
-                    </label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Status</label>
                     <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         <option value="">All</option>
                         <option value="Scheduled" {% if status_filter == 'Scheduled' %}selected{% endif %}>Scheduled</option>
@@ -58,45 +37,30 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">
-                        Patient Name
-                    </label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">Patient Name</label>
                     <input type="text" id="patient" name="search" placeholder="Search by patient name" value="{{ search_query }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
             </div>
             <div class="flex justify-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Apply Filters
-                </button>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Apply Filters</button>
             </div>
         </form>
     </div>
 
-    <!-- Appointments List -->
     <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-            Appointments
-        </h2>
+        <h2 class="text-2xl font-semibold mb-4">Appointments</h2>
         {% if appointments %}
         <div class="overflow-x-auto">
             <table class="min-w-full leading-normal">
                 <thead>
                     <tr>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Patient
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Date & Time
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Status
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Actions
-                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Time</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Reason</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Notes</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,26 +69,57 @@
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex items-center">
                                 <div class="ml-3">
-                                    <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ appointment.client.first_name }} {{ appointment.client.last_name }}
-                                    </p>
+                                    <p class="text-gray-900 whitespace-no-wrap">{{ appointment.client.first_name }} {{ appointment.client.last_name }}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ appointment.appointment_date.strftime('%Y-%m-%d') }} {{ appointment.appointment_time.strftime('%I:%M %p') }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ appointment.appointment_date.strftime('%Y-%m-%d') }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ appointment.appointment_time.strftime('%I:%M %p') }}</p>
+                        </td>
+
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight
+                                {% if appointment.status == 'Scheduled' %}
+                                    text-green-900
+                                {% elif appointment.status == 'Completed' %}
+                                    text-blue-900
+                                {% elif appointment.status == 'Pending' %}
+                                    text-yellow-900
+                                {% elif appointment.status == 'Cancelled' %}
+                                    text-red-900
+                                {% endif %}
+                            ">
+                                <span aria-hidden class="absolute inset-0 
+                                    {% if appointment.status == 'Scheduled' %}
+                                        bg-green-200
+                                    {% elif appointment.status == 'Completed' %}
+                                        bg-blue-200
+                                    {% elif appointment.status == 'Pending' %}
+                                        bg-yellow-200
+                                    {% elif appointment.status == 'Cancelled' %}
+                                        bg-red-200
+                                    {% endif %}
+                                opacity-50 rounded-full"></span>
                                 <span class="relative">{{ appointment.status }}</span>
                             </span>
+                        </td>                        
+
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm break-words">
+                            <p class="text-gray-900">{{ appointment.reason }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm break-words">
+                            <p class="text-gray-900">{{ appointment.notes }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Reschedule</a>
-                            <a href="{{ url_for('doctor.edit_appointment', appointment_id=appointment.appointment_id) }}" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Cancel</a>
-                        </td>
+                            <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="btn btn-reschedule">Reschedule</a>
+                            <a href="{{ url_for('doctor.edit_appointment', appointment_id=appointment.appointment_id) }}" class="btn btn-edit">Edit</a>
+                            <form action="{{ url_for('doctor.cancel_appointment', appointment_id=appointment.appointment_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-cancel">Cancel</button>
+                            </form>
+                        </td>                                                                                                               
                     </tr>
                     {% endfor %}
                 </tbody>

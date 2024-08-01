@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, render_template, request, redirect, send_f
 from sqlalchemy import func
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
-from app.routes.auth import firebase, firebase_db  # Import firebase and firebase_db
+from app.routes.auth import firebase, firebase_db, auth
 from .. import sqlalchemy_db as db
 from ..models_db import Appointment, AuditLog, BudgetCategory, Compliance, Department, Facility, Patient, Doctor, Permission, Project, Revenue, Role, RolePermission, Staff, User, UserRole, Account
 import google.generativeai as genai
@@ -14,6 +14,7 @@ import random
 import string
 from werkzeug.security import generate_password_hash
 from firebase_admin import auth as admin_auth
+
 
 bp = Blueprint('admin', __name__)
 
@@ -49,44 +50,6 @@ def doctor_dashboard():
         return redirect(url_for('auth.signin'))
 
     return render_template('doctors/dashboard.html')
-# @bp.route('/doctor')
-# def doctor_dashboard():
-#     if 'user' not in session or session.get('user_type') != 'doctors':
-#         return render_template('auth/signin.html') + '''
-#             <script>
-#                 showFlashMessage('You must be signed in to access this page.', 'red', 'error');
-#             </script>
-#         '''
-
-#     user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-#     id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
-
-#     try:
-#         # Fetch doctor data from Firebase
-#         doctor_data = firebase_db.child("Doctors").child(user_id).get(token=id_token).val()
-#         if doctor_data:
-#             first_name = doctor_data.get('first_name')
-#             last_name = doctor_data.get('last_name')
-#             total_patients = len(doctor_data.get('patients', []))  # Assuming you store a list of patient IDs
-#             total_appointments = len(doctor_data.get('appointments', []))  # Assuming appointments are stored similarly
-
-#             return render_template('doctors/dashboard.html',
-#                                       first_name=first_name,
-#                                       last_name = last_name
-#                                    )
-#         else:
-#             return render_template('auth/signin.html') + '''
-#                 <script>
-#                     showFlashMessage('Unable to fetch organization details.', 'red', 'error');
-#                 </script>
-#             '''
-#     except Exception as e:
-#         print(f"Firebase fetch error: {e}")
-#         return render_template('auth/signin.html') + '''
-#             <script>
-#                 showFlashMessage('Error accessing organization information.', 'red', 'error');
-#             </script>
-#         '''
 
 #<---------------------- Patient Dashboard Routes----------------------->
 
@@ -244,12 +207,19 @@ def generate_account(doctor_id):
     
     doctor = Doctor.query.get_or_404(doctor_id)
     try:
-        username = doctor.first_name +" " +doctor.last_name
+        username = doctor.first_name + " " + doctor.last_name
         email = generate_unique_email(doctor.first_name)
         password = generate_random_string(12)
         hashed_password = generate_password_hash(password)
 
+        # Create the doctor user in Firebase Authentication
+        firebase_user = firebase.auth().create_user_with_email_and_password(email, password)
+        firebase_user_id = firebase_user['localId']
+        id_token = firebase_user['idToken']
+
+        # Create a new account with the Firebase user ID
         new_account = Account(
+            id=firebase_user_id,  # Store the Firebase user ID
             doctor_id=doctor_id,
             email=email,
             password=hashed_password,
@@ -257,25 +227,24 @@ def generate_account(doctor_id):
             status='Active'
         )
         db.session.add(new_account)
+
+        # Update doctor's status to Active
+        doctor.status = 'Active'
         db.session.commit()
 
         # Create a new user in the User table
         new_user = User(
-            username = username,
+            username=username,
             email=email,
             password_hash=hashed_password,
-            user_type='doctors',  
+            user_type='doctor',  
             created_at=datetime.now()
         )
         db.session.add(new_user)
         db.session.commit()
 
-        # Create the doctor user in Firebase Authentication
-        firebase_user = firebase.auth().create_user_with_email_and_password(email, password)
-        id_token = firebase_user['idToken']
-
         # Set doctor data in Firebase Realtime Database
-        firebase_db.child("Doctors").child(firebase_user['localId']).set({
+        firebase_db.child("Doctors").child(firebase_user_id).set({
             'doctor_id': doctor_id,
             'email': email,
             'first_name': doctor.first_name,

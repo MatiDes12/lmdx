@@ -51,134 +51,160 @@
             <p class="text-sm text-gray-500">{{ doctor['last_message'] }}</p>
           </div>
         {% endfor %}
+      </div>
     </div>
-    
-    
-    
-
   </div>
 </div>
+
+<style>
+.message {
+  max-width: 75%;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.sender-message {
+  background-color: #f0f0f0;
+  text-align: left;
+  margin-right: auto;
+  color: #333;
+}
+.receiver-message {
+  background-color: #007bff;
+  color: white;
+  text-align: right;
+  margin-left: auto;
+}
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const messageHistoryContainer = document.getElementById('message-history');
-
-    messageHistoryContainer.addEventListener('click', function(event) {
-        const targetElement = event.target.closest('.message-preview[data-doctor-id]');
-        if (targetElement) {
-            const doctorId = targetElement.getAttribute('data-doctor-id');
-            if (doctorId) {
-                loadConversation(doctorId);
-                selectDoctorInDropdown(doctorId); // Function to select the doctor in the dropdown
-            } else {
-                alert("Doctor ID is undefined!");
-            }
-        }
-    });
-
-    function loadConversation(doctorId) {
-        fetch(`/patient/get_messages?doctor_id=${doctorId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const messageContainer = document.getElementById('message-display');
-                    messageContainer.innerHTML = '';
-                    data.conversation.forEach(msg => {
-                        const messageElement = document.createElement('div');
-                        messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
-                        messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
-                        messageContainer.appendChild(messageElement);
-                    });
-                } else {
-                    alert('Failed to load messages.');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                alert('An error occurred. Please try again.');
-            });
-    }
-
-    function selectDoctorInDropdown(doctorId) {
-        const selectElement = document.getElementById('doctor-select');
-        selectElement.value = doctorId;
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const sender = '{{ session["user_id"] }}';
-
-    document.getElementById('doctor-select').addEventListener('change', function() {
-        const receiver = this.value;
-        fetch(`/patient/get_messages?doctor_id=${receiver}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const messageContainer = document.getElementById('message-display');
-                    messageContainer.innerHTML = '';
-                    data.conversation.forEach(msg => {
-                        const messageElement = document.createElement('div');
-                        messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
-                        messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
-                        messageContainer.appendChild(messageElement);
-                    });
-                } else {
-                    alert('Failed to load messages.');
-                }
-            });
-    });
-
-    document.getElementById('message-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const messageInput = document.getElementById('message');
-        const receiver = document.getElementById('doctor-select').value;
-        const message = messageInput.value;
-        if (message.trim() !== '') {
-          fetch('/patient/send_message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    doctor_id: receiver,
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const messageContainer = document.getElementById('message-display');
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message receiver-message';
-                    messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">You</p><p class="text-sm text-gray-600">${message}</p>`;
-                    messageContainer.appendChild(messageElement);
-                    messageInput.value = '';
-                } else {
-                    console.error('Error response:', data);
-                    alert('Failed to send message. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                alert('An error occurred. Please try again.');
-            });
-        }
-    });
-
-    document.getElementById('search-messages').addEventListener('input', function() {
-        const query = this.value.toLowerCase();
-        document.querySelectorAll('.message-preview').forEach(function(message) {
-            const doctorName = message.querySelector('.text-sm.font-medium').textContent.toLowerCase();
-            const messageBody = message.querySelector('.text-sm.text-gray-500').textContent.toLowerCase();
-            if (doctorName.includes(query) || messageBody.includes(query)) {
-                message.style.display = 'block';
-            } else {
-                message.style.display = 'none';
-            }
-        });
-    });
-    
-});
-
-
-</script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const messageHistoryContainer = document.getElementById('message-history');
+  
+      messageHistoryContainer.addEventListener('click', function(event) {
+          const targetElement = event.target.closest('.message-preview[data-doctor-id]');
+          if (targetElement) {
+              const doctorId = targetElement.getAttribute('data-doctor-id');
+              if (doctorId) {
+                  loadConversation(doctorId);
+                  selectDoctorInDropdown(doctorId); // Function to select the doctor in the dropdown
+              } else {
+                  alert("Doctor ID is undefined!");
+              }
+          }
+      });
+  
+      function loadConversation(doctorId) {
+          fetch(`/patient/get_messages?doctor_id=${doctorId}`)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      const messageContainer = document.getElementById('message-display');
+                      messageContainer.innerHTML = '';
+                      data.conversation.forEach(msg => {
+                          const messageElement = document.createElement('div');
+                          messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
+                          messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
+                          messageContainer.appendChild(messageElement);
+                      });
+                  } else {
+                      alert('Failed to load messages.');
+                  }
+              })
+              .catch(error => {
+                  console.error('Fetch error:', error);
+                  alert('An error occurred. Please try again.');
+              });
+      }
+  
+      function selectDoctorInDropdown(doctorId) {
+          const selectElement = document.getElementById('doctor-select');
+          selectElement.value = doctorId;
+      }
+  });
+  
+  document.addEventListener('DOMContentLoaded', () => {
+      const sender = '{{ session["user_id"] }}';
+  
+      document.getElementById('doctor-select').addEventListener('change', function() {
+          const receiver = this.value;
+          fetch(`/patient/get_messages?doctor_id=${receiver}`)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      const messageContainer = document.getElementById('message-display');
+                      messageContainer.innerHTML = '';
+                      data.conversation.forEach(msg => {
+                          const messageElement = document.createElement('div');
+                          messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
+                          messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
+                          messageContainer.appendChild(messageElement);
+                      });
+                  } else {
+                      alert('Failed to load messages.');
+                  }
+              });
+      });
+  
+      document.getElementById('message-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const messageInput = document.getElementById('message');
+          const receiver = document.getElementById('doctor-select').value;
+          const message = messageInput.value;
+          if (message.trim() !== '') {
+              fetch('/patient/send_message', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                      doctor_id: receiver,
+                      message: message
+                  })
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      const messageContainer = document.getElementById('message-display');
+                      const messageElement = document.createElement('div');
+                      messageElement.className = 'message receiver-message';
+                      messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">You</p><p class="text-sm text-gray-600">${message}</p>`;
+                      messageContainer.appendChild(messageElement);
+                      messageInput.value = '';
+                      updateMessageHistory(receiver, message);  // Update message history
+                  } else {
+                      console.error('Error response:', data);
+                      alert('Failed to send message. Please try again.');
+                  }
+              })
+              .catch(error => {
+                  console.error('Fetch error:', error);
+                  alert('An error occurred. Please try again.');
+              });
+          }
+      });
+  
+      function updateMessageHistory(doctorId, message) {
+          // Find the corresponding doctor in the message history and update the last message
+          const messagePreview = document.querySelector(`.message-preview[data-doctor-id="${doctorId}"]`);
+          if (messagePreview) {
+              messagePreview.querySelector('.text-sm.text-gray-500').textContent = message;
+              messagePreview.querySelector('.text-xs.text-gray-400').textContent = new Date().toLocaleString();
+          }
+      }
+  
+      document.getElementById('search-messages').addEventListener('input', function() {
+          const query = this.value.toLowerCase();
+          document.querySelectorAll('.message-preview').forEach(function(message) {
+              const doctorName = message.querySelector('.text-sm.font-medium').textContent.toLowerCase();
+              const messageBody = message.querySelector('.text-sm.text-gray-500').textContent.toLowerCase();
+              if (doctorName.includes(query) || messageBody.includes(query)) {
+                  message.style.display = 'block';
+              } else {
+                  message.style.display = 'none';
+              }
+          });
+      });
+  });
+  </script>
 {% endblock %}

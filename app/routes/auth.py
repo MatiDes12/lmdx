@@ -22,6 +22,8 @@ def initialize_firebase():
 # Initialize firebase app
 initialize_firebase()
 
+# app/routes/auth.py
+
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     user_type = request.args.get('type', 'patient')  # Default to 'patient' if not specified
@@ -62,7 +64,7 @@ def signup():
                     </script>
                 '''
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            new_user = User(username = name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
+            new_user = User(username=name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
             db.session.add(new_user)
             db.session.commit()
             user_data = {'full_name': name, 'email': email, 'organization': org_name, 'phone_number': phone_number}
@@ -77,10 +79,9 @@ def signup():
                 '''
             user_data = {'first_name': first_name, 'last_name': last_name, 'email': email, 'phone_number': phone_number}
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            new_user = User(username = first_name +" "+last_name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
+            new_user = User(username=first_name + " " + last_name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
             db.session.add(new_user)
             db.session.commit()
-
 
         try:
             # Check if the email already exists
@@ -99,28 +100,27 @@ def signup():
             user = firebase.auth().create_user_with_email_and_password(email, password)
             id_token = user['idToken']
             refresh_token = user['refreshToken']
-
-            
+            firebase_user_id = user['localId']
 
             # Send email verification
             firebase.auth().send_email_verification(id_token)
 
             # Save additional data to the Firebase database based on user type
             if user_type == 'organization':
-                firebase_db.child("Organization").child(user['localId']).set(user_data, token=id_token)
+                firebase_db.child("Organization").child(firebase_user_id).set(user_data, token=id_token)
                 
                 try:
                     # Attempt to add the new organization to the session and commit
                     new_organization = Organization(
-                    user_id=new_user.user_id,
-                    contact_name=name,
-                    email=email,
-                    special_email=None,
-                    organization=org_name,
-                    phone_number=phone_number,
-                    state=state,
-                    department=None,
-                    license_number=license_number
+                        user_id=new_user.user_id,
+                        contact_name=name,
+                        email=email,
+                        special_email=None,
+                        organization=org_name,
+                        phone_number=phone_number,
+                        state=state,
+                        department=None,
+                        license_number=license_number
                     )
                     db.session.add(new_organization)
                     db.session.commit()
@@ -130,13 +130,12 @@ def signup():
                     print(f"Failed to add organization: {e}")
                     db.session.rollback()
 
-
             if user_type == 'patient':
-                firebase_db.child("ClientAccounts").child(user['localId']).set(user_data, token=id_token)
-
+                firebase_db.child("ClientAccounts").child(firebase_user_id).set(user_data, token=id_token)
 
                 # Create a new Client record in SQLAlchemy
                 new_client = ClientAccounts(
+                    client_id=firebase_user_id,  # Set Firebase ID as client_id
                     first_name=first_name,
                     last_name=last_name,
                     email=email,
@@ -145,12 +144,11 @@ def signup():
                 db.session.add(new_client)
                 db.session.commit()
 
-
             print(f"User created: {user}")
             session['user_type'] = user_type
             session['user_id_token'] = id_token
             session['refresh_token'] = refresh_token
-            session['local_id'] = user['localId']
+            session['local_id'] = firebase_user_id
             session['user_data'] = user_data
             return redirect(url_for('auth.check_verification'))  # Redirect to verification check
 

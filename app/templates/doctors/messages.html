@@ -1,11 +1,10 @@
 {% extends 'doctors/base.html' %}
 
-{% block title %}Messages{% endblock %}
+{% block title %}Message Doctor{% endblock %}
 
 {% block sidebar %}
 {% include 'doctors/sidebar.html' %}
 {% endblock %}
-
 {% block navbar %}
 {% include 'doctors/dashboard_navbar.html' %}
 {% endblock %}
@@ -14,18 +13,18 @@
 <div class="px-6 py-4 bg-gray-100 min-h-screen">
   <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 rounded-lg mb-6 text-white">
     <h1 class="text-3xl font-bold text-white">Your Messages</h1>
-    <p class="text-white text-sm mt-2">Communicate with your healthcare providers securely and conveniently.</p>
+    <p class="text-white text-sm mt-2">Communicate with your clients securely and conveniently.</p>
   </div>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 bg-white p-6 rounded-lg mb-6">
       <h2 class="text-2xl font-bold text-gray-800 mb-4">Send a Message</h2>
       <form id="message-form">
         <div class="mb-6">
-          <label for="doctor-select" class="block text-sm font-medium text-gray-700 mb-2">Choose your doctor:</label>
-          <select id="doctor-select" name="doctor_id" class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 text-gray-700" required>
-            <option value="">Select a doctor</option>
-            {% for doctor in all_doctors  %}
-              <option value="{{ doctor.doctor_id }}">{{ doctor.first_name }} {{ doctor.last_name }}</option>
+          <label for="client-select" class="block text-sm font-medium text-gray-700 mb-2">Choose your client:</label>
+          <select id="client-select" name="client_id" class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 text-gray-700" required>
+            <option value="">Select a client</option>
+            {% for client in all_clients %}
+              <option value="{{ client.client_id }}">{{ client.first_name }} {{ client.last_name }}</option>
             {% endfor %}
           </select>
         </div>
@@ -52,39 +51,62 @@
       </div>
 
       <div id="message-history" class="overflow-y-auto max-h-96 space-y-4">
-        {% for doctor in unique_doctors %}
-          <div class="message-preview p-4 bg-gray-100 rounded-lg cursor-pointer" data-doctor-id="{{ doctor['doctor_id'] }}">
-            <p class="text-sm font-medium">{{ doctor['doctor_name'] }}</p>
-            <p class="text-xs text-gray-400">{{ doctor['timestamp'] }}</p>
-            <p class="text-sm text-gray-500">{{ doctor['last_message'] }}</p>
+        {% for client in unique_clients %}
+          <div class="message-preview p-4 bg-gray-100 rounded-lg cursor-pointer" data-client-id="{{ client['client_id'] }}">
+            <p class="text-sm font-medium">{{ client['client_name'] }}</p>
+            <p class="text-xs text-gray-400">{{ client['timestamp'] }}</p>
+            <p class="text-sm text-gray-500">{{ client['last_message'] }}</p>
           </div>
         {% endfor %}
+      </div>
     </div>
-    
-    
-    
-
   </div>
 </div>
+
+<style>
+  .message {
+    max-width: 75%;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .sender-message {
+    background-color: #f0f0f0;
+    text-align: left;
+    margin-right: auto;
+    font-size: 1.6rem; 
+    font-weight: bold; /* Make the text bold */
+    color: rgb(0, 0, 0); /* Make the text white */
+  }
+  .receiver-message {
+    background-color: #0762c4b0;
+    text-align: right;
+    margin-left: auto;
+    font-size: 1.6rem; /* Increase the font size */
+    font-weight: bold; /* Make the text bold */
+    color: white; /* Make the text white */
+  }
+  </style>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const messageHistoryContainer = document.getElementById('message-history');
 
     messageHistoryContainer.addEventListener('click', function(event) {
-        const targetElement = event.target.closest('.message-preview[data-doctor-id]');
+        const targetElement = event.target.closest('.message-preview[data-client-id]');
         if (targetElement) {
-            const doctorId = targetElement.getAttribute('data-doctor-id');
-            if (doctorId) {
-                loadConversation(doctorId);
-                selectDoctorInDropdown(doctorId); // Function to select the doctor in the dropdown
+            const clientId = targetElement.getAttribute('data-client-id');
+            if (clientId) {
+                loadConversation(clientId);
+                selectClientInDropdown(clientId); // Function to select the client in the dropdown
             } else {
-                alert("Doctor ID is undefined!");
+                alert("Client ID is undefined!");
             }
         }
     });
 
-    function loadConversation(doctorId) {
-        fetch(`/patient/get_messages?doctor_id=${doctorId}`)
+    function loadConversation(clientId) {
+        fetch(`/doctor/get_messages?client_id=${clientId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -106,18 +128,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    function selectDoctorInDropdown(doctorId) {
-        const selectElement = document.getElementById('doctor-select');
-        selectElement.value = doctorId;
+    function selectClientInDropdown(clientId) {
+        const selectElement = document.getElementById('client-select');
+        selectElement.value = clientId;
     }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     const sender = '{{ session["user_id"] }}';
 
-    document.getElementById('doctor-select').addEventListener('change', function() {
+    document.getElementById('client-select').addEventListener('change', function() {
         const receiver = this.value;
-        fetch(`/patient/get_messages?doctor_id=${receiver}`)
+        fetch(`/doctor/get_messages?client_id=${receiver}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -138,16 +160,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('message-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const messageInput = document.getElementById('message');
-        const receiver = document.getElementById('doctor-select').value;
+        const receiver = document.getElementById('client-select').value;
         const message = messageInput.value;
         if (message.trim() !== '') {
-          fetch('/patient/send_message', {
+          fetch('/doctor/send_message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    doctor_id: receiver,
+                    client_id: receiver,
                     message: message
                 })
             })
@@ -175,18 +197,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('search-messages').addEventListener('input', function() {
         const query = this.value.toLowerCase();
         document.querySelectorAll('.message-preview').forEach(function(message) {
-            const doctorName = message.querySelector('.text-sm.font-medium').textContent.toLowerCase();
+            const clientName = message.querySelector('.text-sm.font-medium').textContent.toLowerCase();
             const messageBody = message.querySelector('.text-sm.text-gray-500').textContent.toLowerCase();
-            if (doctorName.includes(query) || messageBody.includes(query)) {
+            if (clientName.includes(query) || messageBody.includes(query)) {
                 message.style.display = 'block';
             } else {
                 message.style.display = 'none';
             }
         });
     });
-    
 });
-
-
 </script>
 {% endblock %}
