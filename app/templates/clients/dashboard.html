@@ -74,39 +74,31 @@
     </div>
 
 
-    <!-- Right Section: Notifications and Reminders -->
-    <div class="col-span-1">
-        <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-            Notifications
-          </div>
-      <div class="space-y-2">
-        <!-- Example Notification -->
-        <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <div class="flex-shrink-0">
-                <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/300" alt="User">
-            </div>
-            <div class="min-w-0 ml-2 flex-1">
-                <p class="text-sm font-medium text-gray-900 dark:text-white">John Doe</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">New appointment scheduled</p>
-            </div>
-            <div class="flex-shrink-0 ml-auto">
-                <p class="text-sm text-gray-500 dark:text-gray-400">2 hours ago</p>
-            </div>
-        </div>
-        <!-- Add more notifications as needed -->
-        <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <div class="flex-shrink-0">
-                <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/301" alt="User">
-            </div>
-            <div class="min-w-0 ml-2 flex-1">
-                <p class="text-sm font-medium text-gray-900 dark:text-white">Jane Smith</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Patient report updated</p>
-            </div>
-            <div class="flex-shrink-0 ml-auto">
-                <p class="text-sm text-gray-500 dark:text-gray-400">1 hour ago</p>
-            </div>
-        </div>
+  <!-- Right Section: Notifications and Reminders -->
+  <div class="col-span-1">
+    <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Notifications
     </div>
+    <div class="space-y-2">
+        {% for notification in notifications %}
+        <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex-shrink-0">
+                <img class="w-8 h-8 rounded-full" src="{{ url_for('static', filename='images/profilePic.jpg') }}" alt="User">
+            </div>
+            <div class="min-w-0 ml-2 flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ notification.user_name }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ notification.message }}</p>
+            </div>
+            <div class="flex-shrink-0 ml-auto">
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ notification.time_ago }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+
+
+  
   </div>
 </div>
 <div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>

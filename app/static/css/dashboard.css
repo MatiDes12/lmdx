@@ -53,3 +53,50 @@ body {
 .dropdown-toggle::after {
     display: none;
 }
+
+/* Button base styling */
+.btn {
+    margin: 1.5%;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Reschedule button styling */
+.btn-reschedule {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.btn-reschedule:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+/* Edit button styling */
+.btn-edit {
+    background-color: #2196F3; /* Blue */
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #0b7dda;
+    transform: translateY(-2px);
+}
+
+/* Cancel button styling */
+.btn-cancel {
+    background-color: #f44336; /* Red */
+    color: white;
+    border: none; /* Removing border for the button in form */
+}
+
+.btn-cancel:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+}

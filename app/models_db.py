@@ -57,22 +57,22 @@ class Visit(db.Model):
 
 class ClientAccounts(db.Model):
     __tablename__ = 'client_accounts'
-    client_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    client_id = db.Column(db.String(255), primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     phone_number = db.Column(db.String(20), nullable=True)
     address = db.Column(db.Text, nullable=True)
+    type = db.Column(db.String(50), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': 'client'
     }
-    type = db.Column(db.String(50), nullable=False)
 
 class Patient(ClientAccounts):
     __tablename__ = 'patients'
-    patient_id = db.Column(db.Integer, db.ForeignKey('client_accounts.client_id'), primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'), primary_key=True) 
     dob = db.Column(db.Date)
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
@@ -94,12 +94,12 @@ class Compliance(db.Model):
     doctor = db.relationship('Doctor', backref=db.backref('compliance', lazy=True))
 
 class Account(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(255), primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     status = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    plain_password = db.Column(db.String(255), nullable=True)  # Temporary field to store plain text password
+    plain_password = db.Column(db.String(255), nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
 
     doctor = db.relationship('Doctor', backref=db.backref('accounts', lazy=True))
@@ -113,7 +113,7 @@ class Doctor(db.Model):
     specialization = db.Column(db.String(100), nullable=False)
     license_number = db.Column(db.String(50), unique=True, nullable=False)
     phone_number = db.Column(db.String(20))
-    status = db.Column(db.String(20))
+    status = db.Column(db.String(20), default='Inactive', nullable=False)
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
 
@@ -127,7 +127,7 @@ class Staff(db.Model):
 
 class Appointment(db.Model):
     appointment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('client_accounts.client_id'))
+    client_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Ensure this matches the actual table name
     appointment_date = db.Column(db.Date, nullable=False)
     appointment_time = db.Column(db.Time, nullable=False)
@@ -239,10 +239,8 @@ class Facility(db.Model):
 class Message(db.Model):
     __tablename__ = 'messages'
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    recipient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    # conversation_id = db.Column(db.String(255), unique=True, nullable=False)
-    # conversation_data = db.Column(db.JSON, nullable=False)
+    sender_id = db.Column(db.String(255), db.ForeignKey('user.user_id'))
+    recipient_id = db.Column(db.String(255), db.ForeignKey('user.user_id'))
     body = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -358,3 +356,13 @@ class Settings(db.Model):
     two_factor_auth = db.Column(db.Boolean, default=False)
     session_timeout = db.Column(db.Integer, default=30)
     password_expiry = db.Column(db.Integer, default=90)
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)
+    patient_id = db.Column(db.Integer, nullable=False)
+    message = db.Column(db.String(255), nullable=False)
+    notification_type = db.Column(db.String(50), nullable=False)  # Add a field to specify the type of notification
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    doctor = db.relationship('Doctor', backref=db.backref('notifications', lazy=True))

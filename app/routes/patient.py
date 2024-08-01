@@ -4,7 +4,7 @@ import os
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message, Patient
+from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
 from .. import sqlalchemy_db as db
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
@@ -27,17 +27,52 @@ def patient_dashboard():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
-    user_id = session.get('user_id')  # Make sure 'user_id' is stored in session during the sign-in process
-    id_token = session.get('user_id_token')  # Also ensure that the Firebase ID token is stored in session
+    user_id = session.get('user_id')
+    id_token = session.get('user_id_token')
     
     try:
         # Fetch user data from Firebase
         user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
         if user_data:
-            print('test')
             first_name = user_data.get('first_name')
             last_name = user_data.get('last_name')
-            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name)
+
+            # Fetch notifications
+            notifications = []
+            notification_data = Notification.query.filter_by(patient_id=user_id).all()
+            if notification_data:
+                for notification in notification_data:
+                    doctor = Doctor.query.get(notification.doctor_id)
+                    notifications.append({
+                        'user_name': doctor.first_name + " " + doctor.last_name if doctor else 'System',
+                        'message': notification.message,
+                        'time_ago': get_time_ago(notification.timestamp)
+                    })
+            
+            # Fetch today's and tomorrow's appointments
+            today_date = datetime.now().date()
+            tomorrow_date = today_date + timedelta(days=1)
+
+            today_appointments = Appointment.query.filter_by(client_id=user_id, appointment_date=today_date, status='Scheduled').all()
+            tomorrow_appointments = Appointment.query.filter_by(client_id=user_id, appointment_date=tomorrow_date, status='Scheduled').all()
+
+            for appointment in today_appointments:
+                doctor = Doctor.query.get(appointment.doctor_id)
+                notifications.append({
+                    'user_name': doctor.first_name + " " + doctor.last_name if doctor else 'Unknown Doctor',
+                    'message': f"Upcoming appointment at {appointment.appointment_time.strftime('%I:%M %p')}",
+                    'time_ago': 'Today'
+                })
+
+            for appointment in tomorrow_appointments:
+                doctor = Doctor.query.get(appointment.doctor_id)
+                notifications.append({
+                    'user_name': doctor.first_name + " " + doctor.last_name if doctor else 'Unknown Doctor',
+                    'message': f"Appointment tomorrow at {appointment.appointment_time.strftime('%I:%M %p')}",
+                    'time_ago': 'Tomorrow'
+                })
+
+            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name, notifications=notifications)
         else:
             flash('Unable to fetch user details.', 'error')
             return redirect(url_for('auth.signin'))
@@ -45,7 +80,7 @@ def patient_dashboard():
         flash('Error accessing user information.', 'error')
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
-    
+
 
 
 #<-------------------------- appointments -------------------------------->
@@ -86,6 +121,23 @@ def generate_available_times(doctor_id, appointment_date):
     print(f"Available times after filtering for Doctor {doctor_id} on {appointment_date}: {available_times}")
     return available_times
 
+def get_time_ago(timestamp):
+    now = datetime.utcnow()
+    diff = now - timestamp
+    seconds = diff.total_seconds()
+    
+    if seconds < 60:
+        return f"{int(seconds)} seconds ago"
+    elif seconds < 3600:
+        return f"{int(seconds / 60)} minutes ago"
+    elif seconds < 86400:
+        return f"{int(seconds / 3600)} hours ago"
+    else:
+        days = int(seconds / 86400)
+        if days == 1:
+            return "1 day ago"
+        else:
+            return f"{days} days ago"
 
 
 
@@ -120,7 +172,6 @@ def get_available_times():
     return jsonify([])
 
 
-#<-------------------------- appointments -------------------------------->
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
     if request.method == 'POST':
@@ -167,7 +218,7 @@ def appointments():
         db.session.commit()
         return redirect(url_for('patient.appointments'))
 
-    doctors = Doctor.query.all()
+    doctors = Doctor.query.filter_by(status='Active').all()
     now = datetime.now()
     upcoming_appointments = Appointment.query.filter(
         (Appointment.appointment_date > now.date()) | 
@@ -204,43 +255,49 @@ def messages():
         return redirect(url_for('auth.signin'))
 
     client_id = session.get('user_id')
-    all_doctors = Doctor.query.all()
+    all_doctors = Doctor.query.filter_by(status='Active').all()  # Only get active doctors
     messages_sent = Message.query.filter_by(sender_id=client_id).all()
     messages_received = Message.query.filter_by(recipient_id=client_id).all()
-    
+
     doctor_ids = set([msg.recipient_id for msg in messages_sent] + [msg.sender_id for msg in messages_received])
-    print("doctor_ids: ",doctor_ids)
     unique_doctors = {}
     
     for doctor_id in doctor_ids:
         doctor = Doctor.query.filter_by(doctor_id=doctor_id).first()
         if doctor:
-            last_message = Message.query.filter(
-                or_(
-                    and_(Message.sender_id == client_id, Message.recipient_id == doctor_id),
-                    and_(Message.sender_id == doctor_id, Message.recipient_id == client_id)
-                )
-            ).order_by(Message.timestamp.desc()).first()
-            
-            if last_message:
-                unique_doctors[doctor.doctor_id] = {
-                    'doctor_name': f"{doctor.first_name} {doctor.last_name}",
-                    'last_message': last_message.body,
-                    'timestamp': last_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-                }
+            account = Account.query.filter_by(doctor_id=doctor_id).first()
+            if account:
+                last_message = Message.query.filter(
+                    or_(
+                        and_(Message.sender_id == client_id, Message.recipient_id == account.id),
+                        and_(Message.sender_id == account.id, Message.recipient_id == client_id)
+                    )
+                ).order_by(Message.timestamp.desc()).first()
                 
+                if last_message:
+                    unique_doctors[doctor.doctor_id] = {
+                        'doctor_name': f"{doctor.first_name} {doctor.last_name}",
+                        'last_message': last_message.body,
+                        'timestamp': last_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                    }
+
     unique_doctors_list = [{'doctor_id': k, **v} for k, v in unique_doctors.items()]
     return render_template('clients/messages.html', all_doctors=all_doctors, unique_doctors=unique_doctors_list)
-
 
 @bp.route('/send_message', methods=['POST'])
 def send_message():
     try:
         data = request.json
         sender_id = session.get('user_id')
-        receiver_id = data.get('doctor_id')
+        doctor_id = data.get('doctor_id')
         body = data.get('message')
         timestamp = datetime.utcnow()
+
+        account = Account.query.filter_by(doctor_id=doctor_id).first()
+        if not account:
+            return jsonify({'success': False, 'error': 'Doctor account not found'}), 404
+
+        receiver_id = account.id
 
         if not sender_id or not receiver_id or not body:
             return jsonify({'success': False, 'error': 'Missing required fields'}), 400
@@ -254,6 +311,16 @@ def send_message():
         db.session.add(new_message)
         db.session.commit()
 
+        # Create a notification for the new message
+        new_notification = Notification(
+            doctor_id=doctor_id,
+            patient_id=sender_id,
+            message=f"New message from {data.get('doctor_id')}: {body}",
+            notification_type='message'
+        )
+        db.session.add(new_notification)
+        db.session.commit()
+
         return jsonify({'success': True}), 200
 
     except Exception as e:
@@ -263,14 +330,22 @@ def send_message():
 @bp.route('/get_messages', methods=['GET'])
 def get_messages():
     sender_id = session.get('user_id')
-    receiver_id = request.args.get('doctor_id')
+    doctor_id = request.args.get('doctor_id')
+
+    account = Account.query.filter_by(doctor_id=doctor_id).first()
+    if not account:
+        return jsonify({'success': False, 'error': 'Doctor account not found'}), 404
+
+    receiver_id = account.id
 
     if not sender_id or not receiver_id:
         return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
     messages = Message.query.filter(
-        (Message.sender_id == sender_id) & (Message.recipient_id == receiver_id) |
-        (Message.sender_id == receiver_id) & (Message.recipient_id == sender_id)
+        or_(
+            and_(Message.sender_id == sender_id, Message.recipient_id == receiver_id),
+            and_(Message.sender_id == receiver_id, Message.recipient_id == sender_id)
+        )
     ).order_by(Message.timestamp.asc()).all()
 
     conversation = [{

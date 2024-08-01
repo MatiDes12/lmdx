@@ -16,11 +16,11 @@
         <h2 class="text-3xl font-semibold text-gray-800 dark:text-white">Reschedule Appointment</h2>
     </div>
 
-        <!-- Header with Short Description -->
-        <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 mb-6">
-            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Appointment Details</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Below is the current appointment details. You can reschedule the appointment by selecting a new date and time.</p>
-        </div>
+    <!-- Header with Short Description -->
+    <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 mb-6">
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Appointment Details</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Below is the current appointment details. You can reschedule the appointment by selecting a new date and time.</p>
+    </div>
     
     <!-- Appointment Details -->
     <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 mb-6">
@@ -28,22 +28,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <div>
                 <label for="patient_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient Name</label>
-                <input type="text" id="patient_name" name="patient_name" value="{{ appointment.patient.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="patient_name" name="patient_name" value="{{ appointment.client.first_name }} {{ appointment.client.last_name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
             
             <div>
                 <label for="doctor_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Doctor</label>
-                <input type="text" id="doctor_name" name="doctor_name" value="{{ appointment.doctor.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="doctor_name" name="doctor_name" value="{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
 
             <div>
                 <label for="current_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Date</label>
-                <input type="text" id="current_date" name="current_date" value="{{ appointment.date.strftime('%B %d, %Y') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="current_date" name="current_date" value="{{ appointment.appointment_date.strftime('%B %d, %Y') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
 
             <div>
                 <label for="current_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Time</label>
-                <input type="text" id="current_time" name="current_time" value="{{ appointment.time.strftime('%I:%M %p') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="current_time" name="current_time" value="{{ appointment.appointment_time.strftime('%I:%M %p') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
         </div>
     </div>
@@ -51,7 +51,7 @@
     <!-- Reschedule Form -->
     <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
         <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300">New Appointment Details</h3>
-        <form method="POST" action="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.id) }}" class="mt-6">
+        <form method="POST" action="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="mt-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="new_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Date</label>
