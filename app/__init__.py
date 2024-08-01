@@ -33,13 +33,18 @@ def create_app():
     Session(app)
     mail.init_app(app)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> R_Branch
     # Import and register blueprints
-    from .routes import auth, dashboard, main, upload, client
+    from .routes import auth, doctor, main, upload, patient, contact, admin
     app.register_blueprint(auth.bp)
-    app.register_blueprint(dashboard.bp, url_prefix='/dashboard')
     app.register_blueprint(main.main_bp)
+    app.register_blueprint(admin.bp, url_prefix='/admin')
+    app.register_blueprint(doctor.bp, url_prefix='/doctor')
     app.register_blueprint(upload.bp, url_prefix='/upload')
-    app.register_blueprint(client.bp, url_prefix='/client')
+    app.register_blueprint(patient.bp, url_prefix='/patient')
+    app.register_blueprint(contact.bp, url_prefix='/contact')
     
     return app

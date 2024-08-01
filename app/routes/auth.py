@@ -1,11 +1,21 @@
+<<<<<<< HEAD
 from mailbox import Message
+=======
+from datetime import datetime
+from mailbox import Message
+import bcrypt
+>>>>>>> R_Branch
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import pyrebase
 from firebase_admin import auth
 import requests
 from app.config import Config
 from app import sqlalchemy_db as db
+<<<<<<< HEAD
 from ..models_db import ClientAccounts, DoctorAccounts, Doctor
+=======
+from ..models_db import ClientAccounts, Organization, User, Account
+>>>>>>> R_Branch
 
 from flask_mail import Mail
 
@@ -23,6 +33,11 @@ def initialize_firebase():
 # Initialize firebase app
 initialize_firebase()
 
+<<<<<<< HEAD
+=======
+# app/routes/auth.py
+
+>>>>>>> R_Branch
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     user_type = request.args.get('type', 'patient')  # Default to 'patient' if not specified
@@ -44,18 +59,38 @@ def signup():
                     showFlashMessage('Password must be at least 8 characters long.', 'red');
                 </script>
             '''
+<<<<<<< HEAD
+=======
+        elif User.query.filter_by(email=email).first():
+            return render_template('auth/signup.html', user_type=user_type) + '''
+                <script>
+                    showFlashMessage('The email address is already in Use.', 'red', 'Error');
+                </script>
+            '''
+>>>>>>> R_Branch
 
-        if user_type == 'doctor':
+        if user_type == 'organization':
             name = request.form['name']
             org_name = request.form['org_name']
+            state = request.form['state']
+            license_number = request.form['license_number']
             if not name or len(name) < 6:
                 return render_template('auth/signup.html', user_type=user_type) + '''
                     <script>
                         showFlashMessage('Username must be at least 6 characters long for doctors.', 'red');
                     </script>
                 '''
+<<<<<<< HEAD
             user_data = {'full_name': name, 'email': email, 'organization': org_name, 'phone_number': phone_number}
         else:
+=======
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            new_user = User(username=name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
+            db.session.add(new_user)
+            db.session.commit()
+            user_data = {'full_name': name, 'email': email, 'organization': org_name, 'phone_number': phone_number}
+        elif user_type == 'patient':
+>>>>>>> R_Branch
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
             if not first_name or not last_name or len(first_name) < 2 or len(last_name) < 2:
@@ -65,6 +100,10 @@ def signup():
                     </script>
                 '''
             user_data = {'first_name': first_name, 'last_name': last_name, 'email': email, 'phone_number': phone_number}
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            new_user = User(username=first_name + " " + last_name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
+            db.session.add(new_user)
+            db.session.commit()
 
         try:
             # Check if the email already exists
@@ -83,11 +122,16 @@ def signup():
             user = firebase.auth().create_user_with_email_and_password(email, password)
             id_token = user['idToken']
             refresh_token = user['refreshToken']
+<<<<<<< HEAD
+=======
+            firebase_user_id = user['localId']
+>>>>>>> R_Branch
 
             # Send email verification
             firebase.auth().send_email_verification(id_token)
 
             # Save additional data to the Firebase database based on user type
+<<<<<<< HEAD
             if user_type == 'doctor':
                 firebase_db.child("DoctorAccounts").child(user['localId']).set(user_data, token=id_token)
 
@@ -130,6 +174,62 @@ def signup():
             '''
     return render_template('auth/signup.html', user_type=user_type)
 
+=======
+            if user_type == 'organization':
+                firebase_db.child("Organization").child(firebase_user_id).set(user_data, token=id_token)
+                
+                try:
+                    # Attempt to add the new organization to the session and commit
+                    new_organization = Organization(
+                        user_id=new_user.user_id,
+                        contact_name=name,
+                        email=email,
+                        special_email=None,
+                        organization=org_name,
+                        phone_number=phone_number,
+                        state=state,
+                        department=None,
+                        license_number=license_number
+                    )
+                    db.session.add(new_organization)
+                    db.session.commit()
+
+                    print("Organization added successfully.")
+                except Exception as e:
+                    print(f"Failed to add organization: {e}")
+                    db.session.rollback()
+
+            if user_type == 'patient':
+                firebase_db.child("ClientAccounts").child(firebase_user_id).set(user_data, token=id_token)
+
+                # Create a new Client record in SQLAlchemy
+                new_client = ClientAccounts(
+                    client_id=firebase_user_id,  # Set Firebase ID as client_id
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phone_number=phone_number
+                )
+                db.session.add(new_client)
+                db.session.commit()
+
+            print(f"User created: {user}")
+            session['user_type'] = user_type
+            session['user_id_token'] = id_token
+            session['refresh_token'] = refresh_token
+            session['local_id'] = firebase_user_id
+            session['user_data'] = user_data
+            return redirect(url_for('auth.check_verification'))  # Redirect to verification check
+
+        except Exception as e:
+            db.session.rollback()
+            return render_template('auth/signup.html', user_type=user_type) + f'''
+                <script>
+                    showFlashMessage('Error: {str(e)}', 'red');
+                </script>
+            '''
+    return render_template('auth/signup.html', user_type=user_type)
+>>>>>>> R_Branch
 
 
 @bp.route('/signin', methods=['GET', 'POST'])
@@ -137,6 +237,9 @@ def signin():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        
+        print(f"Attempting sign-in for email: {email}")  # Debugging line
+        
         try:
             # Attempt to sign in with the provided email and password
             user = firebase.auth().sign_in_with_email_and_password(email, password)
@@ -145,42 +248,67 @@ def signin():
             user_info = firebase.auth().get_account_info(id_token)
             user_id = user_info['users'][0]['localId']
 
-            # Debug: Output user information
-            print(f"User ID: {user_id}, Email: {email}")
+            print(f"Sign-in successful for email: {email}")  # Debugging line
 
             # Check if the user is a doctor
+<<<<<<< HEAD
             doctor_data = firebase_db.child("DoctorAccounts").child(user_id).get(token=id_token).val()
             if doctor_data:
                 user_type = 'doctor'
+=======
+            doctor_data = firebase_db.child("Doctors").child(user_id).get(token=id_token).val()
+            if doctor_data:
+                user_type = 'doctors'
+>>>>>>> R_Branch
             else:
                 # If not a doctor, check if it's a client
                 client_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
                 if client_data:
-                    user_type = 'client'
+                    user_type = 'patient'
                 else:
+<<<<<<< HEAD
                     return render_template('auth/signin.html') + '''
                         <script>
                             showFlashMessage('Invalid email or password', 'red');
                         </script>
                     '''
+=======
+                    # Check if it's an organization user
+                    org_data = firebase_db.child("Organization").child(user_id).get(token=id_token).val()
+                    if org_data:
+                        user_type = 'organization'
+                    else:
+                        return render_template('auth/signin.html') + '''
+                            <script>
+                                showFlashMessage('Invalid email or password', 'red');
+                            </script>
+                        '''
+>>>>>>> R_Branch
 
-            # Debug: Output user type
-            print(f"User Type: {user_type}")
-
-            # Check if email is verified
+            # Check if email is verified, but skip this for doctors
             email_verified = user_info['users'][0]['emailVerified']
-
-            if email_verified:
+            print("user type: ", user_type)
+            if email_verified or user_type == 'doctors':
                 session['user'] = email
                 session['user_type'] = user_type
                 session['user_id_token'] = id_token
                 session['refresh_token'] = refresh_token  # Store refresh token in session
                 session['user_id'] = user_id  # Store user_id in session
-                return redirect(url_for(f'dashboard.{user_type}_dashboard'))
+
+                if user_type == 'organization':
+                    return redirect(url_for('admin.admin_dashboard'))
+                elif user_type == 'patient':
+                    return redirect(url_for('patient.patient_dashboard'))
+                elif user_type == 'doctors':
+                    return redirect(url_for('doctor.doctor_dashboard'))
             else:
                 return render_template('auth/signin.html') + '''
                     <script>
+<<<<<<< HEAD
                         showFlashMessage('Please verify your email before signing in.', 'yellow');
+=======
+                        showFlashMessage('Please verify your email before signing in.', 'yellow', 'Notice');
+>>>>>>> R_Branch
                     </script>
                 '''
         except Exception as e:
@@ -188,10 +316,16 @@ def signin():
             print(f"Sign-in error: {e}")
             return render_template('auth/signin.html') + '''
                 <script>
+<<<<<<< HEAD
                     showFlashMessage('Invalid email or password', 'red');
+=======
+                    showFlashMessage('Invalid email or password', 'red', 'Error');
+>>>>>>> R_Branch
                 </script>
             '''
     return render_template('auth/signin.html')
+
+
 
 @bp.route('/logout')
 def logout():
@@ -252,7 +386,11 @@ def check_verification():
         email_verified = user_info['users'][0]['emailVerified']
 
         if email_verified:
+<<<<<<< HEAD
             if user_type == 'doctor':
+=======
+            if user_type == 'organization':
+>>>>>>> R_Branch
                 name = user_data['full_name']
                 name_parts = name.split()
                 special_email = f"{name_parts[0]}.{name_parts[-1]}@lmdx.com".lower()
@@ -271,6 +409,13 @@ def check_verification():
         flash(f'Error during verification check: {str(e)}', 'danger')
         return redirect(url_for('auth.signin'))
 
+<<<<<<< HEAD
+=======
+from flask_mail import Mail
+
+mail = Mail()
+
+>>>>>>> R_Branch
 def send_special_email_notification(personal_email, special_email):
     msg = Message('Your New Luminamedix Email', recipients=[personal_email])
     msg.body = f"Dear Doctor,\n\nYour new email for signing in to Luminamedix is {special_email}.\nPlease use this email for all future logins.\n\nBest regards,\nLuminamedix Team"
@@ -307,6 +452,7 @@ def resend_verification_email():
         return {'status': 'success', 'message': 'Verification email sent'}
     except Exception as e:
         return {'status': 'error', 'message': str(e)}, 400
+<<<<<<< HEAD
 
 
 # from flask import Blueprint, render_template, request, redirect, url_for, flash, session
@@ -604,3 +750,8 @@ def resend_verification_email():
 #         return {'status': 'success', 'message': 'Verification email sent'}
 #     except Exception as e:
 #         return {'status': 'error', 'message': str(e)}, 400
+=======
+    
+    
+    
+>>>>>>> R_Branch

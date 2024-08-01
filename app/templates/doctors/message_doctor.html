@@ -15,7 +15,7 @@
         <h2 class="text-3xl font-semibold text-gray-800 dark:text-white">Message Doctor</h2>
     </div>
     <div class="bg-white p-8 rounded-lg shadow-lg dark:bg-gray-800">
-        <form method="POST" action="{{ url_for('dashboard.message_doctor', doctor_id=doctor.id) }}">
+        <form method="POST" action="{{ url_for('doctor.message_doctor', doctor_id=doctor.id) }}">
             <div class="mb-6">
                 <label for="recipient" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To</label>
                 <input type="text" id="recipient" value="{{ doctor.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>

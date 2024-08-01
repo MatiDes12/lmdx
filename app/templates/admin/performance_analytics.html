@@ -1,0 +1,298 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Performance Analytics{% endblock %}
+
+{% block sidebar %}
+{% include 'admin/sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-xl shadow-2xl mb-10">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-white p-3 rounded-full mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-extrabold text-white mb-2">Performance Analytics</h1>
+                    <p class="text-white text-xl opacity-80">Comprehensive insights for data-driven decisions</p>
+                </div>
+            </div>
+            <div class="flex space-x-4">
+                <div class="bg-white bg-opacity-20 p-4 rounded-lg text-center">
+                    <p class="text-white font-semibold">Total KPIs</p>
+                    <p class="text-3xl font-bold text-white">{{ total_kpis }}</p>
+                </div>
+                <div class="bg-white bg-opacity-20 p-4 rounded-lg text-center">
+                    <p class="text-white font-semibold">Data Sources</p>
+                    <p class="text-3xl font-bold text-white">{{ data_sources }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Overview Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Key Performance Indicators</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for kpi in kpis %}
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">{{ kpi.name }}</h3>
+                <p class="text-3xl font-bold {% if kpi.trend == 'up' %}text-green-600{% elif kpi.trend == 'down' %}text-red-600{% else %}text-gray-600{% endif %}">
+                    {{ kpi.value }}
+                    {% if kpi.trend == 'up' %}↑{% elif kpi.trend == 'down' %}↓{% endif %}
+                </p>
+                <p class="text-sm text-gray-600">{{ kpi.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Interactive Controls -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div class="flex flex-wrap -mx-2 mb-4">
+            <div class="w-full md:w-1/3 px-2 mb-4">
+                <label for="dateRange" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                <select id="dateRange" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="90d">Last 90 Days</option>
+                    <option value="1y">Last Year</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/3 px-2 mb-4">
+                <label for="metricType" class="block text-sm font-medium text-gray-700 mb-1">Metric Type</label>
+                <select id="metricType" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="all">All Metrics</option>
+                    <option value="financial">Financial</option>
+                    <option value="operational">Operational</option>
+                    <option value="clinical">Clinical</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/3 px-2 mb-4">
+                <label for="dataSource" class="block text-sm font-medium text-gray-700 mb-1">Data Source</label>
+                <select id="dataSource" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="all">All Sources</option>
+                    <option value="ehr">Electronic Health Records</option>
+                    <option value="claims">Claims Data</option>
+                    <option value="surveys">Patient Surveys</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button id="applyFilters" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Data Visualization Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Performance Trends</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Revenue Trends</h3>
+                <canvas id="revenueTrendChart"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Patient Satisfaction</h3>
+                <canvas id="patientSatisfactionChart"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Operational Efficiency</h3>
+                <canvas id="operationalEfficiencyChart"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Clinical Outcomes</h3>
+                <canvas id="clinicalOutcomesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analytics Table -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Detailed Analytics</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Metric</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Current Value</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Previous Period</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Change</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Trend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric in detailed_metrics %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ metric.name }}</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ metric.current_value }}</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ metric.previous_value }}</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="{% if metric.change > 0 %}text-green-600{% elif metric.change < 0 %}text-red-600{% else %}text-gray-600{% endif %}">
+                                {{ metric.change }}%
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <canvas id="trendChart{{ loop.index }}" width="100" height="30"></canvas>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Revenue Trend Chart
+    var revenueTrendCtx = document.getElementById('revenueTrendChart').getContext('2d');
+    var revenueTrendChart = new Chart(revenueTrendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Revenue',
+                data: [12, 19, 3, 5, 2, 3],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Patient Satisfaction Chart
+    var patientSatisfactionCtx = document.getElementById('patientSatisfactionChart').getContext('2d');
+    var patientSatisfactionChart = new Chart(patientSatisfactionCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied'],
+            datasets: [{
+                label: 'Patient Satisfaction',
+                data: [65, 59, 80, 81, 56],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(153, 102, 255, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Operational Efficiency Chart
+    var operationalEfficiencyCtx = document.getElementById('operationalEfficiencyChart').getContext('2d');
+    var operationalEfficiencyChart = new Chart(operationalEfficiencyCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Wait Time', 'Resource Utilization', 'Staff Productivity', 'Cost Efficiency', 'Patient Throughput'],
+            datasets: [{
+                label: 'Current Period',
+                data: [65, 59, 90, 81, 56],
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgb(54, 162, 235)',
+                pointBackgroundColor: 'rgb(54, 162, 235)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(54, 162, 235)'
+            }, {
+                label: 'Previous Period',
+                data: [28, 48, 40, 19, 96],
+                fill: true,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                pointBackgroundColor: 'rgb(255, 99, 132)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(255, 99, 132)'
+            }]
+        },
+        options: {
+            responsive: true,
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            }
+        }
+    });
+
+    // Clinical Outcomes Chart
+    var clinicalOutcomesCtx = document.getElementById('clinicalOutcomesChart').getContext('2d');
+    var clinicalOutcomesChart = new Chart(clinicalOutcomesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Improved', 'Stable', 'Declined'],
+            datasets: [{
+                label: 'Clinical Outcomes',
+                data: [300, 50, 100],
+                backgroundColor: [
+                    'rgb(75, 192, 192)',
+                    'rgb(255, 205, 86)',
+                    'rgb(255, 99, 132)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Trend Charts
+    {% for metric in detailed_metrics %}
+    var trendCtx{{ loop.index }} = document.getElementById('trendChart{{ loop.index }}').getContext('2d');
+    var trendChart{{ loop.index }} = new Chart(trendCtx{{ loop.index }}, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: '{{ metric.name }}',
+                data: [12, 19, 3, 5, 2, 3],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    {% endfor %}
+</script>
+{% endblock %}

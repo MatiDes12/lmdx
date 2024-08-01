@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %} - Your Application</title>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client.css') }}">
+    <!-- Tailwind CSS and other stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" integrity="sha384-dyH6mxrFvKDbAFOkzZZRJgohWo6PZ2i5P9BQpCnU9aNiv7v8y+29AAKZjjGVzjT2" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui/dist/tailwind-ui.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    {% endblock head %}
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <div class="flex h-screen">
+        <!-- Navbar included here -->
+        {% include 'admin/sidebar.html' %}
+        <!-- Main content area -->
+        <div class="flex-1 overflow-y-auto">
+            {% block content %}
+            <!-- Content will be injected here -->
+            {% endblock content %}
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+          let flashMessages = document.querySelectorAll(".flash-message");
+          flashMessages.forEach(function (message) {
+            message.style.display = "none";
+          });
+        }, 5000);
+      });
+    </script>
+</body>
+</html>

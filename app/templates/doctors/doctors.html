@@ -11,208 +11,252 @@
 {% endblock %}
 
 {% block content %}
-<section class="container px-4 mx-auto">
-    <div class="flex items-center gap-x-3 mb-4">
-        <h2 class="text-lg font-medium text-gray-800 dark:text-white">Doctors</h2>
-        <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-lg dark:bg-gray-800 dark:text-blue-400">{{ doctors|length }} Doctors</span>
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
+            <rect width="48" height="48" fill="none"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M33.8336 13.8108C33.8336 17.2715 32.9737 21.7851 31.6512 21.0998C30.6493 24.3745 27.6028 26.7561 24 26.7561C19.8532 26.7561 16.4434 23.601 16.0399 19.5605C14.7272 17.2629 13.0049 12.6603 17.4321 9.07166C17.5111 9.04556 17.56 8.8302 17.6324 8.51185C17.9057 7.30885 18.5132 4.63511 22.3418 5.14555C25.295 5.53929 33.8337 7.06355 33.8336 13.8108ZM30.0281 15.992C30.0281 15.992 29.5764 17.3137 29.9999 18.7874C29.9831 22.0867 27.3033 24.7561 24 24.7561C20.7627 24.7561 18.1241 22.1922 18.0043 18.9841C18.1494 18.4342 18.1488 17.5027 18.1481 16.4682C18.1469 14.6012 18.1455 12.3989 19.0002 11.5C24.9889 15.4885 30.0281 15.992 30.0281 15.992Z" fill="currentColor"/>
+            <path d="M13 36C13 34.9177 13.5732 33.9692 14.4326 33.4416C14.4008 33.3213 14.3701 33.1958 14.3406 33.0669C14.2029 32.4653 14.0779 31.7335 13.9862 30.9988C13.9013 30.3182 13.8424 29.6146 13.831 28.993C9.60993 30.6499 6 33.5376 6 36.5699V42H42V36.5699C42 33.6661 38.6895 30.8949 34.7019 29.2101L34.7027 29.2376C34.7198 29.8478 34.6856 30.5473 34.6203 31.2213C34.56 31.8448 34.4711 32.4673 34.3643 33H35C35.3788 33 35.725 33.214 35.8944 33.5528L36.8944 35.5528C36.9639 35.6916 37 35.8448 37 36V38C37 38.5523 36.5523 39 36 39H34V37H35V36.2361L34.382 35H31.618L31 36.2361V37H32V39H30C29.4477 39 29 38.5523 29 38V36C29 35.8448 29.0361 35.6916 29.1056 35.5528L30.1056 33.5528C30.275 33.214 30.6212 33 31 33H32.3152C32.3369 32.9141 32.359 32.8188 32.3811 32.7144C32.4811 32.2429 32.5699 31.6456 32.6297 31.0287C32.6894 30.411 32.7177 29.798 32.7035 29.2937C32.6964 29.0411 32.6791 28.8313 32.6542 28.6699C32.6324 28.5281 32.6104 28.4627 32.6057 28.4487C32.6057 28.4486 32.6057 28.4488 32.6057 28.4487C32.6048 28.4459 32.6045 28.4451 32.6053 28.4466C32.6052 28.4464 32.6054 28.4468 32.6053 28.4466L32.6089 28.4456C32.0745 28.2798 31.5363 28.1348 31 28.0126C30.4972 27.8981 29.9775 28.5902 29.7493 29.0237H25.6851C24.7949 29.0239 24.342 29.0238 23.8968 29.0237H23.8813C23.4264 29.0236 22.9738 29.0235 22.0639 29.0237H18C17.9721 28.9707 17.9436 28.9139 17.9141 28.8551C17.7025 28.4331 17.4413 27.9121 17 28.0126C16.6151 28.1003 16.2293 28.1997 15.8446 28.3101C15.8334 28.4582 15.8279 28.6348 15.8292 28.8375C15.8327 29.3904 15.8856 30.0679 15.9709 30.7512C16.056 31.4332 16.1703 32.0972 16.2901 32.6206C16.3249 32.7725 16.3591 32.9079 16.3919 33.0254C17.8636 33.2174 19 34.476 19 36C19 37.6569 17.6569 39 16 39C14.3431 39 13 37.6569 13 36Z" fill="currentColor"/>
+<path d="M17 36C17 36.5742 16.5384 37.0147 16 37.0147C15.4616 37.0147 15 36.5742 15 36C15 35.4258 15.4616 34.9853 16 34.9853C16.5384 34.9853 17 35.4258 17 36Z" fill="currentColor"/>
+</svg>
+        <div>
+            <h1 class="text-3xl font-bold">Doctor Management</h1>
+            <p class="text-lg">Manage all doctor information, schedules, and specializations</p>
+        </div>
     </div>
 
-    <!-- Search and Filter Section -->
-    <form method="GET" action="{{ url_for('dashboard.doctors') }}" class="flex flex-col md:flex-row items-center gap-4 mb-4 p-6 bg-white rounded-lg shadow-md">
-        <!-- Search Bar -->
-        <div class="relative flex-grow">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search doctors..." 
-                value="{{ request.args.get('search', '') }}" 
-                class="w-full py-3 px-4 text-gray-700 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition duration-300"
-            >
-            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+    <!-- Quick Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Total Doctors</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ total_doctors }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Active Doctors</h3>
+            <p class="text-3xl font-bold text-green-600">{{ active_doctors }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Specializations</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ total_specializations }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Appointments Today</h3>
+            <p class="text-3xl font-bold text-red-600">{{ appointments_today }}</p>
+        </div>
+    </div>
+
+    <!-- Advanced Search and Filter Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-        </div>
-
-        <!-- Status Filter Dropdown -->
-        <div x-data="{ isOpen: false }" class="relative">
-            <button @click="isOpen = !isOpen" type="button" class="flex items-center justify-between w-full md:w-auto px-4 py-3 bg-gray-100 text-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">
-                <span class="mr-2 text-gray-500">Status</span>
-                <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-
-            <div 
-                x-show="isOpen" 
-                @click.away="isOpen = false"
-                x-transition:enter="transition ease-out duration-100"
-                x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90" 
-                class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800"
-            >
-                <a href="{{ url_for('dashboard.doctors', status='All') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-gray-500 rounded-full"></span>All
-                </a>
-                <a href="{{ url_for('dashboard.doctors', status='Active') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-green-500 rounded-full"></span>Active
-                </a>
-                <a href="{{ url_for('dashboard.doctors', status='Inactive') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-red-500 rounded-full"></span>Inactive
-                </a>
-            </div>
-        </div>
-
-        <!-- Specialization Filter Dropdown -->
-        <div x-data="{ isOpen: false }" class="relative">
-            <button @click="isOpen = !isOpen" type="button" class="flex items-center justify-between w-full md:w-auto px-4 py-3 bg-gray-100 text-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">
-                <span class="mr-2 text-gray-500">Specialization</span>
-                <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        
-            <div 
-                x-show="isOpen" 
-                @click.away="isOpen = false"
-                x-transition:enter="transition ease-out duration-100"
-                x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="transition ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90" 
-                class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800"
-            >
-                <a href="{{ url_for('dashboard.doctors', specialization='All') }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 bg-gray-500 rounded-full"></span>All
-                </a>
-                {% set colors = {'Cardiologist': 'bg-green-500', 'Neurologist': 'bg-blue-500', 'Dermatologist': 'bg-green-500', 'Pediatrics': 'bg-yellow-500', 'Orthopedics': 'bg-red-500', 'General Surgery': 'bg-purple-500', 'Psychiatry': 'bg-orange-500', 'Endocrinology': 'bg-teal-500'} %}
-                {% for specialization in specializations %}
-                <a href="{{ url_for('dashboard.doctors', specialization=specialization[0]) }}" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <span class="inline-block w-2.5 h-2.5 mr-2 {{ colors.get(specialization[0], 'bg-gray-500') }} rounded-full"></span>{{ specialization[0] }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Filter Button -->
-        <button 
-            type="submit" 
-            class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 flex items-center justify-center"
-        >
-            <span>Filter</span>
-            <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-              </svg>
-        </button>
-    </form>
-
-    <!-- Doctors Table -->
-    <div class="flex flex-col mt-6">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-800">
-                            <tr>
-                                <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    <div class="flex items-center gap-x-3">
-                                        <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                        <span>Name</span>
-                                    </div>
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Specialization
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Schedule
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Status
-                                </th>
-                                <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 whitespace-nowrap pl-24">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                            {% for doctor in doctors %}
-                            <tr>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    <div class="inline-flex items-center gap-x-3">
-                                        <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                        <div class="flex items-center gap-x-2">
-                                            <img class="object-cover w-10 h-10 rounded-full" src="https://i.pravatar.cc/300?img={{ doctor.id }}" alt="{{ doctor.name }}'s profile picture">
-                                            <div>
-                                                <h2 class="font-medium text-gray-800 dark:text-white ">{{ doctor.name }}</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                    {{ doctor.specialization }}
-                                </td>
-                                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                    {{ doctor.schedule }}
-                                </td>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2">
-                                        <span class="h-1.5 w-1.5 rounded-full {% if doctor.status.lower() == 'active' %}bg-green-500{% elif doctor.status.lower() == 'inactive' %}bg-red-500{% else %}bg-gray-500{% endif %}"></span>
-                                        <h2 class="text-sm font-normal {% if doctor.status.lower() == 'active' %}text-green-500{% elif doctor.status.lower() == 'inactive' %}text-red-500{% else %}text-gray-500{% endif %}">{{ doctor.status }}</h2>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm whitespace-nowrap">
-                                    <div class="flex items-center gap-x-6">
-                                        <a href="{{ url_for('dashboard.message_doctor', doctor_id=doctor.id) }}" class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#4285F4">
-                                                <path d="M280-240q-17 0-28.5-11.5T240-280v-80h520v-360h80q17 0 28.5 11.5T880-680v600L720-240H280ZM80-280v-560q0-17 11.5-28.5T120-880h520q17 0 28.5 11.5T680-840v360q0 17-11.5 28.5T640-440H240L80-280Zm520-240v-280H160v280h440Zm-440 0v-280 280Z"/>
-                                            </svg>
-                                        </a>
-                                        <a href="{{ url_for('dashboard.view_doctor_profile', doctor_id=doctor.id) }}" class="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#34A853">
-                                                <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            Advanced Doctor Search
+        </h2>
+        <form action="{{ url_for('doctor.doctors') }}" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="search-results">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="doctor_name">
+                        Doctor Name
+                    </label>
+                    <input type="text" id="doctor_name" name="doctor_name" placeholder="Search by doctor name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="specialization">
+                        Specialization
+                    </label>
+                    <select id="specialization" name="specialization" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">All</option>
+                        {% for spec in specializations %}
+                        <option value="{{ spec }}" {% if spec == current_specialization %}selected{% endif %}>{{ spec }}</option>
+                        {% endfor %}
+                    </select>                    
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
+                        Status
+                    </label>
+                    <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
             </div>
-        </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Search Doctors
+                </button>
+            </div>
+        </form>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex items-center justify-between mt-6">
-        <a href="{{ url_for('dashboard.doctors', page=pagination.prev_num, search=search_query, specialization=specialization_filter, status=status_filter) }}" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 {% if not pagination.has_prev %}opacity-50 cursor-not-allowed{% endif %}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+    <!-- Doctor List with Quick Actions -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span>Previous</span>
+            Doctor List
+        </h2>
+        {% if doctors %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Doctor
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Specialization
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Schedule
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Quick Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doctor in doctors %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-10 h-10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="w-10 h-10 text-gray-400 bg-gray-200 p-1 rounded-full">
+                                        <rect width="48" height="48" fill="none"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4326 33.4416C13.5732 33.9692 13 34.9177 13 36C13 37.6569 14.3431 39 16 39C17.6569 39 19 37.6569 19 36C19 34.476 17.8636 33.2174 16.3919 33.0254C16.3591 32.9079 16.3249 32.7725 16.2901 32.6206C16.1703 32.0972 16.056 31.4332 15.9709 30.7512C15.8856 30.0679 15.8327 29.3904 15.8292 28.8375C15.8279 28.6348 15.8334 28.4582 15.8446 28.3101C16.2293 28.1997 16.6151 28.1003 17 28.0126C17.4413 27.9121 17.7025 28.433 17.9141 28.8551C17.9436 28.9139 17.9721 28.9707 18 29.0237H22.0639C22.9797 29.0235 23.4324 29.0236 23.8903 29.0237C24.3376 29.0238 24.7906 29.0239 25.6851 29.0237H29.7493C29.9775 28.5902 30.4972 27.8981 31 28.0126C31.5363 28.1348 32.0745 28.2798 32.6089 28.4456L32.6056 28.4472C32.6044 28.4449 32.6045 28.4453 32.6057 28.4487C32.6104 28.4627 32.6324 28.5281 32.6542 28.6699C32.6791 28.8313 32.6964 29.0411 32.7035 29.2937C32.7177 29.798 32.6894 30.411 32.6297 31.0287C32.5699 31.6456 32.4811 32.2429 32.3811 32.7144C32.359 32.8188 32.3369 32.9141 32.3152 33H31C30.6212 33 30.275 33.214 30.1056 33.5528L29.1056 35.5528C29.0361 35.6916 29 35.8448 29 36V38C29 38.5523 29.4477 39 30 39H32V37H31V36.2361L31.618 35H34.382L35 36.2361V37H34V39H36C36.5523 39 37 38.5523 37 38V36C37 35.8448 36.9639 35.6916 36.8944 35.5528L35.8944 33.5528C35.725 33.214 35.3788 33 35 33H34.3643C34.4711 32.4673 34.56 31.8448 34.6203 31.2213C34.6856 30.5473 34.7198 29.8478 34.7027 29.2376L34.7019 29.2101C38.6895 30.8949 42 33.6661 42 36.5699V42H6V36.5699C6 33.5376 9.60993 30.6499 13.831 28.993C13.8424 29.6146 13.9013 30.3182 13.9862 30.9988C14.0779 31.7335 14.2029 32.4653 14.3406 33.0669C14.3701 33.1958 14.4008 33.3213 14.4326 33.4416ZM16 37.0147C16.5384 37.0147 17 36.5742 17 36C17 35.4258 16.5384 34.9853 16 34.9853C15.4616 34.9853 15 35.4258 15 36C15 36.5742 15.4616 37.0147 16 37.0147Z" fill="currentColor"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 24C28.4183 24 32 20.4183 32 16C32 11.5817 28.4183 8 24 8C19.5817 8 16 11.5817 16 16C16 20.4183 19.5817 24 24 24ZM24 26C29.5228 26 34 21.5228 34 16C34 10.4772 29.5228 6 24 6C18.4772 6 14 10.4772 14 16C14 21.5228 18.4772 26 24 26Z" fill="currentColor"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-gray-900 whitespace-no-wrap font-semibold text-sm mt-2">
+                                        {{ doctor.first_name }} {{ doctor.last_name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ doctor.specialization }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                <span class="relative flex items-center">
+                                    {% if doctor.status == 'Active' %}
+                                    <span class="flex items-center">
+                                      <span class="w-2.5 h-2.5 bg-green-500 rounded-full mr-2"></span>
+                                      <span class="text-green-500 font-bold text-xs">Active</span>
+                                    </span>
+                                    {% else %}
+                                    <span class="flex items-center">
+                                      <span class="w-2.5 h-2.5 bg-red-500 rounded-full mr-2"></span>
+                                      <span class="text-red-500 font-bold text-xs">Inactive</span>
+                                    </span>
+                                    {% endif %}
+                                  </span>                                  
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ doctor.schedule }} </p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex space-x-2">
+                                <a href="#" class="btn-medical view-btn flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white font-semibold rounded-md shadow-md hover:bg-teal-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                                    <!-- <span class="icon">👁️</span> -->
+                                    <span>View</span>
+                                  </a>
+                                  <a href="#" class="btn-medical message-btn flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <span class="icon">💬</span>
+                                    <span>Message</span>
+                                  </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+<!-- Pagination -->
+<div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+    <span class="text-xs xs:text-sm text-gray-900">
+        Showing {{ pagination.page }} to {{ pagination.pages }} of {{ pagination.total }} Entries
+    </span>
+    <div class="inline-flex mt-2 xs:mt-0">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('doctors.doctors', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+            Prev
         </a>
-
-        <div class="items-center hidden lg:flex gap-x-3">
-            {% for page_num in pagination.iter_pages() %}
+        {% else %}
+        <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-l cursor-not-allowed" disabled>
+            Prev
+        </button>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages() %}
             {% if page_num %}
-            <a href="{{ url_for('dashboard.doctors', page=page_num, search=search_query, specialization=specialization_filter, status=status_filter) }}" class="px-2 py-1 text-sm {% if page_num == pagination.page %}text-blue-500 dark:bg-gray-800 bg-blue-100/60{% else %}text-gray-500 rounded-md dark:bg-gray-800 bg-gray-100/60{% endif %}">
-                {{ page_num }}
-            </a>
+                {% if page_num != pagination.page %}
+                    <a href="{{ url_for('doctors.doctors', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="text-sm bg-blue-500 text-white font-semibold py-2 px-4">
+                        {{ page_num }}
+                    </span>
+                {% endif %}
             {% else %}
-            <span class="px-2 py-1 text-sm text-gray-500 rounded-md dark:bg-gray-800 bg-gray-100/60">...</span>
+                <span class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4">...</span>
             {% endif %}
-            {% endfor %}
-        </div>
-
-        <a href="{{ url_for('dashboard.doctors', page=pagination.next_num, search=search_query, specialization=specialization_filter, status=status_filter) }}" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 {% if not pagination.has_next %}opacity-50 cursor-not-allowed{% endif %}">
-            <span>Next</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-            </svg>
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+        <a href="{{ url_for('doctors.doctors', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+            Next
         </a>
+        {% else %}
+        <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-r cursor-not-allowed" disabled>
+            Next
+        </button>
+        {% endif %}
     </div>
-</section>
+</div>
+{% else %}
+<div class="text-center py-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No Doctors Found</h3>
+    <p class="text-gray-500">There are currently no doctors available. Use the filter above to search for specific doctors or check back later.</p>
+</div>
+{% endif %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('#doctor_name, #specialization, #status');
+        inputs.forEach(input => input.addEventListener('input', function() {
+            let searchQuery = document.getElementById('doctor_name').value;
+            let specialization = document.getElementById('specialization').value;
+            let status = document.getElementById('status').value;
+    
+            fetch(`/dashboard/doctors?search=${searchQuery}&specialization=${specialization}&status=${status}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultContainer = document.getElementById('search-results');
+                resultContainer.innerHTML = '';  // Clear previous results
+                data.forEach(doc => {
+                    resultContainer.innerHTML += `<div>${doc.first_name} ${doc.last_name} - ${doc.specialization} - ${doc.status}</div>`;
+                });
+            })
+            .catch(error => console.error('Error fetching data: ', error));
+        }));
+    });
+    </script>
+    
 {% endblock %}
+

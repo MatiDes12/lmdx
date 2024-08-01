@@ -1,7 +1,151 @@
 {% extends 'clients/base.html' %}
 {% block navbar %}
-{% include 'clients/navbar.html' %}
+    {% include 'clients/navbar.html' %}
 {% endblock %}
 {% block content %}
+<div class="px-6 py-4">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Lab Test Results</h1>
+        <p>Access detailed results of your lab tests and track your health metrics over time.</p>
+    </div>
 
+    <!-- Filters for selecting test category and year -->
+    <div class="flex gap-4 mb-6">
+        <!-- Test Category Dropdown -->
+        <div>
+            <label for="test-category" class="block text-sm font-medium text-gray-700">Choose Test Category:</label>
+            <select id="test-category" class="block w-full pl-3 pr-10 py-2 mt-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow bg-gray-50">
+                <option>Blood Work</option>
+                <option>Urine Analysis</option>
+                <option>Genetic Testing</option>
+                <option>Imaging Results</option>
+                <option>Pathology Reports</option>
+            </select>
+        </div>
+
+        <!-- Year Dropdown -->
+        <div>
+            <label for="year" class="block text-sm font-medium text-gray-700">Choose Year:</label>
+            <select id="year" class="block w-full pl-3 pr-10 py-2 mt-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow bg-gray-50">
+                <option>2025</option>
+                <option>2024</option>
+                <option>2023</option>
+                <option>2022</option>
+                <option>2021</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Navigation for different test panels -->
+    <div class="border-b-2 border-gray-200">
+        <div class="flex space-x-4 -mb-px text-sm">
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'Metabolic')">Comprehensive Metabolic Panel</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'Thyroid')">Thyroid Stimulating Hormone</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'Lipid')">Lipid Panel</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'CBC')">CBC with Differential</button>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <!-- Tab Content for Comprehensive Metabolic Panel -->
+<div id="Metabolic" class="tab-content" style="display: block;">
+    <table class="min-w-full divide-y divide-gray-200 mt-4">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Normal Range</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <!-- Entries for Comprehensive Metabolic Panel -->
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sodium</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">139 mEq/L</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">135-145 mEq/L</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Potassium</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4.5 mEq/L</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3.5-5.0 mEq/L</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Chloride</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">102 mEq/L</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">98-107 mEq/L</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">CO2</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24 mEq/L</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">23-29 mEq/L</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Calcium</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9.8 mg/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8.6-10.2 mg/dL</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Tab Content for Thyroid Panel -->
+<div id="Thyroid" class="tab-content hidden">
+    <table class="min-w-full divide-y divide-gray-200 mt-4">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Normal Range</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <!-- Entries for Thyroid Panel -->
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">TSH</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2.5 uIU/mL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0.450-4.500 uIU/mL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">T4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8.5 ug/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4.5-12.0 ug/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">T3 Uptake</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">30%</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24-39%</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Free T4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1.5 ng/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0.8-1.8 ng/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Free T3</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3.2 pg/mL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2.3-4.2 pg/mL</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Tab Content for Lipid Panel -->
+<div id="Lipid" class="tab-content hidden">
+    <table class="min-w-full divide-y divide-gray-200 mt-4">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Normal Range</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <!-- Entries for Lipid Panel -->
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Total Cholesterol</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">190 mg/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><200 mg/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">LDL Cholesterol</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">110 mg/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><100 mg/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">HDL Cholesterol</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">55 mg/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">>40 mg/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Triglycerides</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">140 mg/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><150 mg/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">VLDL Cholesterol</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28 mg/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5-30 mg/dL</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Additional tabs content hidden initially and shown when their respective tab is clicked -->
+<div id="CBC" class="tab-content hidden">
+    <table class="min-w-full divide-y divide-gray-200 mt-4">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Normal Range</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">White Blood Cell Count</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5,900/mm³</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4,500-11,000/mm³</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Red Blood Cell Count</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4.6 million/mm³</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Male: 4.7-6.1 million/mm³, Female: 4.2-5.4 million/mm³</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Hemoglobin</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14.0 g/dL</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Male: 13.8-17.2 g/dL, Female: 12.1-15.1 g/dL</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Hematocrit</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">40%</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Male: 40.7%-50.3%, Female: 36.1%-44.3%</td></tr>
+            <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Platelet Count</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">230,000/mm³</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">150,000-450,000/mm³</td></tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+function openTab(evt, tabName) {
+    var i, tabcontent, tabs;
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tabs = document.getElementsByClassName("tabs");
+    for (i = 0; i < tabs.length; i++) {
+        tabs[i].className = tabs[i].className.replace(" text-blue-600 border-blue-500", "");
+        tabs[i].className += " border-transparent";
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " text-blue-600 border-blue-500";
+}
+</script>
 {% endblock %}

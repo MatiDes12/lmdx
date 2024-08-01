@@ -1,0 +1,296 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Facilities Management{% endblock %}
+
+{% block sidebar %}
+{% include 'admin/sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Stylish Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-teal-400 p-8 rounded-xl shadow-2xl mb-10">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-white p-3 rounded-full mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-extrabold text-white mb-2">Facilities Management</h1>
+                    <p class="text-white text-xl opacity-80">Optimize and manage all healthcare facilities efficiently</p>
+                </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                <p class="text-white font-semibold">Total Facilities</p>
+                <p class="text-4xl font-bold text-white">{{ total_facilities }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Facilities Controls -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-8 rounded-lg shadow-lg mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-white">Facilities Controls</h2>
+            <button onclick="showAddFacilityModal()" class="bg-white hover:bg-gray-100 text-blue-600 font-bold py-2 px-5 rounded-full flex items-center shadow-lg transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Add New Facility
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex-1">
+                <label for="searchFacility" class="block text-sm font-medium text-white mb-2">Search Facilities</label>
+                <div class="relative">
+                    <input type="text" id="searchFacility" name="searchFacility" class="block w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 border-0 focus:ring-2 focus:ring-blue-400 text-gray-900 placeholder-gray-500 shadow-md transition duration-300" placeholder="Search by facility name or location...">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1">
+                <label for="filterStatus" class="block text-sm font-medium text-white mb-2">Filter by Status</label>
+                <div class="relative">
+                    <select id="filterStatus" name="filterStatus" class="block w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 border-0 focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-md appearance-none cursor-pointer transition duration-300">
+                        <option value="">All Statuses</option>
+                        <option value="operational">Operational</option>
+                        <option value="maintenance">Under Maintenance</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1">
+                <label for="sortBy" class="block text-sm font-medium text-white mb-2">Sort By</label>
+                <div class="relative">
+                    <select id="sortBy" name="sortBy" class="block w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 border-0 focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-md appearance-none cursor-pointer transition duration-300">
+                        <option value="name">Facility Name</option>
+                        <option value="location">Location</option>
+                        <option value="status">Status</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <!-- Facilities List -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Facilities List</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Facility Name</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Location</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="facilityTableBody">
+                    {% if facilities %}
+                        {% for facility in facilities %}
+                        <tr>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ facility.name }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ facility.location }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ facility.status }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <button onclick="editFacility('{{ facility.facility_id }}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button onclick="deleteFacility('{{ facility.facility_id }}')" class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center text-gray-500">
+                                No facilities found. Please add a facility.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Maintenance Schedule Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Maintenance Schedule</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Facility Name</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Scheduled Date</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Maintenance Type</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="maintenanceTableBody">
+                    {% if maintenance_schedules %}
+                        {% for schedule in maintenance_schedules %}
+                        <tr>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ schedule.facility_name }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ schedule.scheduled_date.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ schedule.maintenance_type }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ schedule.status }}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <button onclick="editMaintenance('{{ schedule.schedule_id }}')" class="text-blue-600 hover:text-blue-900 mr-2"></button>
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button onclick="deleteMaintenance('{{ schedule.schedule_id }}')" class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center text-gray-500">
+                                No maintenance schedules found. Please add a schedule.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Facility Modal -->
+    <div id="addFacilityModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form id="addFacilityForm" action="{{ url_for('admin.add_facility') }}" method="POST">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Add New Facility</h3>
+                        <div class="mt-2">
+                            <div class="mb-4">
+                                <label for="facilityName" class="block text-sm font-medium text-gray-700">Facility Name</label>
+                                <input type="text" name="facilityName" id="facilityName" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div class="mb-4">
+                                <label for="facilityLocation" class="block text-sm font-medium text-gray-700">Location</label>
+                                <input type="text" name="facilityLocation" id="facilityLocation" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div class="mb-4">
+                                <label for="facilityStatus" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select name="facilityStatus" id="facilityStatus" required class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <option value="operational">Operational</option>
+                                    <option value="maintenance">Under Maintenance</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Add Facility
+                        </button>
+                        <button type="button" onclick="closeAddFacilityModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showAddFacilityModal() {
+            document.getElementById('addFacilityModal').classList.remove('hidden');
+        }
+    
+        function closeAddFacilityModal() {
+            document.getElementById('addFacilityModal').classList.add('hidden');
+        }
+    
+        function editFacility(facilityId) {
+            // Fetch facility details and populate the edit form
+            fetch(`/admin/facilities/edit/${facilityId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the edit form with the fetched data
+                    // You'll need to create an edit modal similar to the add modal
+                    console.log('Edit facility:', data);
+                });
+        }
+    
+        function deleteFacility(facilityId) {
+            if (confirm('Are you sure you want to delete this facility?')) {
+                fetch(`/admin/facilities/delete/${facilityId}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the facility from the DOM or refresh the page
+                            location.reload();
+                        } else {
+                            alert('Failed to delete facility');
+                        }
+                    });
+            }
+        }
+    
+        document.getElementById('searchFacility').addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#facilityTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchValue) ? '' : 'none';
+            });
+        });
+    
+        document.getElementById('filterStatus').addEventListener('change', function() {
+            const status = this.value;
+            const rows = document.querySelectorAll('#facilityTableBody tr');
+            rows.forEach(row => {
+                const rowStatus = row.querySelector('td:nth-child(3)').textContent;
+                row.style.display = status === '' || rowStatus === status ? '' : 'none';
+            });
+        });
+    
+        document.getElementById('sortBy').addEventListener('change', function() {
+            const sortBy = this.value;
+            const tbody = document.querySelector('#facilityTableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                let aValue = a.querySelector(`td:nth-child(${getColumnIndex(sortBy)})`).textContent;
+                let bValue = b.querySelector(`td:nth-child(${getColumnIndex(sortBy)})`).textContent;
+                return aValue.localeCompare(bValue);
+            });
+            
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        });
+    
+        function getColumnIndex(sortBy) {
+            switch(sortBy) {
+                case 'name': return 1;
+                case 'location': return 2;
+                case 'status': return 3;
+                default: return 1;
+            }
+        }
+    </script>
+{% endblock %}
+    

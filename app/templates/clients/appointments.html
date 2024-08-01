@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'clients/base.html' %}
 {% block navbar %}
 {% include 'clients/navbar.html' %}
@@ -114,5 +115,203 @@ function openModal(doctorId) {
 function closeModal() {
     document.getElementById('appointmentModal').classList.add('hidden');
 }
+=======
+{% extends 'clients/base.html' %} {% block navbar %} {% include
+'clients/navbar.html' %} {% endblock %} {% block content %}
+<div class="px-6 py-4 bg-gray-100">
+  <!-- Header Section -->
+  <div
+    class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-md mb-8"
+  >
+    <h1 class="text-3xl font-bold text-white">Your Appointments</h1>
+    <p class="text-white text-sm mt-2">
+      Manage your healthcare schedule with ease.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Upcoming Appointments Section -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">
+        Upcoming Appointments 
+        <span class="text-sm font-normal text-gray-600 bg-blue-100 inline-block px-2 py-1 rounded-full ml-2 text-blue-800">
+          You have {{ upcoming_appointments|length }} Total Appointments
+      </h2>
+      <div class="space-y-4 overflow-y-auto" style="max-height: 550px;" id="upcoming-appointments">
+        {% include 'clients/_upcoming_appointments.html' %}
+      </div>
+    </div>
+    
+
+    <!-- Schedule New Appointment Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">
+        Schedule Appointment
+      </h2>
+      <form action="{{ url_for('patient.appointments') }}" method="POST" class="space-y-4">
+        <div>
+          <label for="doctor-select" class="block text-sm font-medium text-gray-700 mb-1">Select Doctor</label>
+          <select id="doctor-select" name="doctor_id" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            <option value="" disabled selected>Select your doctor</option>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.doctor_id }}">
+              Dr. {{ doctor.first_name }} {{ doctor.last_name }} - {{ doctor.specialization }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label
+            for="date-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Select Date</label
+          >
+          <input
+          type="date"
+          id="date-select"
+          name="appointment_date"
+          min="{{ today_date }}"
+          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
+        />        
+        </div>
+        <div>
+          <label
+            for="time-select"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Select Time</label
+          >
+          <select
+            id="time-select"
+            name="appointment_time"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {% for time in available_times %}
+            <option value="{{ time }}">{{ time }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label
+            for="reason"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Reason for Appointment</label
+          >
+          <input
+            type="text"
+            id="reason"
+            name="reason"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Brief description of your visit"
+          />
+        </div>
+        <div>
+          <label
+            for="notes"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Additional Notes (Optional)</label
+          >
+          <textarea
+            id="notes"
+            name="notes"
+            rows="3"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Any additional information for the doctor"
+          ></textarea>
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-2 px-4 rounded-md transition duration-300 text-sm"
+        >
+          Book Appointment
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal for Viewing Appointment Details -->
+    <div id="detailsModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <!-- Modal content -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Appointment Details</h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500" id="appointmentDetails">Details will be loaded here...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const doctorSelect = document.getElementById('doctor-select');
+    const dateSelect = document.getElementById('date-select');
+    const timeSelect = document.getElementById('time-select');
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
+    function updateAvailableTimes() {
+      const doctorId = doctorSelect.value;
+      const date = dateSelect.value;
+      const now = new Date();
+
+      fetch(`{{ url_for('patient.get_available_times', _external=true) }}?doctor_id=${doctorId}&date=${date}`)
+        .then(response => response.json())
+        .then(times => {
+          timeSelect.innerHTML = '';
+          if (times.length > 0) {
+            times.forEach(time => {
+              const timeValue = new Date(date + ' ' + time);
+              if (date !== today || timeValue > now) { // Check if the time is in the future for today
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                timeSelect.appendChild(option);
+              }
+            });
+          }
+          if (timeSelect.options.length === 0) {
+            const option = document.createElement('option');
+            option.textContent = 'No available times';
+            timeSelect.appendChild(option);
+          }
+        });
+    }
+
+    doctorSelect.addEventListener('change', updateAvailableTimes);
+    dateSelect.addEventListener('change', updateAvailableTimes);
+    updateAvailableTimes(); // Call on initial load
+  });
+
+// function viewDetails(appointmentId, doctorName, appointmentDate, appointmentTime, reason, notes) {
+//   // Display the formatted details
+//   const details = `
+//     <strong>ID:</strong> ${appointmentId}<br>
+//     <strong>Doctor:</strong> ${doctorName}<br>
+//     <strong>Date:</strong> ${appointmentDate}<br>
+//     <strong>Time:</strong> ${appointmentTime}<br>
+//     <strong>Reason:</strong> ${reason}<br>
+//     <strong>Notes:</strong> ${notes}
+//   `;
+//   document.getElementById('appointmentDetails').innerHTML = details;
+//   document.getElementById('detailsModal').classList.remove('hidden');
+// }
+
+
+>>>>>>> R_Branch
 </script>
 {% endblock %}

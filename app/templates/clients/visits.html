@@ -1,81 +1,105 @@
 {% extends 'clients/base.html' %}
 {% block navbar %}
-{% include 'clients/navbar.html' %}
+    {% include 'clients/navbar.html' %}
 {% endblock %}
 {% block content %}
-<div class="flex flex-col mt-6">
-    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center gap-x-3">
-                                    <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                    <span>Name</span>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                Specialization
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                Schedule
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                Status
-                            </th>
-                            <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 whitespace-nowrap pl-24">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                        {% for doctor in doctors %}
-                        <tr>
-                            <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                <div class="inline-flex items-center gap-x-3">
-                                    <input type="checkbox" class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700">
-                                    <div class="flex items-center gap-x-2">
-                                        <img class="object-cover w-10 h-10 rounded-full" src="https://i.pravatar.cc/300?img={{ doctor.id }}" alt="{{ doctor.name }}'s profile picture">
-                                        <div>
-                                            <h2 class="font-medium text-gray-800 dark:text-white ">{{ doctor.name }}</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                {{ doctor.specialization }}
-                            </td>
-                            <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                {{ doctor.schedule }}
-                            </td>
-                            <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2">
-                                    <span class="h-1.5 w-1.5 rounded-full {% if doctor.status.lower() == 'active' %}bg-green-500{% elif doctor.status.lower() == 'inactive' %}bg-red-500{% else %}bg-gray-500{% endif %}"></span>
-                                    <h2 class="text-sm font-normal {% if doctor.status.lower() == 'active' %}text-green-500{% elif doctor.status.lower() == 'inactive' %}text-red-500{% else %}text-gray-500{% endif %}">{{ doctor.status }}</h2>
-                                </div>
-                            </td>
-                            <td class="px-4 py-4 text-sm whitespace-nowrap">
-                                <div class="flex items-center gap-x-6">
-                                    <a href="{{ url_for('dashboard.message_doctor', doctor_id=doctor.id) }}" class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#4285F4">
-                                            <path d="M280-240q-17 0-28.5-11.5T240-280v-80h520v-360h80q17 0 28.5 11.5T880-680v600L720-240H280ZM80-280v-560q0-17 11.5-28.5T120-880h520q17 0 28.5 11.5T680-840v360q0 17-11.5 28.5T640-440H240L80-280Zm520-240v-280H160v280h440Zm-440 0v-280 280Z"/>
-                                        </svg>
-                                    </a>
-                                    <a href="{{ url_for('dashboard.view_doctor_profile', doctor_id=doctor.id) }}" class="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#34A853">
-                                            <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+
+<div class="px-6 py-4 bg-gray-100">
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-xl shadow-lg mb-8 text-white postion-fixed">
+            <h1 class="text-4xl font-bold mb-2">Visit Summary</h1>
+            <p class="text-lg">Review the details and outcomes of your recent doctor's visits</p>
+        </div>
+
+        <!-- Visit Timeline -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Your Health Journey</h2>
+            <div class="relative">
+                {% for visit in visits %}
+                    <div class="mb-8 flex items-center">
+                        <div class="flex flex-col items-center mr-4">
+                            <div class="rounded-full h-12 w-12 flex items-center justify-center bg-blue-500 text-white font-semibold text-lg">
+                                {{ visit.date.strftime('%d') }}
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">{{ visit.date.strftime('%b %Y') }}</div>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-lg flex-grow">
+                            <h3 class="font-semibold text-lg mb-2">{{ visit.doctor_name }}</h3>
+                            <p class="text-gray-700 mb-2">{{ visit.summary }}</p>
+                            <p class="text-sm text-blue-600 font-medium">Next Steps: {{ visit.next_steps }}</p>
+                            <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-600 transition-colors duration-200">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="absolute top-0 bottom-0 left-6 w-0.5 bg-gray-300 -z-10"></div>
+            </div>
+        </div>
+
+        <!-- Latest Visit Details -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Latest Visit Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Symptoms Discussed</h3>
+                    <ul class="list-disc list-inside text-gray-700">
+                        {% for symptom in latest_visit.symptoms %}
+                            <li>{{ symptom }}</li>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Medication Changes</h3>
+                    <ul class="space-y-2">
+                        {% for medication in latest_visit.medications %}
+                            <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 rounded-full bg-{{ medication.action_color }}-500"></span>
+                                <span>{{ medication.name }} - {{ medication.action }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-6">
+                <h3 class="font-semibold text-lg mb-2">Doctor's Notes</h3>
+                <p class="text-gray-700">{{ latest_visit.notes }}</p>
+            </div>
+        </div>
+
+        <!-- Follow-up Actions -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">Follow-up Actions</h2>
+            <div class="space-y-4">
+                {% for action in follow_up_actions %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold">{{ action.title }}</h4>
+                            <p class="text-sm text-gray-600">{{ action.description }}</p>
+                        </div>
+                        <button class="bg-green-500 text-white px-4 py-2 rounded-full text-sm hover:bg-green-600 transition-colors duration-200">
+                            {{ action.action_text }}
+                        </button>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-</div>
+
+
+<script>
+    // Add smooth scrolling and fade-in animations
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const visitItems = document.querySelectorAll('.mb-8.flex');
+        visitItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                item.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
 {% endblock %}

@@ -1,10 +1,13 @@
-import secrets
-import string
+import os
+import google.generativeai as genai
 
-def generate_secret_key(length=24):
-    alphabet = string.ascii_letters + string.digits + '!@#$%^&*(-_=+)'
-    return ''.join(secrets.choice(alphabet) for _ in range(length))
+# Access your API key as an environment variable.
+genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+# Choose a model that's appropriate for your use case.
+model = genai.GenerativeModel('gemini-1.5-flash')
 
-# Example usage
-generated_key = generate_secret_key()
-print(f"Generated Secret Key: {generated_key}")
+prompt = "Write a story about a magic backpack."
+
+response = model.generate_content(prompt)
+
+print(response.text)

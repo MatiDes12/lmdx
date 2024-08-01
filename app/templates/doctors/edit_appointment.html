@@ -13,38 +13,38 @@
 <section class="container px-4 mx-auto">
     <div class="mb-8">
         <div class="flex items-center gap-x-3">
-            <img src="https://i.pravatar.cc/150?u={{ appointment.patient.name }}" alt="{{ appointment.patient.name }}" class="w-16 h-16 rounded-full">
+            <img src="https://i.pravatar.cc/150?u={{ appointment.client.first_name }}.{{ appointment.client.last_name }}" alt="{{ appointment.client.first_name }} {{ appointment.client.last_name }}" class="w-16 h-16 rounded-full">
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{appointment.patient.name}}</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Patient ID: {{ appointment.patient.id }}</p>
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ appointment.client.first_name }} {{ appointment.client.last_name }}</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Patient ID: {{ appointment.client.client_id }}</p>
             </div>
         </div>
     </div>
-        <!-- Header with Short Description -->
+    <!-- Header with Short Description -->
     <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800 mb-6">
         <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Appointment Details</h3>
         <p class="text-sm text-gray-600 dark:text-gray-400">Use this form to edit the appointment details. Please ensure the information is accurate and up-to-date.</p>
     </div>
-    <form method="POST" action="{{ url_for('dashboard.edit_appointment', appointment_id=appointment.id) }}" class="mt-6 bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
+    <form method="POST" action="{{ url_for('doctor.edit_appointment', appointment_id=appointment.appointment_id) }}" class="mt-6 bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="mb-4">
                 <label for="patient_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient Name</label>
-                <input type="text" id="patient_name" value="{{ appointment.patient.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="patient_name" value="{{ appointment.client.first_name }} {{ appointment.client.last_name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
 
             <div class="mb-4">
                 <label for="doctor_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Doctor</label>
-                <input type="text" id="doctor_name" value="{{ appointment.doctor.name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="doctor_name" value="{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
 
             <div class="mb-4">
                 <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
-                <input type="text" id="date" value="{{ appointment.date.strftime('%B %d, %Y') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="date" value="{{ appointment.appointment_date.strftime('%B %d, %Y') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
 
             <div class="mb-4">
                 <label for="time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
-                <input type="text" id="time" value="{{ appointment.time.strftime('%I:%M %p') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
+                <input type="text" id="time" value="{{ appointment.appointment_time.strftime('%I:%M %p') }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
             </div>
 
             <div class="mb-4 relative" x-data="{ isOpen: false, selectedStatus: '{{ appointment.status }}' }">
@@ -92,16 +92,11 @@
                         <span class="inline-block w-2.5 h-2.5 mr-2 bg-red-500 rounded-full"></span>Cancelled
                     </a>
                 </div>
-            </div>
+            </div>            
 
             <div class="mb-4">
-                <label for="last_visit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Visit</label>
-                <input type="text" id="last_visit" value="{{ last_visit }}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly>
-            </div>
-
-            <div class="mb-4">
-                <label for="medical_history" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Medical History</label>
-                <textarea id="medical_history" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="4" readonly>{{ medical_history }}</textarea>
+                <label for="reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason</label>
+                <textarea id="reason" name="reason" class="mt-1 p-2 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="4">{{ appointment.reason }}</textarea>
             </div>
 
             <div class="mb-4">

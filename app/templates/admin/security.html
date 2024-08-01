@@ -1,0 +1,171 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Security Settings{% endblock %}
+
+{% block sidebar %}
+{% include 'admin/sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Stylish Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 rounded-xl shadow-2xl mb-10">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-white p-3 rounded-full mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-4xl font-extrabold text-white mb-2">Security Settings</h2>
+                    <p class="text-white text-xl opacity-80">Manage system security and user access</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="mb-8">
+        <nav class="flex space-x-4">
+            <a href="#password-policy" class="text-gray-600 hover:text-blue-600 font-semibold" onclick="showSection('password-policy')">Password Policy</a>
+            <a href="#two-factor-authentication" class="text-gray-600 hover:text-blue-600 font-semibold" onclick="showSection('two-factor-authentication')">Two-Factor Authentication</a>
+            <a href="#session-management" class="text-gray-600 hover:text-blue-600 font-semibold" onclick="showSection('session-management')">Session Management</a>
+            <a href="#access-control" class="text-gray-600 hover:text-blue-600 font-semibold" onclick="showSection('access-control')">Access Control</a>
+        </nav>
+    </div>
+
+    <!-- Security Settings Sections -->
+    <div id="password-policy" class="section bg-white p-6 rounded-lg shadow-md space-y-4 hidden">
+        <h3 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Password Policy
+        </h3>
+        <form class="space-y-4">
+            <div>
+                <label for="min_length" class="block text-sm font-medium text-gray-700">Minimum Length</label>
+                <input type="number" id="min_length" name="min_length" min="8" max="32" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="require_uppercase" class="flex items-center">
+                    <input type="checkbox" id="require_uppercase" name="require_uppercase" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2">Require Uppercase</span>
+                </label>
+            </div>
+            <div>
+                <label for="require_lowercase" class="flex items-center">
+                    <input type="checkbox" id="require_lowercase" name="require_lowercase" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2">Require Lowercase</span>
+                </label>
+            </div>
+            <div>
+                <label for="require_numbers" class="flex items-center">
+                    <input type="checkbox" id="require_numbers" name="require_numbers" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2">Require Numbers</span>
+                </label>
+            </div>
+            <div>
+                <label for="require_special_chars" class="flex items-center">
+                    <input type="checkbox" id="require_special_chars" name="require_special_chars" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2">Require Special Characters</span>
+                </label>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Update Password Policy
+            </button>
+        </form>
+    </div>
+
+    <div id="two-factor-authentication" class="section bg-white p-6 rounded-lg shadow-md space-y-4 hidden">
+        <h3 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Two-Factor Authentication
+        </h3>
+        <form class="space-y-4">
+            <div>
+                <label for="enable_2fa" class="flex items-center">
+                    <input type="checkbox" id="enable_2fa" name="enable_2fa" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <span class="ml-2">Enable Two-Factor Authentication</span>
+                </label>
+            </div>
+            <div>
+                <label for="2fa_method" class="block text-sm font-medium text-gray-700">2FA Method</label>
+                <select id="2fa_method" name="2fa_method" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="app">Authenticator App</option>
+                    <option value="sms">SMS</option>
+                    <option value="email">Email</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Update 2FA Settings
+            </button>
+        </form>
+    </div>
+
+    <div id="session-management" class="section bg-white p-6 rounded-lg shadow-md space-y-4 hidden">
+        <h3 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Session Management
+        </h3>
+        <form class="space-y-4">
+            <div>
+                <label for="session_timeout" class="block text-sm font-medium text-gray-700">Session Timeout (minutes)</label>
+                <input type="number" id="session_timeout" name="session_timeout" min="5" max="1440" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="max_concurrent_sessions" class="block text-sm font-medium text-gray-700">Max Concurrent Sessions</label>
+                <input type="number" id="max_concurrent_sessions" name="max_concurrent_sessions" min="1" max="10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Update Session Settings
+            </button>
+        </form>
+    </div>
+
+    <div id="access-control" class="section bg-white p-6 rounded-lg shadow-md space-y-4 hidden">
+        <h3 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Access Control
+        </h3>
+        <form class="space-y-4">
+            <div>
+                <label for="max_login_attempts" class="block text-sm font-medium text-gray-700">Max Login Attempts</label>
+                <input type="number" id="max_login_attempts" name="max_login_attempts" min="3" max="10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="lockout_duration" class="block text-sm font-medium text-gray-700">Lockout Duration (minutes)</label>
+                <input type="number" id="lockout_duration" name="lockout_duration" min="5" max="1440" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="ip_whitelist" class="block text-sm font-medium text-gray-700">IP Whitelist (comma-separated)</label>
+                <input type="text" id="ip_whitelist" name="ip_whitelist" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Update Access Control
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    document.getElementById(sectionId).classList.remove('hidden');
+}
+
+// Show the first section by default
+document.addEventListener('DOMContentLoaded', () => {
+    showSection('password-policy');
+});
+</script>
+{% endblock %}

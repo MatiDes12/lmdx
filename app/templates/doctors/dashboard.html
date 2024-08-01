@@ -14,7 +14,7 @@
 <div class="p-4">
   <!-- Welcome Section -->
   <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{ doctor_name }}!</h1>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{ first_name }} {{ last_name }}!</h1>
     <p class="mt-1 text-gray-600 dark:text-gray-400">Here is an overview of your dashboard with quick stats and latest updates.</p>
 </div>
 
@@ -27,7 +27,7 @@
               <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
                   <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Patients</h3>
                   <p class="text-sm text-gray-700 dark:text-gray-300">{{ total_patients }} total patients.</p>
-                  <a href="{{ url_for('dashboard.patients') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
+                  <a href="{{ url_for('doctor.patients') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
                       View Patients
                   </a>
                   <p class="text-xs text-gray-500 dark:text-gray-400 absolute top-2 right-2">Last update: {{ last_update }}</p>
@@ -37,7 +37,7 @@
               <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
                   <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Doctors</h3>
                   <p class="text-sm text-gray-700 dark:text-gray-300">{{ total_doctors }} total doctors.</p>
-                  <a href="{{ url_for('dashboard.doctors') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-purple-800">
+                  <a href="{{ url_for('doctor.doctors') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-purple-800">
                       View Doctors
                   </a>
                   <p class="text-xs text-gray-500 dark:text-gray-400 absolute top-2 right-2">Last update: {{ last_update }}</p>
@@ -47,7 +47,7 @@
               <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
                   <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Appointments</h3>
                   <p class="text-sm text-gray-700 dark:text-gray-300">{{ total_appointments }} total appointments.</p>
-                  <a href="{{ url_for('dashboard.appointments') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
+                  <a href="{{ url_for('doctor.appointments') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
                       View Appointments
                   </a>
                   <p class="text-xs text-gray-500 dark:text-gray-400 absolute top-2 right-2">Last update: {{ last_update }}</p>
@@ -130,19 +130,19 @@
       <div class="col-span-1">
           <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Quick Links</h2>
           <div class="space-y-2">
-              <a href="{{ url_for('dashboard.reports') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <a href="{{ url_for('doctor.reports') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M13 7H7v2h6V7zM7 11h6v2H7v-2zM7 15h6v2H7v-2zM15 3h-1V2a2 2 0 10-4 0v1H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zm-4 0V2a1 1 0 112 0v1h-2z"></path>
                   </svg>
                   <span class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Generate Reports</span>
               </a>
-              <a href="{{ url_for('dashboard.settings') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <a href="{{ url_for('doctor.settings') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M12 8c0-2.21-1.79-4-4-4S4 5.79 4 8s1.79 4 4 4 4-1.79 4-4zm-2 0a2 2 0 11-4 0 2 2 0 014 0zm-5 7a3 3 0 00-3 3h16a3 3 0 00-3-3H5z" clip-rule="evenodd"></path>
                   </svg>
                   <span class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Settings</span>
               </a>
-              <a href="{{ url_for('dashboard.predictive_analytics') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <a href="{{ url_for('doctor.predictive_analytics') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M13 7H7v2h6V7zM7 11h6v2H7v-2zM7 15h6v2H7v-2zM15 3h-1V2a2 2 0 10-4 0v1H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zm-4 0V2a1 1 0 112 0v1h-2z"></path>
                   </svg>
