@@ -187,7 +187,7 @@
     </span>
     <div class="inline-flex mt-2 xs:mt-0">
         {% if pagination.has_prev %}
-        <a href="{{ url_for('doctors.doctors', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+        <a href="{{ url_for('doctor.doctors', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
             Prev
         </a>
         {% else %}
@@ -199,7 +199,7 @@
         {% for page_num in pagination.iter_pages() %}
             {% if page_num %}
                 {% if page_num != pagination.page %}
-                    <a href="{{ url_for('doctors.doctors', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                    <a href="{{ url_for('doctor.doctors', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
                         {{ page_num }}
                     </a>
                 {% else %}
@@ -213,7 +213,7 @@
         {% endfor %}
         
         {% if pagination.has_next %}
-        <a href="{{ url_for('doctors.doctors', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+        <a href="{{ url_for('doctor.doctors', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
             Next
         </a>
         {% else %}

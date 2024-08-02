@@ -12,11 +12,11 @@
 
 {% block content %}
 <div class="p-4">
-  <!-- Welcome Section -->
-  <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
+ <!-- Welcome Section -->
+ <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
     <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{ first_name }} {{ last_name }}!</h1>
     <p class="mt-1 text-gray-600 dark:text-gray-400">Here is an overview of your dashboard with quick stats and latest updates.</p>
-</div>
+  </div>
 
   <div class="grid grid-cols-3 gap-4">
       <!-- Statistics Section -->
@@ -43,63 +43,36 @@
                   <p class="text-xs text-gray-500 dark:text-gray-400 absolute top-2 right-2">Last update: {{ last_update }}</p>
               </div>
 
-              <!-- Appointments Card -->
-              <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
-                  <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Appointments</h3>
-                  <p class="text-sm text-gray-700 dark:text-gray-300">{{ total_appointments }} total appointments.</p>
-                  <a href="{{ url_for('doctor.appointments') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                      View Appointments
-                  </a>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 absolute top-2 right-2">Last update: {{ last_update }}</p>
-              </div>
+                <!-- Appointments Card -->
+                <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+                    <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Appointments</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ total_appointments }} total appointments.</p>
+                    <a href="{{ url_for('doctor.appointments') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
+                    View Appointments
+                    </a>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 absolute top-2 right-2">Last update: {{ last_update }}</p>
+                </div>
           </div>
       </div>
 
-      <!-- Recent Notifications Section -->
-      <div class="col-span-1">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Recent Notifications</h2>
-          <div class="space-y-2">
-              <!-- Example Notification -->
-              <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                  <div class="flex-shrink-0">
-                      <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/300" alt="User">
-                  </div>
-                  <div class="min-w-0 ml-2 flex-1">
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">John Doe</p>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">New appointment scheduled</p>
-                  </div>
-                  <div class="flex-shrink-0 ml-auto">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">2 hours ago</p>
-                  </div>
-              </div>
-              <!-- Add more notifications as needed -->
-              <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                  <div class="flex-shrink-0">
-                      <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/301" alt="User">
-                  </div>
-                  <div class="min-w-0 ml-2 flex-1">
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">Jane Smith</p>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">Patient report updated</p>
-                  </div>
-                  <div class="flex-shrink-0 ml-auto">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">1 hour ago</p>
-                  </div>
-              </div>
-              <!-- Add more notifications as needed -->
-              <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                  <div class="flex-shrink-0">
-                      <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/302" alt="User">
-                  </div>
-                  <div class="min-w-0 ml-2 flex-1">
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">John Doe</p>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">New appointment scheduled</p>
-                  </div>
-                  <div class="flex-shrink-0 ml-auto">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">2 hours ago</p>
-                  </div>
-              </div>
-          </div>
-      </div>
+    <!-- Recent Notifications Section -->
+    <div class="col-span-1 mt-4">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Recent Notifications</h2>
+        <div class="space-y-2 overflow-y-auto max-h-60">
+        {% for notification in notifications %}
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center">
+            <div>
+            <p class="text-sm text-gray-700 dark:text-gray-300">{{ notification.message }}</p>
+            </div>
+            <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ notification.timestamp.strftime('%B %d, %Y %I:%M %p') }}</p>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-700 dark:text-gray-300">No recent notifications.</p>
+        {% endfor %}
+        </div>
+    </div>
   </div>
 
   <!-- Tasks/Reminders Section -->
@@ -151,20 +124,24 @@
           </div>
       </div>
 
-      <!-- Upcoming Appointments Section -->
-      <div class="col-span-1">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Upcoming Appointments</h2>
-          <div class="space-y-2">
-              <!-- Example Appointment -->
-              <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                  <p class="text-sm text-gray-700 dark:text-gray-300">John Doe - 3:00 PM</p>
-              </div>
-              <!-- Add more appointments as needed -->
-              <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                  <p class="text-sm text-gray-700 dark:text-gray-300">Jane Smith - 4:00 PM</p>
-              </div>
-          </div>
-      </div>
+        <!-- Upcoming Appointments Section -->
+        <div class="col-span-1 mt-4">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Upcoming Appointments</h2>
+            <div class="space-y-2">
+            {% for appointment in upcoming_appointments %}
+            <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center">
+                <div>
+                <p class="text-sm text-gray-700 dark:text-gray-300">{{ appointment.client.first_name }} {{ appointment.client.last_name }} - {{ appointment.appointment_time.strftime('%I:%M %p') }}</p>
+                </div>
+                <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ appointment.appointment_date.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-700 dark:text-gray-300">No upcoming appointments.</p>
+            {% endfor %}
+            </div>
+        </div>
 
       <!-- Staff Schedules Section -->
       <div class="col-span-1">

@@ -77,6 +77,9 @@
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M16 22C16.5523 22 17 21.5523 17 21C17 20.4477 16.5523 20 16 20C15.4477 20 15 20.4477 15 21C15 21.5523 15.4477 22 16 22ZM16 24C17.6569 24 19 22.6569 19 21C19 19.3431 17.6569 18 16 18C14.3431 18 13 19.3431 13 21C13 22.6569 14.3431 24 16 24Z" fill="currentColor"/>
                         </svg>
                     <span class="mx-2 text-sm font-medium">Messages</span>
+                    {% if unread_messages_count|default(0) > 0 %}
+                    <span class="absolute top-0 right-0 mt-1 mr-1 inline-flex items-center justify-center w-3 h-3 bg-red-600 text-white text-xs font-bold rounded-full"></span>
+                    {% endif %}
                 </a>
 
                 <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('doctor.prescription') }}">

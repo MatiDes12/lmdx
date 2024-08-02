@@ -10,7 +10,6 @@ html, body {
     
 }
 
-<<<<<<< HEAD
 .card {
     width: 260px;
     background-color: #fff;
@@ -69,10 +68,36 @@ html, body {
     color: rgb(0, 0, 0);
     box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
   }
-=======
-/* chat room */
 
-  
 
-/* chat room */
->>>>>>> R_Branch
+  /* notifications */
+
+/* Container for notifications */
+.notifications-container {
+  position: relative;
+  overflow-y: auto;
+  max-height: 630px; /* Adjust as needed, equivalent to 96rem */
+}
+
+/* Hide scrollbar (works for most browsers) */
+.notifications-container::-webkit-scrollbar {
+  display: none;
+}
+
+.notifications-container {
+  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+  scrollbar-width: none;  /* For Firefox */
+}
+
+/* Gradient fade effect at the bottom */
+.notifications-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px; /* Adjust the height of the fade effect */
+  background: linear-gradient(to bottom, transparent, #ffffff); /* Adjust the color to match your background */
+  pointer-events: none; /* Ensures clicks go through the gradient */
+}
+

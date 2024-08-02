@@ -11,6 +11,8 @@ from PIL import Image
 from firebase_admin import auth, exceptions
 from flask_paginate import Pagination, get_page_parameter
 from sqlalchemy import and_, and_, or_
+from datetime import datetime, timedelta
+
 
 # Configure your Google Gemini API key
 GOOGLE_API_KEY1 = ''
@@ -21,12 +23,51 @@ bp = Blueprint('doctor', __name__)
 
 
 #<---------------------- doctor Dashboard Routes----------------------->
+
 @bp.route('/doctor')
 def doctor_dashboard():
-    if 'user' not in session:
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+    
+    # Retrieve the doctor details using the account ID from the session
+    firebase_user_id = session.get('user_id')  # Assuming session stores Firebase ID
+    account = Account.query.filter_by(id=firebase_user_id).first()
+
+    if not account:
         return redirect(url_for('auth.signin'))
 
-    return render_template('doctors/dashboard.html')
+    doctor_id = account.doctor_id
+
+    # Fetch doctor's first and last name
+    doctor = Doctor.query.get(doctor_id)
+    first_name = doctor.first_name if doctor else 'Doctor'
+    last_name = doctor.last_name if doctor else ''
+
+    # Query for upcoming appointments
+    today = datetime.now().date()
+    upcoming_appointments = Appointment.query.filter(
+        Appointment.doctor_id == doctor_id,
+        Appointment.appointment_date >= today
+    ).order_by(Appointment.appointment_date.asc(), Appointment.appointment_time.asc()).all()
+
+    # Count unread messages
+    unread_messages_count = Message.query.filter_by(recipient_id=firebase_user_id, is_read=False).count()
+
+    # Query for recent unread notifications
+    unread_notifications = Notification.query.filter_by(
+        doctor_id=doctor_id,
+        is_read=False
+    ).order_by(Notification.timestamp.desc()).all()
+
+    return render_template(
+        'doctors/dashboard.html',
+        first_name=first_name,
+        last_name=last_name,
+        upcoming_appointments=upcoming_appointments,
+        unread_messages_count=unread_messages_count,
+        notifications=unread_notifications
+    )
+
 
 #<----------------------Appointments----------------------->
 
@@ -120,15 +161,25 @@ def cancel_appointment(appointment_id):
 
 #<-------------------------- messages -------------------------------->
 
+# app/routes/doctor.py
+
 @bp.route('/messages', methods=['GET'])
 def messages():
     if 'user' not in session or session.get('user_type') != 'doctors':
         return redirect(url_for('auth.signin'))
 
-    doctor_id = session.get('user_id')
+    firebase_user_id = session.get('user_id')
+    account = Account.query.filter_by(id=firebase_user_id).first()
+
+    if not account:
+        return redirect(url_for('auth.signin'))
+
+    doctor_id = account.doctor_id
     all_clients = ClientAccounts.query.all()
-    messages_sent = Message.query.filter_by(sender_id=doctor_id).all()
-    messages_received = Message.query.filter_by(recipient_id=doctor_id).all()
+
+    # Retrieve messages based on doctor_id
+    messages_sent = Message.query.filter_by(sender_id=firebase_user_id).all()
+    messages_received = Message.query.filter_by(recipient_id=firebase_user_id).all()
 
     client_ids = set([msg.recipient_id for msg in messages_sent] + [msg.sender_id for msg in messages_received])
     unique_clients = {}
@@ -138,8 +189,8 @@ def messages():
         if client:
             last_message = Message.query.filter(
                 or_(
-                    and_(Message.sender_id == doctor_id, Message.recipient_id == client_id),
-                    and_(Message.sender_id == client_id, Message.recipient_id == doctor_id)
+                    and_(Message.sender_id == firebase_user_id, Message.recipient_id == client_id),
+                    and_(Message.sender_id == client_id, Message.recipient_id == firebase_user_id)
                 )
             ).order_by(Message.timestamp.desc()).first()
 
@@ -150,8 +201,21 @@ def messages():
                     'timestamp': last_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
                 }
 
+    # Mark all unread messages as read
+    unread_messages = Message.query.filter_by(recipient_id=firebase_user_id, is_read=False).all()
+    for message in unread_messages:
+        message.is_read = True
+
+    # Mark all unread notifications as read for this doctor
+    unread_notifications = Notification.query.filter_by(doctor_id=doctor_id, is_read=False).all()
+    for notification in unread_notifications:
+        notification.is_read = True
+
+    db.session.commit()  # Commit changes to update the read status
+
     unique_clients_list = [{'client_id': k, **v} for k, v in unique_clients.items()]
     return render_template('doctors/messages.html', all_clients=all_clients, unique_clients=unique_clients_list)
+
 
 
 @bp.route('/send_message', methods=['POST'])
@@ -165,7 +229,7 @@ def send_message():
 
         if not sender_id or not receiver_id or not body:
             return jsonify({'success': False, 'error': 'Missing required fields'}), 400
-
+             
         new_message = Message(
             sender_id=sender_id,
             recipient_id=receiver_id,
@@ -177,10 +241,12 @@ def send_message():
         
         # Create a notification for the new message
         new_notification = Notification(
-            doctor_id=receiver_id,
-            patient_id=sender_id,
-            message=f"New message from {data.get('doctor_id')}: {body}",
-            notification_type='message'
+            doctor_id=sender_id, 
+            patient_id=receiver_id,
+            message=f"New message from your doctor: {body}",
+            notification_type='message',
+            timestamp=timestamp,
+            is_read=False
         )
         db.session.add(new_notification)
         db.session.commit()

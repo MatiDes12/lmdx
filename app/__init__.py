@@ -33,10 +33,6 @@ def create_app():
     Session(app)
     mail.init_app(app)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> R_Branch
     # Import and register blueprints
     from .routes import auth, doctor, main, upload, patient, contact, admin
     app.register_blueprint(auth.bp)
@@ -46,5 +42,16 @@ def create_app():
     app.register_blueprint(upload.bp, url_prefix='/upload')
     app.register_blueprint(patient.bp, url_prefix='/patient')
     app.register_blueprint(contact.bp, url_prefix='/contact')
-    
+    app.context_processor(inject_unread_messages_count)
+
     return app
+
+def inject_unread_messages_count():
+    from flask import session
+    from .models_db import Message
+
+    unread_messages_count = 0
+    if 'user_id' in session and session.get('user_type') in ['patient', 'client', 'doctors']:
+        user_id = session.get('user_id')
+        unread_messages_count = Message.query.filter_by(recipient_id=user_id, is_read=False).count()
+    return dict(unread_messages_count=unread_messages_count)

@@ -79,68 +79,7 @@
     <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
         Notifications
     </div>
-<<<<<<< HEAD
-  
-    <div class="grid grid-cols-3 gap-4">
-        <!-- Quick Links Section -->
-        <div class="col-span-1">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Quick Links</h2>
-            <div class="space-y-2">
-                <a href="{{ url_for('dashboard.reports') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13 7H7v2h6V7zM7 11h6v2H7v-2zM7 15h6v2H7v-2zM15 3h-1V2a2 2 0 10-4 0v1H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zm-4 0V2a1 1 0 112 0v1h-2z"></path>
-                    </svg>
-                    <span class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Generate Reports</span>
-                </a>
-                <a href="{{ url_for('dashboard.settings') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M12 8c0-2.21-1.79-4-4-4S4 5.79 4 8s1.79 4 4 4 4-1.79 4-4zm-2 0a2 2 0 11-4 0 2 2 0 014 0zm-5 7a3 3 0 00-3 3h16a3 3 0 00-3-3H5z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Settings</span>
-                </a>
-                <a href="{{ url_for('dashboard.predictive_analytics') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13 7H7v2h6V7zM7 11h6v2H7v-2zM7 15h6v2H7v-2zM15 3h-1V2a2 2 0 10-4 0v1H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zm-4 0V2a1 1 0 112 0v1h-2z"></path>
-                    </svg>
-                    <span class="ml-2 text-sm font-medium text-gray-900 dark:text-white">View Analytics</span>
-                </a>
-            </div>
-        </div>
-  
-        <!-- Upcoming Appointments Section -->
-        <div class="col-span-1">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Upcoming Appointments</h2>
-            <div class="space-y-2">
-                {% for appointment in appointments %}
-                <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ appointment.doctor.name }} - {{ appointment.time.strftime('%I:%M %p') }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ appointment.date.strftime('%B %d, %Y') }}</p>
-                </div>
-                {% else %}
-                <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">No scheduled appointments.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-  
-        <!-- Staff Schedules Section -->
-        <div class="col-span-1">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Staff Schedules</h2>
-            <div class="space-y-2">
-                <!-- Example Schedule -->
-                <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">Dr. John - 9:00 AM to 5:00 PM</p>
-                </div>
-                <!-- Add more schedules as needed -->
-                <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <p class="text-sm text-gray-700 dark:text-gray-300">Nurse Jane - 8:00 AM to 4:00 PM</p>
-                </div>
-            </div>
-        </div>
-=======
-    <div class="space-y-2">
+    <div class="space-y-2 notifications-container">
         {% for notification in notifications %}
         <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div class="flex-shrink-0">
@@ -155,14 +94,10 @@
             </div>
         </div>
         {% endfor %}
->>>>>>> R_Branch
     </div>
-    
   </div>
 
 
-  
-  </div>
 </div>
 <div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
 

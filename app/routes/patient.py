@@ -18,12 +18,6 @@ bp = Blueprint('patient', __name__)
 # Load environment variables from .env file
 load_dotenv()
 
-# # Now you can access the environment variable
-# genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
-
-# # Configure Google Gemini API
-# model = genai.GenerativeModel('gemini-1.5-flash')
-
 
 #<-------------------------- dashboard -------------------------------->
 
@@ -31,10 +25,10 @@ load_dotenv()
 def patient_dashboard():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
-    
+
     user_id = session.get('user_id')
     id_token = session.get('user_id_token')
-    
+
     try:
         # Fetch user data from Firebase
         user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
@@ -42,9 +36,12 @@ def patient_dashboard():
             first_name = user_data.get('first_name')
             last_name = user_data.get('last_name')
 
-            # Fetch notifications
+            unread_messages_count = Message.query.filter_by(recipient_id=user_id, is_read=False).count()
+
+
+            # Fetch unread notifications
             notifications = []
-            notification_data = Notification.query.filter_by(patient_id=user_id).all()
+            notification_data = Notification.query.filter_by(patient_id=user_id, is_read=False).all()
             if notification_data:
                 for notification in notification_data:
                     doctor = Doctor.query.get(notification.doctor_id)
@@ -54,6 +51,7 @@ def patient_dashboard():
                         'time_ago': get_time_ago(notification.timestamp)
                     })
             
+                    
             # Fetch today's and tomorrow's appointments
             today_date = datetime.now().date()
             tomorrow_date = today_date + timedelta(days=1)
@@ -77,7 +75,8 @@ def patient_dashboard():
                     'time_ago': 'Tomorrow'
                 })
 
-            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name, notifications=notifications)
+            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name, notifications=notifications, unread_messages_count=unread_messages_count)
+
         else:
             flash('Unable to fetch user details.', 'error')
             return redirect(url_for('auth.signin'))
@@ -86,6 +85,21 @@ def patient_dashboard():
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
 
+
+def get_time_ago(timestamp):
+    now = datetime.utcnow()
+    diff = now - timestamp
+    seconds = diff.total_seconds()
+
+    if seconds < 60:
+        return f"{int(seconds)} seconds ago"
+    elif seconds < 3600:
+        return f"{int(seconds / 60)} minutes ago"
+    elif seconds < 86400:
+        return f"{int(seconds / 3600)} hours ago"
+    else:
+        days = int(seconds / 86400)
+        return f"{days} days ago" if days > 1 else "1 day ago"
 
 
 #<-------------------------- appointments -------------------------------->
@@ -125,24 +139,6 @@ def generate_available_times(doctor_id, appointment_date):
     
     print(f"Available times after filtering for Doctor {doctor_id} on {appointment_date}: {available_times}")
     return available_times
-
-def get_time_ago(timestamp):
-    now = datetime.utcnow()
-    diff = now - timestamp
-    seconds = diff.total_seconds()
-    
-    if seconds < 60:
-        return f"{int(seconds)} seconds ago"
-    elif seconds < 3600:
-        return f"{int(seconds / 60)} minutes ago"
-    elif seconds < 86400:
-        return f"{int(seconds / 3600)} hours ago"
-    else:
-        days = int(seconds / 86400)
-        if days == 1:
-            return "1 day ago"
-        else:
-            return f"{days} days ago"
 
 
 
@@ -261,24 +257,28 @@ def messages():
 
     client_id = session.get('user_id')
     all_doctors = Doctor.query.filter_by(status='Active').all()  # Only get active doctors
+
+    # Retrieve messages based on client_id and doctor_id from the Account table
     messages_sent = Message.query.filter_by(sender_id=client_id).all()
     messages_received = Message.query.filter_by(recipient_id=client_id).all()
 
-    doctor_ids = set([msg.recipient_id for msg in messages_sent] + [msg.sender_id for msg in messages_received])
+    # Collect unique doctor IDs from messages
+    account_ids = set([msg.recipient_id for msg in messages_sent] + [msg.sender_id for msg in messages_received])
     unique_doctors = {}
-    
-    for doctor_id in doctor_ids:
-        doctor = Doctor.query.filter_by(doctor_id=doctor_id).first()
-        if doctor:
-            account = Account.query.filter_by(doctor_id=doctor_id).first()
-            if account:
+
+    for account_id in account_ids:
+        account = Account.query.filter_by(id=account_id).first()
+        if account:
+            doctor = Doctor.query.filter_by(doctor_id=account.doctor_id).first()
+            if doctor:
+                # Get the last message for this conversation
                 last_message = Message.query.filter(
                     or_(
                         and_(Message.sender_id == client_id, Message.recipient_id == account.id),
                         and_(Message.sender_id == account.id, Message.recipient_id == client_id)
                     )
                 ).order_by(Message.timestamp.desc()).first()
-                
+
                 if last_message:
                     unique_doctors[doctor.doctor_id] = {
                         'doctor_name': f"{doctor.first_name} {doctor.last_name}",
@@ -286,6 +286,17 @@ def messages():
                         'timestamp': last_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
                     }
 
+    # Mark all message notifications as read for this client
+    unread_notifications = Notification.query.filter_by(patient_id=client_id, is_read=False, notification_type='message').all()
+    for notification in unread_notifications:
+        notification.is_read = True
+        
+    unread_messages = Message.query.filter_by(recipient_id=client_id, is_read=False).all()
+    for message in unread_messages:
+        message.is_read = True
+        
+    db.session.commit()
+    
     unique_doctors_list = [{'doctor_id': k, **v} for k, v in unique_doctors.items()]
     return render_template('clients/messages.html', all_doctors=all_doctors, unique_doctors=unique_doctors_list)
 
@@ -318,10 +329,12 @@ def send_message():
 
         # Create a notification for the new message
         new_notification = Notification(
-            doctor_id=doctor_id,
-            patient_id=sender_id,
-            message=f"New message from {data.get('doctor_id')}: {body}",
-            notification_type='message'
+            doctor_id=account.doctor_id, 
+            patient_id=receiver_id,
+            message=f"New message from your doctor: {body}",
+            notification_type='message',
+            timestamp=timestamp,
+            is_read=False
         )
         db.session.add(new_notification)
         db.session.commit()
@@ -337,6 +350,7 @@ def get_messages():
     sender_id = session.get('user_id')
     doctor_id = request.args.get('doctor_id')
 
+    # Retrieve the doctor's account ID using doctor_id
     account = Account.query.filter_by(doctor_id=doctor_id).first()
     if not account:
         return jsonify({'success': False, 'error': 'Doctor account not found'}), 404
@@ -346,6 +360,7 @@ def get_messages():
     if not sender_id or not receiver_id:
         return jsonify({'success': False, 'error': 'Missing required fields'}), 400
 
+    # Fetch messages from the database using receiver_id
     messages = Message.query.filter(
         or_(
             and_(Message.sender_id == sender_id, Message.recipient_id == receiver_id),
@@ -353,6 +368,7 @@ def get_messages():
         )
     ).order_by(Message.timestamp.asc()).all()
 
+    # Create a list of messages with necessary details
     conversation = [{
         'sender': 'You' if msg.sender_id == sender_id else 'Doctor',
         'message': msg.body,
@@ -600,7 +616,4 @@ def health_tips():
 #         flash('Profile updated successfully!', 'success')
 #         return redirect(url_for('profile_settings'))
 
-#     return render_template('profile_settings.html', patient=patient)
-
-
-
+#     return render_template('profile_settings.html', patient=patient)'

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: a332bc7d3fc3
+Revision ID: 39c4ecdc4861
 Revises: 
-Create Date: 2024-07-31 11:07:59.219920
+Create Date: 2024-08-01 15:18:32.015646
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a332bc7d3fc3'
+revision = '39c4ecdc4861'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,7 +27,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('category_id')
     )
     op.create_table('client_accounts',
-    sa.Column('client_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('client_id', sa.String(length=255), nullable=False),
     sa.Column('first_name', sa.String(length=100), nullable=False),
     sa.Column('last_name', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
@@ -50,7 +50,7 @@ def upgrade():
     sa.Column('specialization', sa.String(length=100), nullable=False),
     sa.Column('license_number', sa.String(length=50), nullable=False),
     sa.Column('phone_number', sa.String(length=20), nullable=True),
-    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('schedule', sa.String(length=100), nullable=True),
     sa.Column('time', sa.String(length=100), nullable=True),
     sa.PrimaryKeyConstraint('doctor_id'),
@@ -133,11 +133,10 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
+    sa.UniqueConstraint('email')
     )
     op.create_table('account',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.String(length=255), nullable=False),
     sa.Column('doctor_id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
@@ -150,7 +149,7 @@ def upgrade():
     )
     op.create_table('appointment',
     sa.Column('appointment_id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('client_id', sa.Integer(), nullable=True),
+    sa.Column('client_id', sa.String(length=255), nullable=True),
     sa.Column('doctor_id', sa.Integer(), nullable=True),
     sa.Column('appointment_date', sa.Date(), nullable=False),
     sa.Column('appointment_time', sa.Time(), nullable=False),
@@ -179,13 +178,23 @@ def upgrade():
     )
     op.create_table('messages',
     sa.Column('message_id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('sender_id', sa.Integer(), nullable=True),
-    sa.Column('recipient_id', sa.Integer(), nullable=True),
+    sa.Column('sender_id', sa.String(length=255), nullable=True),
+    sa.Column('recipient_id', sa.String(length=255), nullable=True),
     sa.Column('body', sa.String(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['recipient_id'], ['user.user_id'], ),
     sa.ForeignKeyConstraint(['sender_id'], ['user.user_id'], ),
     sa.PrimaryKeyConstraint('message_id')
+    )
+    op.create_table('notifications',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('doctor_id', sa.Integer(), nullable=False),
+    sa.Column('patient_id', sa.String(length=255), nullable=False),
+    sa.Column('message', sa.String(length=255), nullable=False),
+    sa.Column('notification_type', sa.String(length=50), nullable=False),
+    sa.Column('timestamp', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('organization',
     sa.Column('org_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -207,7 +216,7 @@ def upgrade():
     sa.UniqueConstraint('user_id')
     )
     op.create_table('patients',
-    sa.Column('patient_id', sa.Integer(), nullable=False),
+    sa.Column('patient_id', sa.String(length=255), nullable=False),
     sa.Column('dob', sa.Date(), nullable=True),
     sa.Column('insurance_number', sa.String(length=100), nullable=True),
     sa.Column('gender', sa.Enum('Male', 'Female', 'Other', name='gender_enum'), nullable=True),
@@ -394,6 +403,7 @@ def downgrade():
     op.drop_table('prescription')
     op.drop_table('patients')
     op.drop_table('organization')
+    op.drop_table('notifications')
     op.drop_table('messages')
     op.drop_table('compliance')
     op.drop_table('audit_log')

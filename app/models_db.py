@@ -101,6 +101,7 @@ class Account(db.Model):
 
     doctor = db.relationship('Doctor', backref=db.backref('accounts', lazy=True))
 
+
 class Doctor(db.Model):
     __tablename__ = 'doctors'
     doctor_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -112,13 +113,6 @@ class Doctor(db.Model):
     status = db.Column(db.String(20), default='Inactive', nullable=False)
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
-<<<<<<< HEAD
-    is_scheduled = db.Column(db.Boolean, default=False)  # New field to track scheduling
-
-    patients = db.relationship('Patient', backref='doctor', lazy=True)
-    appointments = db.relationship('Appointment', backref='doctor', lazy=True)
-=======
->>>>>>> R_Branch
 
 class Staff(db.Model):
     staff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -128,36 +122,7 @@ class Staff(db.Model):
     position = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
 
-    def get_active_appointment(self):
-        return next((appt for appt in self.appointments if appt.status == 'Scheduled'), None)
-
 class Appointment(db.Model):
-<<<<<<< HEAD
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(20), nullable=False, default='Scheduled')
-    notes = db.Column(db.String(200))
-
-    
-class Patient(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    blood_type = db.Column(db.String(3))
-    height = db.Column(db.Float)
-    weight = db.Column(db.Float)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'))
-    admission_date = db.Column(db.DateTime, default=datetime.utcnow)
-    last_visit = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(20))
-    email = db.Column(db.String(120), unique=True)
-    medical_history = db.Column(db.Text)
-    phone_number = db.Column(db.String(20))
-=======
     appointment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     client_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Ensure this matches the actual table name
@@ -169,7 +134,6 @@ class Patient(db.Model):
     
     doctor = db.relationship('Doctor', backref='appointments')
     client = db.relationship('ClientAccounts', backref='appointments')
->>>>>>> R_Branch
 
 class LabTest(db.Model):
     test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -276,6 +240,7 @@ class Message(db.Model):
     recipient_id = db.Column(db.String(255), db.ForeignKey('user.user_id'))
     body = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
 
 class Department(db.Model):
     __tablename__ = 'department'
@@ -391,11 +356,15 @@ class Settings(db.Model):
     password_expiry = db.Column(db.Integer, default=90)
 
 class Notification(db.Model):
+    __tablename__ = 'notifications' 
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)
-    patient_id = db.Column(db.Integer, nullable=False)
+    patient_id = db.Column(db.String(255), nullable=False)
     message = db.Column(db.String(255), nullable=False)
-    notification_type = db.Column(db.String(50), nullable=False)  # Add a field to specify the type of notification
+    notification_type = db.Column(db.String(50), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)  # New column to track read status
 
     doctor = db.relationship('Doctor', backref=db.backref('notifications', lazy=True))
+
+
