@@ -4,9 +4,11 @@ import random
 import re
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Reminder, User, Message, Visit
+from ..models_db import ClientAccounts, Doctor, Appointment, LabResult, LabTest, Medication, Patient, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
 from .. import sqlalchemy_db as db
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
 import google.generativeai as genai
@@ -19,6 +21,11 @@ bp = Blueprint('patient', __name__)
 # Load environment variables from .env file
 load_dotenv()
 
+UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'lab_results')
+UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'profile_pictures')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 #<-------------------------- dashboard -------------------------------->
 
@@ -111,9 +118,10 @@ def generate_available_times(doctor_id, appointment_date):
         print(f"Doctor {doctor_id} not active or not found.")
         return []
 
+    # Strip whitespace and parse times
     working_hours = doctor.time.split(' - ')
-    start_time = datetime.strptime(working_hours[0], "%I:%M %p")
-    end_time = datetime.strptime(working_hours[1], "%I:%M %p")
+    start_time = datetime.strptime(working_hours[0].strip(), "%I:%M %p")
+    end_time = datetime.strptime(working_hours[1].strip(), "%I:%M %p")
 
     available_times = []
     while start_time < end_time:
@@ -136,11 +144,16 @@ def generate_available_times(doctor_id, appointment_date):
     current_datetime = datetime.now()
 
     # Filter out booked times and past times for the current day
-    available_times = [time for time in available_times if time not in booked_times and (appointment_date != current_datetime.date().strftime("%Y-%m-%d") or datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime)]
+    available_times = [
+        time for time in available_times
+        if time not in booked_times and (
+            appointment_date != current_datetime.date().strftime("%Y-%m-%d") or 
+            datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime
+        )
+    ]
     
     print(f"Available times after filtering for Doctor {doctor_id} on {appointment_date}: {available_times}")
     return available_times
-
 
 
 def day_of_week(day_name):
@@ -177,11 +190,14 @@ def get_available_times():
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
     if request.method == 'POST':
+        # Extract form data
         doctor_id = request.form.get('doctor_id')
         appointment_date = request.form.get('appointment_date')
         appointment_time = request.form.get('appointment_time')
         reason = request.form.get('reason')
         notes = request.form.get('notes')
+
+        # Get the client ID from session
         client_id = session.get('user_id')
 
         if not client_id:
@@ -207,6 +223,7 @@ def appointments():
         else:
             enhanced_notes = notes  # Use existing notes if no reason is provided
 
+        # Create a new appointment instance
         new_appointment = Appointment(
             client_id=client_id,
             doctor_id=doctor_id,
@@ -216,25 +233,45 @@ def appointments():
             reason=reason,
             notes=enhanced_notes
         )
+
+        # Add the new appointment to the database
         db.session.add(new_appointment)
         db.session.commit()
+
+        flash('Appointment scheduled successfully!', 'success')
         return redirect(url_for('patient.appointments'))
 
-    doctors = Doctor.query.filter_by(status='Active').all()
+    # Only fetch appointments for the logged-in user
+    client_id = session.get('user_id')
+
+    if not client_id:
+        flash('You must be logged in to view your appointments.')
+        return redirect(url_for('auth.signin'))
+
+    # Filter appointments for the specific client ID
     now = datetime.now()
     upcoming_appointments = Appointment.query.filter(
+        Appointment.client_id == client_id,  # Filter for the logged-in user's appointments
         (Appointment.appointment_date > now.date()) | 
         ((Appointment.appointment_date == now.date()) & (Appointment.appointment_time >= now.time())),
         Appointment.status != 'Cancelled'
     ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
+
+    # Fetch active doctors
+    doctors = Doctor.query.filter_by(status='Active').all()
+
+    # Generate timeslots for each doctor
     doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, now.date()) for doctor in doctors}
+    
     today_date = now.strftime("%Y-%m-%d")
     
-    return render_template('clients/appointments.html', 
-                           upcoming_appointments=upcoming_appointments,
-                           doctors=doctors,
-                           doctor_timeslots=doctor_timeslots,
-                           today_date=today_date)
+    return render_template(
+        'clients/appointments.html',
+        upcoming_appointments=upcoming_appointments,
+        doctors=doctors,
+        doctor_timeslots=doctor_timeslots,
+        today_date=today_date
+    )
 
 
 @bp.route('/cancel_appointment/<int:appointment_id>', methods=['POST'])
@@ -600,28 +637,58 @@ def chatbot():
 
 
 #<-------------------------- profile -------------------------------->
-@bp.route('/profile')
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@bp.route('/profile', methods=['GET', 'POST'])
 def profile():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('auth.signin'))
     
     client_account = ClientAccounts.query.get(user_id)
-    patient_info = Patient.query.get(user_id)
     
+    # Fetch or create patient info if not exists
+    patient_info = Patient.query.get(user_id)
+    if not patient_info:
+        # Create a new Patient record if it doesn't exist
+        patient_info = Patient(patient_id=user_id)
+        db.session.add(patient_info)
+        db.session.commit()
+
     if request.method == 'POST':
         form_name = request.form.get('form_name')
         
         if form_name == 'personal_info':
+            # Update personal info
             client_account.first_name = request.form.get('first_name')
             client_account.last_name = request.form.get('last_name')
             if patient_info:
-                patient_info.dob = request.form.get('dob')
-                patient_info.gender = request.form.get('gender')
+                # Convert the date string to a date object
+                dob_str = request.form.get('dob')
+                if dob_str:
+                    patient_info.dob = datetime.strptime(dob_str, '%Y-%m-%d').date()  # Convert string to date
+                else:
+                    patient_info.dob = None
+
+                patient_info.gender = request.form.get('gender') or None
+
+            # Handle profile picture upload
+            if 'profile_picture' in request.files:
+                profile_picture = request.files['profile_picture']
+                if profile_picture and allowed_file(profile_picture.filename):
+                    filename = secure_filename(profile_picture.filename)
+                    image_path = os.path.join(UPLOAD_FOLDER, filename)
+                    profile_picture.save(image_path)
+
+                    # Update path to use forward slashes and make it relative to 'static'
+                    patient_info.image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
+
             db.session.commit()
             flash('Personal information updated successfully', 'success')
         
         elif form_name == 'contact_details':
+            # Update contact details
             client_account.email = request.form.get('email')
             client_account.phone_number = request.form.get('phone')
             client_account.address = request.form.get('address')
@@ -629,6 +696,7 @@ def profile():
             flash('Contact details updated successfully', 'success')
         
         elif form_name == 'preferences':
+            # Update preferences
             client_account.language = request.form.get('language')
             client_account.timezone = request.form.get('timezone')
             client_account.email_notifications = 'email_notifications' in request.form
@@ -638,11 +706,24 @@ def profile():
         
         elif form_name == 'security_settings':
             # Implement password change logic here
-            pass
+            current_password = request.form['current_password']
+            new_password = request.form['new_password']
+            confirm_password = request.form['confirm_password']
+
+            user = User.query.get(user_id)
+
+            if not user.check_password(current_password):
+                flash('Current password is incorrect', 'danger')
+            elif new_password != confirm_password:
+                flash('New passwords do not match', 'danger')
+            else:
+                user.set_password(new_password)
+                db.session.commit()
+                flash('Password updated successfully!', 'success')
 
     return render_template('clients/profile.html', client_account=client_account, patient_info=patient_info)
 
-
+# Update personal info
 @bp.route('/profile/update_personal_info', methods=['POST'])
 def update_personal_info():
     if 'user' not in session or session.get('user_type') != 'patient':
@@ -652,15 +733,36 @@ def update_personal_info():
     client_account = ClientAccounts.query.get(user_id)
     patient_info = Patient.query.get(user_id)
 
+    if not patient_info:
+        # Create a new Patient record if it doesn't exist
+        patient_info = Patient(patient_id=user_id)
+        db.session.add(patient_info)
+
     client_account.first_name = request.form['first_name']
     client_account.last_name = request.form['last_name']
-    patient_info.dob = request.form['dob']
-    patient_info.gender = request.form['gender']
+    
+    # Convert the date string to a date object
+    dob_str = request.form.get('dob')
+    if dob_str:
+        patient_info.dob = datetime.strptime(dob_str, '%Y-%m-%d').date()  # Convert string to date
+    else:
+        patient_info.dob = None
+
+    patient_info.gender = request.form['gender'] or None
+
+    # Handle profile picture upload
+    if 'profile_picture' in request.files:
+        profile_picture = request.files['profile_picture']
+        if profile_picture and allowed_file(profile_picture.filename):
+            filename = secure_filename(profile_picture.filename)
+            profile_picture.save(os.path.join(UPLOAD_FOLDER, filename))
+            client_account.profile_picture = os.path.join(UPLOAD_FOLDER, filename)
+
     db.session.commit()
     flash('Personal information updated successfully!', 'success')
-    return redirect(url_for('client.profile'))
+    return redirect(url_for('patient.profile'))
 
-
+# Update contact details
 @bp.route('/profile/update_contact_details', methods=['POST'])
 def update_contact_details():
     if 'user' not in session or session.get('user_type') != 'patient':
@@ -674,9 +776,9 @@ def update_contact_details():
     client_account.address = request.form['address']
     db.session.commit()
     flash('Contact details updated successfully!', 'success')
-    return redirect(url_for('client.profile'))
+    return redirect(url_for('patient.profile'))
 
-
+# Update preferences
 @bp.route('/profile/update_preferences', methods=['POST'])
 def update_preferences():
     if 'user' not in session or session.get('user_type') != 'patient':
@@ -691,9 +793,9 @@ def update_preferences():
     client_account.sms_notifications = 'sms_notifications' in request.form
     db.session.commit()
     flash('Preferences updated successfully!', 'success')
-    return redirect(url_for('client.profile'))
+    return redirect(url_for('patient.profile'))
 
-
+# Update security settings
 @bp.route('/profile/update_security_settings', methods=['POST'])
 def update_security_settings():
     if 'user' not in session or session.get('user_type') != 'patient':
@@ -715,8 +817,7 @@ def update_security_settings():
         db.session.commit()
         flash('Password updated successfully!', 'success')
 
-    return redirect(url_for('client.profile'))
-
+    return redirect(url_for('patient.profile'))
 
 #<-------------------------- pretty date -------------------------------->
 def pretty_date(time=False):
@@ -767,9 +868,18 @@ def pretty_date(time=False):
 
 @bp.route('/test_results')
 def test_results():
+    # Ensure the user is logged in and is a patient
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
-    return render_template('clients/test_results.html')
+    
+    # Get the logged-in patient's ID
+    patient_id = session.get('user_id')
+
+    # Query to fetch the lab results for the logged-in patient
+    test_results = db.session.query(LabResult, LabTest).join(LabTest, LabResult.test_id == LabTest.test_id)\
+        .filter(LabResult.patient_id == patient_id).order_by(LabResult.result_date.desc()).all()
+
+    return render_template('clients/test_results.html', test_results=test_results)
 
 #<-------------------------- medication -------------------------------->
 @bp.route('/medication', methods=['GET', 'POST'])

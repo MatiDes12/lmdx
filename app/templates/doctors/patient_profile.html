@@ -13,10 +13,10 @@
 <section class="container mx-auto p-6">
     <div class="mb-8">
         <div class="flex items-center gap-x-3">
-            <img src="https://i.pravatar.cc/150?u={{ patient.name }}" alt="{{ patient.name }}" class="w-16 h-16 rounded-full">
+            <img src="https://i.pravatar.cc/150?u={{ client_account.first_name }} {{ client_account.last_name }}" alt="{{ client_account.first_name }}" class="w-16 h-16 rounded-full">
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ patient.name }}</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Patient ID: {{ patient.id }}</p>
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ client_account.first_name }} {{ client_account.last_name }}</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Patient ID: {{ patient.patient_id }}</p>
             </div>
         </div>
     </div>
@@ -29,16 +29,36 @@
 
     <!-- Patient Details Form -->
     <div class="bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
-        <form method="POST" action="{{ url_for('doctor.patient_profile', patient_id=patient.id) }}">
+        <form method="POST" action="{{ url_for('doctor.patient_profile', client_id=patient.patient_id) }}">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                    <input type="text" id="name" name="name" value="{{ patient.name }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                    <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ client_account.first_name }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div>
-                    <label for="age" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Age</label>
-                    <input type="number" id="age" name="age" value="{{ patient.age }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                    <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ client_account.last_name }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                    <input type="email" id="email" name="email" value="{{ client_account.email }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
+                    <input type="text" id="phone_number" name="phone_number" value="{{ client_account.phone_number }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="dob" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" value="{{ patient.dob.strftime('%Y-%m-%d') }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="insurance_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Insurance Number</label>
+                    <input type="text" id="insurance_number" name="insurance_number" value="{{ patient.insurance_number }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div>
@@ -50,136 +70,20 @@
                     </select>
                 </div>
 
-                <div x-data="{ isOpen: false, selectedStatus: '{{ patient.status }}' }" class="relative">
-                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                    <input type="hidden" name="status" :value="selectedStatus">
-                    <button 
-                        @click="isOpen = !isOpen" 
-                        type="button" 
-                        class="relative z-10 block w-full py-3 px-4 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                        <span class="flex items-center">
-                            <span :class="{
-                                'bg-gray-500': selectedStatus === 'All',
-                                'bg-green-500': selectedStatus === 'Active',
-                                'bg-yellow-500': selectedStatus === 'Inactive',
-                                'bg-red-500': selectedStatus === 'Discharged',
-                                'bg-blue-500': selectedStatus === 'Admitted',
-                                'bg-purple-500': selectedStatus === 'In Treatment',
-                                'bg-orange-500': selectedStatus === 'Pending',
-                                'bg-teal-500': selectedStatus === 'Follow-Up',
-                                'bg-indigo-500': selectedStatus === 'Recovered',
-                                'bg-pink-500': selectedStatus === 'Critical',
-                                'bg-gray-500': selectedStatus === 'Transferred'
-                            }" class="inline-block w-2.5 h-2.5 mr-2 rounded-full"></span>
-                            <span x-text="selectedStatus"></span>
-                            <svg class="w-5 h-5 ml-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
-                    </button>
-                    <div 
-                        x-show="isOpen" 
-                        @click.away="isOpen = false"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90" 
-                        class="absolute right-0 z-20 w-full py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800 max-h-48 overflow-y-auto"
-                    >
-                        <a @click="selectedStatus = 'Active'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-green-500 rounded-full"></span>Active
-                        </a>
-                        <a @click="selectedStatus = 'Inactive'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-yellow-500 rounded-full"></span>Inactive
-                        </a>
-                        <a @click="selectedStatus = 'Discharged'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-red-500 rounded-full"></span>Discharged
-                        </a>
-                        <a @click="selectedStatus = 'Admitted'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-blue-500 rounded-full"></span>Admitted
-                        </a>
-                        <a @click="selectedStatus = 'In Treatment'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-purple-500 rounded-full"></span>In Treatment
-                        </a>
-                        <a @click="selectedStatus = 'Pending'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-orange-500 rounded-full"></span>Pending
-                        </a>
-                        <a @click="selectedStatus = 'Follow-Up'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-teal-500 rounded-full"></span>Follow-Up
-                        </a>
-                        <a @click="selectedStatus = 'Recovered'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-indigo-500 rounded-full"></span>Recovered
-                        </a>
-                        <a @click="selectedStatus = 'Critical'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-pink-500 rounded-full"></span>Critical
-                        </a>
-                        <a @click="selectedStatus = 'Transferred'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            <span class="inline-block w-2.5 h-2.5 mr-2 bg-gray-500 rounded-full"></span>Transferred
-                        </a>
-                    </div>
-                </div>
-
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                    <input type="email" id="email" name="email" value="{{ patient.email }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
-                <div>
-                    <label for="phone_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
-                    <input type="text" id="phone_number" name="phone_number" value="{{ patient.phone_number }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
-                <div class="flex gap-4">
-                    <div class="flex-1">
-                        <label for="admission_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Admission Date</label>
-                        <input type="date" id="admission_date" name="admission_date" value="{{ patient.admission_date.strftime('%Y-%m-%d') }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="flex-1">
-                        <label for="last_visit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Visit</label>
-                        <input type="date" id="last_visit" name="last_visit" value="{{ patient.last_visit.strftime('%Y-%m-%d') }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                </div>
-
-                <div x-data="{ isOpen: false, selectedDoctor: '{{ patient.doctor.name }}' }" class="relative mt-1">
-                    <label for="doctor_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Doctor</label>
-                    <input type="hidden" name="doctor_id" :value="selectedDoctor">
-                    <button 
-                        @click="isOpen = !isOpen" 
-                        type="button" 
-                        class="relative z-10 block w-full py-3 px-4 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                        <span class="flex items-center">
-                            <span x-text="selectedDoctor"></span>
-                            <svg class="w-5 h-5 ml-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
-                    </button>
-                    <div 
-                        x-show="isOpen" 
-                        @click.away="isOpen = false"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="opacity-0 scale-90"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="opacity-0 scale-90" 
-                        class="absolute right-0 z-20 w-full py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800 max-h-48 overflow-y-auto"
-                    >
+                    <label for="doctor_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Assigned Doctor</label>
+                    <select id="doctor_id" name="doctor_id" class="mt-1 p-3 block w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-blue-500 focus:border-blue-500">
                         {% for doctor in doctors %}
-                        <a @click="selectedDoctor = '{{ doctor.name }}'; isOpen = false" href="#" class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                            {{ doctor.name }}
-                        </a>
+                        <option value="{{ doctor.doctor_id }}" {% if patient.doctor_id == doctor.doctor_id %}selected{% endif %}>
+                            Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+                        </option>
                         {% endfor %}
-                    </div>
+                    </select>
                 </div>
             </div>
 
             <div class="flex justify-end mt-6">
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Save</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Save Changes</button>
             </div>
         </form>
     </div>

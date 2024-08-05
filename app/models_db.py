@@ -90,6 +90,9 @@ class Patient(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
     visits = db.relationship('Visit', back_populates='patient')
     follow_up_actions = db.relationship('FollowUpAction', back_populates='patient')
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
+    image_path = db.Column(db.String(255)) 
+
     doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
 
 
@@ -149,18 +152,27 @@ class Appointment(db.Model):
     client = db.relationship('ClientAccounts', backref='appointments')
 
 class LabTest(db.Model):
+    __tablename__ = 'lab_test'
     test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     test_name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
 
 class LabResult(db.Model):
+    __tablename__ = 'lab_result'
     result_id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
     test_id = db.Column(db.Integer, db.ForeignKey('lab_test.test_id'))
     result_value = db.Column(db.Text, nullable=False)
     result_date = db.Column(db.Date, nullable=False)
     notes = db.Column(db.Text)
+    image_path = db.Column(db.String(255)) 
+
+    patient = db.relationship('ClientAccounts', backref=db.backref('lab_results', lazy=True))
+    doctor = db.relationship('Doctor', backref=db.backref('lab_results', lazy=True))
+    test = db.relationship('LabTest', backref=db.backref('lab_results', lazy=True))
+
+
 
 class InsuranceProvider(db.Model):
     provider_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
