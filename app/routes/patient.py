@@ -110,9 +110,10 @@ def generate_available_times(doctor_id, appointment_date):
         print(f"Doctor {doctor_id} not active or not found.")
         return []
 
+    # Strip whitespace and parse times
     working_hours = doctor.time.split(' - ')
-    start_time = datetime.strptime(working_hours[0], "%I:%M %p")
-    end_time = datetime.strptime(working_hours[1], "%I:%M %p")
+    start_time = datetime.strptime(working_hours[0].strip(), "%I:%M %p")
+    end_time = datetime.strptime(working_hours[1].strip(), "%I:%M %p")
 
     available_times = []
     while start_time < end_time:
@@ -135,11 +136,16 @@ def generate_available_times(doctor_id, appointment_date):
     current_datetime = datetime.now()
 
     # Filter out booked times and past times for the current day
-    available_times = [time for time in available_times if time not in booked_times and (appointment_date != current_datetime.date().strftime("%Y-%m-%d") or datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime)]
+    available_times = [
+        time for time in available_times
+        if time not in booked_times and (
+            appointment_date != current_datetime.date().strftime("%Y-%m-%d") or 
+            datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime
+        )
+    ]
     
     print(f"Available times after filtering for Doctor {doctor_id} on {appointment_date}: {available_times}")
     return available_times
-
 
 
 def day_of_week(day_name):
@@ -176,11 +182,14 @@ def get_available_times():
 @bp.route('/appointments', methods=['GET', 'POST'])
 def appointments():
     if request.method == 'POST':
+        # Extract form data
         doctor_id = request.form.get('doctor_id')
         appointment_date = request.form.get('appointment_date')
         appointment_time = request.form.get('appointment_time')
         reason = request.form.get('reason')
         notes = request.form.get('notes')
+
+        # Get the client ID from session
         client_id = session.get('user_id')
 
         if not client_id:
@@ -206,6 +215,7 @@ def appointments():
         else:
             enhanced_notes = notes  # Use existing notes if no reason is provided
 
+        # Create a new appointment instance
         new_appointment = Appointment(
             client_id=client_id,
             doctor_id=doctor_id,
@@ -215,25 +225,45 @@ def appointments():
             reason=reason,
             notes=enhanced_notes
         )
+
+        # Add the new appointment to the database
         db.session.add(new_appointment)
         db.session.commit()
+
+        flash('Appointment scheduled successfully!', 'success')
         return redirect(url_for('patient.appointments'))
 
-    doctors = Doctor.query.filter_by(status='Active').all()
+    # Only fetch appointments for the logged-in user
+    client_id = session.get('user_id')
+
+    if not client_id:
+        flash('You must be logged in to view your appointments.')
+        return redirect(url_for('auth.signin'))
+
+    # Filter appointments for the specific client ID
     now = datetime.now()
     upcoming_appointments = Appointment.query.filter(
+        Appointment.client_id == client_id,  # Filter for the logged-in user's appointments
         (Appointment.appointment_date > now.date()) | 
         ((Appointment.appointment_date == now.date()) & (Appointment.appointment_time >= now.time())),
         Appointment.status != 'Cancelled'
     ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
+
+    # Fetch active doctors
+    doctors = Doctor.query.filter_by(status='Active').all()
+
+    # Generate timeslots for each doctor
     doctor_timeslots = {doctor.doctor_id: generate_available_times(doctor.doctor_id, now.date()) for doctor in doctors}
+    
     today_date = now.strftime("%Y-%m-%d")
     
-    return render_template('clients/appointments.html', 
-                           upcoming_appointments=upcoming_appointments,
-                           doctors=doctors,
-                           doctor_timeslots=doctor_timeslots,
-                           today_date=today_date)
+    return render_template(
+        'clients/appointments.html',
+        upcoming_appointments=upcoming_appointments,
+        doctors=doctors,
+        doctor_timeslots=doctor_timeslots,
+        today_date=today_date
+    )
 
 
 @bp.route('/cancel_appointment/<int:appointment_id>', methods=['POST'])

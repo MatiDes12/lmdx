@@ -30,6 +30,25 @@
         </div>
     </div>
 
+    <!-- Patient Dropdown to Add Lab Results -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Add Lab Results
+        </h2>
+        <div class="mb-4">
+            <label for="patient_dropdown" class="block text-sm font-medium text-gray-700">Select Patient with Completed Appointment</label>
+            <select id="patient_dropdown" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <option value="" disabled selected>Select a patient</option>
+                {% for patient in patients %}
+                <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
     <!-- Lab Results Filter Section -->
     <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <h2 class="text-2xl font-semibold mb-4 flex items-center">
@@ -94,10 +113,16 @@
                             Test Type
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Result Value
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Date
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Status
+                            Notes
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Image
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Actions
@@ -111,23 +136,30 @@
                             <div class="flex items-center">
                                 <div class="ml-3">
                                     <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ result.patient.name }}
+                                        {{ result.patient.first_name }} {{ result.patient.last_name }}
                                     </p>
                                     <p class="text-gray-600 whitespace-no-wrap">{{ result.patient.email }}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ result.test_type }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.test.test_name }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ result.date }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.result_value }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-                                <span class="relative">{{ result.status }}</span>
-                            </span>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.result_date.strftime('%Y-%m-%d') }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ result.notes }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            {% if result.image_path %}
+                            <a href="{{ url_for('static', filename=result.image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-900">View Image</a>
+                            {% else %}
+                            <span class="text-gray-600">No Image</span>
+                            {% endif %}
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex space-x-2">
@@ -148,7 +180,7 @@
             </span>
             <div class="inline-flex mt-2 xs:mt-0">
                 {% if pagination.has_prev %}
-                <a href="{{ url_for('doctors.lab_results', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                <a href="{{ url_for('doctor.lab_results', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
                     Prev
                 </a>
                 {% else %}
@@ -160,7 +192,7 @@
                 {% for page_num in pagination.iter_pages() %}
                     {% if page_num %}
                         {% if page_num != pagination.page %}
-                            <a href="{{ url_for('doctors.lab_results', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                            <a href="{{ url_for('doctor.lab_results', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
                                 {{ page_num }}
                             </a>
                         {% else %}
@@ -174,7 +206,7 @@
                 {% endfor %}
                 
                 {% if pagination.has_next %}
-                <a href="{{ url_for('doctors.lab_results', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                <a href="{{ url_for('doctor.lab_results', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
                     Next
                 </a>
                 {% else %}
@@ -195,4 +227,140 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Lab Results Input Form Modal -->
+<div id="labResultModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Add Lab Result</h3>
+        </div>
+        <form id="labResultForm" action="{{ url_for('doctor.lab_results') }}" method="POST" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="patient_id">Select Patient</label>
+                    <select name="patient_id" id="patient" required>
+                        {% for patient in patients %}
+                        <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="test_type">Select Test Type</label>
+                    <select name="test_id" id="test_type" required>
+                        {% for test in tests %}
+                        <option value="{{ test.test_id }}" data-description="{{ test.description }}">{{ test.test_name }}</option>
+                        {% endfor %}
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" id="otherTestContainer">
+                    <label for="other_test_name">Other Test Name</label>
+                    <input type="text" name="other_test_name" id="other_test_name" placeholder="If other test name">
+                </div>                
+                <div class="form-group hidden" id="otherTestDescriptionContainer">
+                    <label for="other_test_description">Description</label>
+                    <textarea name="other_test_description" id="other_test_description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="result_value">Result</label>
+                    <textarea name="result_value" id="result_value" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="result_date">Result Date</label>
+                    <input type="date" name="result_date" id="result_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes (Optional)</label>
+                    <textarea name="notes" id="notes" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="upload_file">Upload File (Optional)</label>
+                    <input type="file" name="upload_file" id="upload_file">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitLabResultForm()">Submit</button>
+                <button type="button" class="btn btn-secondary" onclick="closeLabResultModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+function toggleOtherTestInput() {
+var testType = document.getElementById('test_type');
+var otherTestNameInput = document.getElementById('other_test_name');
+
+// Check if the selected option is 'Other'
+if (testType.value === 'other') {
+    otherTestNameInput.disabled = false; // Enable the input
+    otherTestNameInput.focus(); // Optionally, focus the input
+} else {
+    otherTestNameInput.disabled = true; // Disable the input
+    otherTestNameInput.value = ''; // Optionally, clear the input
+}
+} 
+document.addEventListener("DOMContentLoaded", function() {
+    const testTypeSelect = document.getElementById('test_type');
+    const otherTestContainer = document.getElementById('otherTestContainer');
+    const otherTestDescriptionContainer = document.getElementById('otherTestDescriptionContainer');
+
+    // Show/Hide fields for 'Other' test type
+    testTypeSelect.addEventListener('change', function() {
+        if (testTypeSelect.value === 'other') {
+            otherTestContainer.classList.remove('hidden');
+            otherTestDescriptionContainer.classList.remove('hidden');
+        } else {
+            otherTestContainer.classList.add('hidden');
+            otherTestDescriptionContainer.classList.add('hidden');
+        }
+    });
+
+    // Show the modal when a patient is selected
+    const patientDropdown = document.getElementById('patient_dropdown');
+    const labResultModal = document.getElementById('labResultModal');
+    const patientField = document.getElementById('patient');
+
+    patientDropdown.addEventListener('change', function() {
+        const selectedPatientId = patientDropdown.value;
+        if (selectedPatientId) {
+            // Set the selected patient in the modal's form
+            patientField.value = selectedPatientId;
+            // Show the modal
+            labResultModal.classList.remove('hidden');
+        }
+    });
+
+    // Remove the patient from the dropdown after form submission
+    const labResultForm = document.getElementById('labResultForm');
+    labResultForm.addEventListener('submit', function(e) {
+        e.preventDefault();  // Prevent default form submission for now
+
+        // Remove selected patient from dropdown
+        const selectedPatientId = patientField.value;
+        const optionToRemove = patientDropdown.querySelector(`option[value="${selectedPatientId}"]`);
+        if (optionToRemove) {
+            optionToRemove.remove();
+        }
+
+        // Now submit the form
+        labResultForm.submit();
+    });
+});
+
+function submitLabResultForm() {
+    document.getElementById('labResultForm').submit();
+}
+
+function closeLabResultModal() {
+    document.getElementById('labResultModal').classList.add('hidden');
+}
+</script>
+
+
 {% endblock %}
+
+

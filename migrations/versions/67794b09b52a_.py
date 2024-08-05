@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 39c4ecdc4861
+Revision ID: 67794b09b52a
 Revises: 
-Create Date: 2024-08-01 15:18:32.015646
+Create Date: 2024-08-04 02:18:33.811154
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '39c4ecdc4861'
+revision = '67794b09b52a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -182,6 +182,7 @@ def upgrade():
     sa.Column('recipient_id', sa.String(length=255), nullable=True),
     sa.Column('body', sa.String(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['recipient_id'], ['user.user_id'], ),
     sa.ForeignKeyConstraint(['sender_id'], ['user.user_id'], ),
     sa.PrimaryKeyConstraint('message_id')
@@ -193,6 +194,7 @@ def upgrade():
     sa.Column('message', sa.String(length=255), nullable=False),
     sa.Column('notification_type', sa.String(length=50), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -322,6 +324,8 @@ def upgrade():
     sa.Column('result_value', sa.Text(), nullable=False),
     sa.Column('result_date', sa.Date(), nullable=False),
     sa.Column('notes', sa.Text(), nullable=True),
+    sa.Column('report_type', sa.String(length=50), nullable=True),
+    sa.Column('image_path', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ),
     sa.ForeignKeyConstraint(['test_id'], ['lab_test.test_id'], ),
