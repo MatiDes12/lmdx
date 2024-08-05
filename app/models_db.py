@@ -205,6 +205,7 @@ class Inventory(db.Model):
 
 class Medication(db.Model):
     medication_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    client_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
     dosage = db.Column(db.String(100))

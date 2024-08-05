@@ -431,6 +431,68 @@ def fetch_user_data(user_id):
             }
     return None
 
+def fetch_user_appointment(user_id):
+    appointments = Appointment.query.filter_by(client_id=user_id).all()
+    if appointments:
+        return [
+            {
+                'doctor': f"Dr. {appt.doctor.first_name} {appt.doctor.last_name}",
+                'date': appt.appointment_date.strftime('%Y-%m-%d'),
+                'time': appt.appointment_time.strftime('%I:%M %p'),
+                'reason': appt.reason if appt.reason else 'No reason provided',
+                'notes': appt.notes if appt.notes else 'No additional notes'
+
+            }
+            for appt in appointments
+        ]
+    return None
+
+def fetch_user_medication(user_id):
+    medications = Medication.query.filter_by(client_id=user_id).all()
+    if medications:
+        return [
+            {
+                'medication_name': med.medication_name,
+                'dosage': med.dosage,
+                'frequency': med.frequency,
+                'start_date': med.start_date.strftime('%Y-%m-%d'),
+                'end_date': med.end_date.strftime('%Y-%m-%d'),
+                'notes': med.notes if med.notes else 'No additional notes'
+            }
+            for med in medications
+        ]
+    return None
+
+def fetch_user_lab_results(user_id):
+    lab_results = LabResult.query.filter_by(patient_id=user_id).all()
+    if lab_results:
+        return [
+            {
+                'test_name': result.lab_test.test_name,
+                'result_value': result.result_value,
+                'unit': result.unit,
+                'reference_range': result.reference_range,
+                'date': result.result_date.strftime('%Y-%m-%d'),
+                'notes': result.notes if result.notes else 'No additional notes'
+            }
+            for result in lab_results
+        ]
+    return None
+
+def fetch_user_doctors(user_id):
+    Doctors = Doctor.query.filter_by(doctor_id=user_id).all()
+    if Doctors:
+        return [
+            {
+                'doctor_name': doctor.doctor_name,
+                'specialization': doctor.specialization,
+                'schedule': doctor.schedule,
+                'time': doctor.time
+            }
+            for doctor in Doctors
+        ]
+    
+    return None
 
 @bp.route('/chatbot', methods=['GET', 'POST'])
 def chatbot():
@@ -441,6 +503,48 @@ def chatbot():
     client_account = ClientAccounts.query.get(user_id)
     if not client_account:
         return jsonify({'success': False, 'error': 'Client account not found'}), 404
+    
+    appointment_details = fetch_user_appointment(user_id)
+    if appointment_details:
+        appointment_info = [
+            f"Appointment with {appt['doctor']} on {appt['date']} at {appt['time']} for {appt['reason']}"
+            for appt in appointment_details
+        ]
+        print(appointment_info)
+    else:
+        appointment_info = "No upcoming appointments found."
+
+    
+
+    medication_details = fetch_user_medication(user_id)
+    if medication_details:
+        medication_info = [
+            f"{med['medication_name']} - Dosage: {med['dosage']}, Frequency: {med['frequency']}, Notes: {med['notes']}"
+            for med in medication_details
+        ]
+        print(medication_info)
+    else:
+        medication_info = "No active medications found."
+
+    lab_results = fetch_user_lab_results(user_id)
+    if lab_results:
+        lab_results_info = [
+            f"{result['test_name']} - Result: {result['result_value']} {result['unit']} (Reference Range: {result['reference_range']}), Date: {result['date']}, Notes: {result['notes']}"
+            for result in lab_results
+        ]
+        print(lab_results_info)
+    else:
+        lab_results_info = "No lab results found."
+
+    doctors = fetch_user_doctors(user_id)
+    if doctors:
+        doctor_info = [
+            f"{doctor['doctor_name']} - Specialization: {doctor['specialization']}, Schedule: {doctor['schedule']}"
+            for doctor in doctors
+        ]
+        print(doctor_info)
+    else:
+        doctor_info = "No doctor appointments found."
 
     # List of greeting messages
     greetings = [
@@ -504,7 +608,7 @@ def chatbot():
         if message:
             user_context = (
                 f"User information: Name: {client_account.first_name} {client_account.last_name}, "
-                f"Email: {client_account.email}, Phone: {client_account.phone_number}, Address: {client_account.address}"
+                f"Email: {client_account.email}, Phone: {client_account.phone_number}"
             )
             advanced_instruction = (
                 "Your task is to assist patients with general health information and management. "
@@ -599,7 +703,7 @@ def chatbot():
                 "By following these formatting guidelines, you will be able to create visually appealing and easy-to-read responses that enhance the user experience."
                 )
 
-            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\nAI:"
+            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info}"
 
             try:
                 genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])

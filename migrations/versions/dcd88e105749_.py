@@ -1,14 +1,8 @@
 """empty message
 
-<<<<<<<< HEAD:migrations/versions/779d42953b66_.py
-Revision ID: 779d42953b66
+Revision ID: dcd88e105749
 Revises: 
-Create Date: 2024-08-05 01:04:08.194658
-========
-Revision ID: 67794b09b52a
-Revises: 
-Create Date: 2024-08-04 02:18:33.811154
->>>>>>>> 10eca5349da7caac455e671ea9bc7984d591f2e5:migrations/versions/67794b09b52a_.py
+Create Date: 2024-08-05 02:35:12.952756
 
 """
 from alembic import op
@@ -16,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:migrations/versions/779d42953b66_.py
-revision = '779d42953b66'
-========
-revision = '67794b09b52a'
->>>>>>>> 10eca5349da7caac455e671ea9bc7984d591f2e5:migrations/versions/67794b09b52a_.py
+revision = 'dcd88e105749'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -95,14 +85,6 @@ def upgrade():
     sa.Column('test_name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('test_id')
-    )
-    op.create_table('medication',
-    sa.Column('medication_id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('dosage', sa.String(length=100), nullable=True),
-    sa.Column('manufacturer', sa.String(length=255), nullable=True),
-    sa.PrimaryKeyConstraint('medication_id')
     )
     op.create_table('permission',
     sa.Column('permission_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -186,6 +168,30 @@ def upgrade():
     sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('lab_result',
+    sa.Column('result_id', sa.Integer(), nullable=False),
+    sa.Column('patient_id', sa.String(length=255), nullable=True),
+    sa.Column('doctor_id', sa.Integer(), nullable=True),
+    sa.Column('test_id', sa.Integer(), nullable=True),
+    sa.Column('result_value', sa.Text(), nullable=False),
+    sa.Column('result_date', sa.Date(), nullable=False),
+    sa.Column('notes', sa.Text(), nullable=True),
+    sa.Column('image_path', sa.String(length=255), nullable=True),
+    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
+    sa.ForeignKeyConstraint(['patient_id'], ['client_accounts.client_id'], ),
+    sa.ForeignKeyConstraint(['test_id'], ['lab_test.test_id'], ),
+    sa.PrimaryKeyConstraint('result_id')
+    )
+    op.create_table('medication',
+    sa.Column('medication_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('client_id', sa.String(length=255), nullable=True),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('dosage', sa.String(length=100), nullable=True),
+    sa.Column('manufacturer', sa.String(length=255), nullable=True),
+    sa.ForeignKeyConstraint(['client_id'], ['client_accounts.client_id'], ),
+    sa.PrimaryKeyConstraint('medication_id')
+    )
     op.create_table('messages',
     sa.Column('message_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('sender_id', sa.String(length=255), nullable=True),
@@ -233,21 +239,10 @@ def upgrade():
     sa.Column('insurance_number', sa.String(length=100), nullable=True),
     sa.Column('gender', sa.Enum('Male', 'Female', 'Other', name='gender_enum'), nullable=True),
     sa.Column('doctor_id', sa.Integer(), nullable=True),
+    sa.Column('image_path', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['client_accounts.client_id'], ),
     sa.PrimaryKeyConstraint('patient_id')
-    )
-    op.create_table('prescription',
-    sa.Column('prescription_id', sa.Integer(), nullable=False),
-    sa.Column('doctor_id', sa.Integer(), nullable=True),
-    sa.Column('medication_id', sa.Integer(), nullable=True),
-    sa.Column('dosage', sa.String(length=100), nullable=False),
-    sa.Column('frequency', sa.String(length=100), nullable=False),
-    sa.Column('start_date', sa.Date(), nullable=False),
-    sa.Column('end_date', sa.Date(), nullable=True),
-    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
-    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
-    sa.PrimaryKeyConstraint('prescription_id')
     )
     op.create_table('projects',
     sa.Column('project_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -259,13 +254,6 @@ def upgrade():
     sa.Column('department_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['department_id'], ['department.department_id'], ),
     sa.PrimaryKeyConstraint('project_id')
-    )
-    op.create_table('reminder',
-    sa.Column('reminder_id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('medication_id', sa.Integer(), nullable=True),
-    sa.Column('time', sa.Time(), nullable=False),
-    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
-    sa.PrimaryKeyConstraint('reminder_id')
     )
     op.create_table('role_permission',
     sa.Column('role_id', sa.Integer(), nullable=False),
@@ -335,21 +323,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ),
     sa.PrimaryKeyConstraint('action_id')
     )
-    op.create_table('lab_result',
-    sa.Column('result_id', sa.Integer(), nullable=False),
-    sa.Column('patient_id', sa.Integer(), nullable=True),
-    sa.Column('doctor_id', sa.Integer(), nullable=True),
-    sa.Column('test_id', sa.Integer(), nullable=True),
-    sa.Column('result_value', sa.Text(), nullable=False),
-    sa.Column('result_date', sa.Date(), nullable=False),
-    sa.Column('notes', sa.Text(), nullable=True),
-    sa.Column('report_type', sa.String(length=50), nullable=True),
-    sa.Column('image_path', sa.String(length=255), nullable=True),
-    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
-    sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ),
-    sa.ForeignKeyConstraint(['test_id'], ['lab_test.test_id'], ),
-    sa.PrimaryKeyConstraint('result_id')
-    )
     op.create_table('organization_doctor',
     sa.Column('org_doctor_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('org_id', sa.Integer(), nullable=True),
@@ -394,6 +367,25 @@ def upgrade():
     sa.ForeignKeyConstraint(['room_id'], ['room.room_id'], ),
     sa.PrimaryKeyConstraint('patient_room_id')
     )
+    op.create_table('prescription',
+    sa.Column('prescription_id', sa.Integer(), nullable=False),
+    sa.Column('doctor_id', sa.Integer(), nullable=True),
+    sa.Column('medication_id', sa.Integer(), nullable=True),
+    sa.Column('dosage', sa.String(length=100), nullable=False),
+    sa.Column('frequency', sa.String(length=100), nullable=False),
+    sa.Column('start_date', sa.Date(), nullable=False),
+    sa.Column('end_date', sa.Date(), nullable=True),
+    sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ),
+    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
+    sa.PrimaryKeyConstraint('prescription_id')
+    )
+    op.create_table('reminder',
+    sa.Column('reminder_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('medication_id', sa.Integer(), nullable=True),
+    sa.Column('time', sa.Time(), nullable=False),
+    sa.ForeignKeyConstraint(['medication_id'], ['medication.medication_id'], ),
+    sa.PrimaryKeyConstraint('reminder_id')
+    )
     op.create_table('visits',
     sa.Column('visit_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('patient_id', sa.String(length=255), nullable=True),
@@ -410,25 +402,26 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('visits')
+    op.drop_table('reminder')
+    op.drop_table('prescription')
     op.drop_table('patient_room')
     op.drop_table('patient_insurance')
     op.drop_table('organization_staff')
     op.drop_table('organization_patient')
     op.drop_table('organization_doctor')
-    op.drop_table('lab_result')
     op.drop_table('follow_up_actions')
     op.drop_table('billing')
     op.drop_table('user_role')
     op.drop_table('staff')
     op.drop_table('settings')
     op.drop_table('role_permission')
-    op.drop_table('reminder')
     op.drop_table('projects')
-    op.drop_table('prescription')
     op.drop_table('patients')
     op.drop_table('organization')
     op.drop_table('notifications')
     op.drop_table('messages')
+    op.drop_table('medication')
+    op.drop_table('lab_result')
     op.drop_table('compliance')
     op.drop_table('audit_log')
     op.drop_table('appointment')
@@ -438,7 +431,6 @@ def downgrade():
     op.drop_table('role')
     op.drop_table('revenue')
     op.drop_table('permission')
-    op.drop_table('medication')
     op.drop_table('lab_test')
     op.drop_table('inventory')
     op.drop_table('insurance_provider')
