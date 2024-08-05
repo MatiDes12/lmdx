@@ -24,7 +24,7 @@ bp = Blueprint('patient', __name__)
 load_dotenv()
 
 UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'lab_results')
-UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'profile_pictures')
+UPLOAD_FOLDER_PROF = os.path.join('app', 'static', 'uploads', 'profile_pictures')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Get the current time
@@ -35,6 +35,7 @@ formatted_time = current_time.strftime("%I:%M %p")
 
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER_PROF, exist_ok=True)
 
 #<-------------------------- dashboard -------------------------------->
 
@@ -653,7 +654,7 @@ def profile():
                 profile_picture = request.files['profile_picture']
                 if profile_picture and allowed_file(profile_picture.filename):
                     filename = secure_filename(profile_picture.filename)
-                    image_path = os.path.join(UPLOAD_FOLDER, filename)
+                    image_path = os.path.join(UPLOAD_FOLDER_PROF, filename)
                     profile_picture.save(image_path)
 
                     # Update path to use forward slashes and make it relative to 'static'
@@ -730,12 +731,16 @@ def update_personal_info():
         profile_picture = request.files['profile_picture']
         if profile_picture and allowed_file(profile_picture.filename):
             filename = secure_filename(profile_picture.filename)
-            profile_picture.save(os.path.join(UPLOAD_FOLDER, filename))
-            client_account.profile_picture = os.path.join(UPLOAD_FOLDER, filename)
+            image_path = os.path.join(UPLOAD_FOLDER_PROF, filename)
+            profile_picture.save(image_path)
+
+            # Update path to use forward slashes and make it relative to 'static'
+            patient_info.image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
 
     db.session.commit()
     flash('Personal information updated successfully!', 'success')
     return redirect(url_for('patient.profile'))
+
 
 # Update contact details
 @bp.route('/profile/update_contact_details', methods=['POST'])
