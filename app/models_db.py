@@ -77,6 +77,7 @@ class Patient(db.Model):
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
+    image_path = db.Column(db.String(255)) 
 
     doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
 

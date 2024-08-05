@@ -16,8 +16,11 @@ from werkzeug.utils import secure_filename
 
 
 # Define a folder where uploaded images will be stored
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'lab_results')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # Configure your Google Gemini API key
 GOOGLE_API_KEY1 = ''
@@ -668,10 +671,6 @@ def patient_profile(client_id):
 
 #<----------------------Reports----------------------->
 
-# Ensure the upload folder exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -688,6 +687,7 @@ def reports():
         return redirect(url_for('auth.signin'))
 
     doctor_id = account.doctor_id
+    completed_appointments = Appointment.query.filter_by(doctor_id=doctor_id, status='Completed').all()
 
     # Fetch existing reports with patient and test details
     reports = db.session.query(LabResult, ClientAccounts, LabTest).join(ClientAccounts, LabResult.patient_id == ClientAccounts.client_id).join(LabTest, LabResult.test_id == LabTest.test_id).filter(LabResult.doctor_id == doctor_id).all()
@@ -700,7 +700,7 @@ def reports():
         notes = request.form.get('notes')
         report_type = request.form.get('report_type')
 
-        # Handle image upload if report type is Imaging
+        # Handle image upload
         image_path = None
         if report_type == 'imaging' and 'image' in request.files:
             image_file = request.files['image']
@@ -708,6 +708,10 @@ def reports():
                 filename = secure_filename(image_file.filename)
                 image_path = os.path.join(UPLOAD_FOLDER, filename)
                 image_file.save(image_path)
+                
+                # Update path to use forward slashes and make it relative to 'static'
+                image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
+                print(f"Image saved to: {image_path}")  # Debugging log
 
         # Add new report to the database
         new_report = LabResult(
@@ -724,8 +728,7 @@ def reports():
         flash('Medical report added successfully!', 'success')
         return redirect(url_for('doctor.reports'))
 
-    return render_template('doctors/reports.html', reports=reports)
-
+    return render_template('doctors/reports.html', completed_appointments=completed_appointments, reports=reports)
 
 
 #<----------------------Lab Results----------------------->
@@ -767,10 +770,14 @@ def lab_results():
             image_path = None
             if upload_file and allowed_file(upload_file.filename):
                 filename = secure_filename(upload_file.filename)
-                upload_folder = os.path.join('static', 'uploads', 'lab_results')
+                upload_folder = os.path.join('app', 'static', 'uploads', 'lab_results')
                 os.makedirs(upload_folder, exist_ok=True)
                 image_path = os.path.join(upload_folder, filename)
                 upload_file.save(image_path)
+
+                # Ensure correct path formatting
+                image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
+                print(f"Image saved to: {image_path}")  # Debugging log
 
             # Determine the test description and ID
             if test_id == 'other' and other_test_name:
