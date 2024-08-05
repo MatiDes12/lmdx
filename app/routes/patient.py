@@ -3,7 +3,7 @@ import os
 import random
 import re
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
-from ..models_db import ClientAccounts, Doctor, Appointment, Medication, Patient, Reminder, User, Message
+from ..models_db import ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Reminder, User, Message, Visit
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
 from .. import sqlalchemy_db as db
@@ -817,30 +817,63 @@ def visits():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
-    # Fetch visit history, latest visit details, and follow-up actions from the database
-    visits = [
-        {"date": datetime(2024, 7, 15), "doctor_name": "Dr. John Smith", "summary": "Routine check-up, recommended vitamin D supplementation.", "next_steps": "Follow-up in 3 months."},
-        {"date": datetime(2024, 10, 20), "doctor_name": "Dr. Jane Doe", "summary": "Follow-up visit, improved health markers.", "next_steps": "Annual check-up scheduled for next year."},
-        {"date": datetime(2025, 1, 10), "doctor_name": "Dr. John Smith", "summary": "Discussing long-term treatment options for chronic conditions.", "next_steps": "Review new medications in 6 months."}
-    ]
+    user_id = session.get('user_id')
+
+    # Fetch visit history
+    visits = Visit.query.all()
+
+    print(visits)
+
+    # Fetch the latest visit
+    latest_visit = visits[0] if visits else None
+
+    # Extract additional details if latest visit is available
+    latest_visit_details = None
+    if latest_visit:
+        latest_visit_details = {
+            "symptoms": ["Fatigue", "Joint pain", "Occasional headaches"],  # Replace with actual data if available
+            "medications": [
+                {"name": "Vitamin D", "action": "New prescription", "action_color": "green"},
+                {"name": "Ibuprofen", "action": "Dosage increased", "action_color": "yellow"},
+                {"name": "Allergy medication", "action": "Discontinued", "action_color": "red"}
+            ],
+            "notes": "Patient shows improvement in overall health markers. Recommended lifestyle changes appear to be effective. Continue monitoring and adjust treatment plan as needed."
+        }
+
+    # Fetch follow-up actions
+    follow_up_actions = FollowUpAction.query.all()
+
+    return render_template('clients/visits.html', visits=visits, latest_visit=latest_visit_details, follow_up_actions=follow_up_actions)
+
+# @bp.route('/visits')
+# def visits():
+#     if 'user' not in session or session.get('user_type') != 'patient':
+#         return redirect(url_for('auth.signin'))
     
-    latest_visit = {
-        "symptoms": ["Fatigue", "Joint pain", "Occasional headaches"],
-        "medications": [
-            {"name": "Vitamin D", "action": "New prescription", "action_color": "green"},
-            {"name": "Ibuprofen", "action": "Dosage increased", "action_color": "yellow"},
-            {"name": "Allergy medication", "action": "Discontinued", "action_color": "red"}
-        ],
-        "notes": "Patient shows improvement in overall health markers. Recommended lifestyle changes appear to be effective. Continue monitoring and adjust treatment plan as needed."
-    }
+#     # Fetch visit history, latest visit details, and follow-up actions from the database
+#     visits = [
+#         {"date": datetime(2024, 7, 15), "doctor_name": "Dr. John Smith", "summary": "Routine check-up, recommended vitamin D supplementation.", "next_steps": "Follow-up in 3 months."},
+#         {"date": datetime(2024, 10, 20), "doctor_name": "Dr. Jane Doe", "summary": "Follow-up visit, improved health markers.", "next_steps": "Annual check-up scheduled for next year."},
+#         {"date": datetime(2025, 1, 10), "doctor_name": "Dr. John Smith", "summary": "Discussing long-term treatment options for chronic conditions.", "next_steps": "Review new medications in 6 months."}
+#     ]
     
-    follow_up_actions = [
-        {"title": "Blood Test", "description": "Schedule a follow-up blood test in 2 weeks", "action_text": "Schedule Now"},
-        {"title": "Specialist Referral", "description": "Book an appointment with a rheumatologist", "action_text": "Find Specialist"},
-        {"title": "Medication Review", "description": "Review effectiveness of new prescriptions in 1 month", "action_text": "Set Reminder"}
-    ]
+#     latest_visit = {
+#         "symptoms": ["Fatigue", "Joint pain", "Occasional headaches"],
+#         "medications": [
+#             {"name": "Vitamin D", "action": "New prescription", "action_color": "green"},
+#             {"name": "Ibuprofen", "action": "Dosage increased", "action_color": "yellow"},
+#             {"name": "Allergy medication", "action": "Discontinued", "action_color": "red"}
+#         ],
+#         "notes": "Patient shows improvement in overall health markers. Recommended lifestyle changes appear to be effective. Continue monitoring and adjust treatment plan as needed."
+#     }
     
-    return render_template('clients/visits.html', visits=visits, latest_visit=latest_visit, follow_up_actions=follow_up_actions)
+#     follow_up_actions = [
+#         {"title": "Blood Test", "description": "Schedule a follow-up blood test in 2 weeks", "action_text": "Schedule Now"},
+#         {"title": "Specialist Referral", "description": "Book an appointment with a rheumatologist", "action_text": "Find Specialist"},
+#         {"title": "Medication Review", "description": "Review effectiveness of new prescriptions in 1 month", "action_text": "Set Reminder"}
+#     ]
+    
+#     return render_template('clients/visits.html', visits=visits, latest_visit=latest_visit_details, follow_up_actions=follow_up_actions)
 
 # @bp.route('/view_details/<int:visit_id>')
 # def view_details(visit_id):

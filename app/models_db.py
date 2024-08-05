@@ -47,13 +47,24 @@ class AuditLog(db.Model):
     action = db.Column(db.String(255), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class FollowUpAction(db.Model):
+    __tablename__ = 'follow_up_actions'
+    action_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    action_text = db.Column(db.String(255))
+    patient = db.relationship('Patient', back_populates='follow_up_actions')
+
 class Visit(db.Model):
+    __tablename__ = 'visits'
     visit_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.patient_id'))
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
     doctor_name = db.Column(db.String(255), nullable=False)
     date = db.Column(db.Date, nullable=False)
     summary = db.Column(db.Text)
     next_steps = db.Column(db.Text)
+    patient = db.relationship('Patient', back_populates='visits')
 
 class ClientAccounts(db.Model):
     __tablename__ = 'client_accounts'
@@ -72,13 +83,15 @@ class ClientAccounts(db.Model):
 
 class Patient(db.Model):
     __tablename__ = 'patients'
-    patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'), primary_key=True) 
-    dob = db.Column(db.Date, nullable=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'), primary_key=True)
+    dob = db.Column(db.Date)
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
-
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    visits = db.relationship('Visit', back_populates='patient')
+    follow_up_actions = db.relationship('FollowUpAction', back_populates='patient')
     doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
+
 
 
 
