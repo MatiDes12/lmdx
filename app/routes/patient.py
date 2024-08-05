@@ -1,8 +1,9 @@
-
 from mailbox import Message
 import os
+import random
+import re
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
-from ..models_db import Doctor, Appointment, Medication, Reminder, User, Message
+from ..models_db import ClientAccounts, Doctor, Appointment, Medication, Patient, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
 from .. import sqlalchemy_db as db
@@ -407,38 +408,344 @@ def get_messages():
 
     return jsonify({'success': True, 'conversation': conversation}), 200
 
-#<-------------------------- profile -------------------------------->
+#<-------------------------- AI Chatbot -------------------------------->
+# Fetch user data function
+def fetch_user_data(user_id):
+    user_data = User.query.get(user_id)
+    if user_data:
+        client_account = ClientAccounts.query.filter_by(client_id=user_data.user_id).first()
+        if client_account:
+            return {
+                'first_name': client_account.first_name,
+                'last_name': client_account.last_name,
+                'email': client_account.email,
+                'phone_number': client_account.phone_number,
+                'address': client_account.address
+            }
+    return None
 
+
+@bp.route('/chatbot', methods=['GET', 'POST'])
+def chatbot():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'User not logged in'}), 401
+
+    client_account = ClientAccounts.query.get(user_id)
+    if not client_account:
+        return jsonify({'success': False, 'error': 'Client account not found'}), 404
+
+    # List of greeting messages
+    greetings = [
+        "Hi <strong>{first_name}</strong>! 😊 I'm Lumix, your dedicated Health Assistant at LuminaMedix. How can I help you today?",
+        "Welcome <strong>{first_name}</strong>! 👋 This is Lumix from LuminaMedix. What can I assist you with today?",
+        "Good day, <strong>{first_name}</strong>! 🌞 I'm Lumix, your AI Health Companion. How may I support your health needs today?",
+        "Hello <strong>{first_name}</strong>! 🌟 Lumix here, your personal health guide from LuminaMedix. What assistance do you need?",
+        "Greetings <strong>{first_name}</strong>! 🙌 I am Lumix, your AI Health Assistant at LuminaMedix. How may I be of service today?",
+        "Hi there, <strong>{first_name}</strong>! 🤗 I'm Lumix from LuminaMedix. What health queries do you have today?",
+        "Hello <strong>{first_name}</strong>! 💪 Lumix at your service from LuminaMedix. How can I make your day healthier?",
+        "Welcome back, <strong>{first_name}</strong>! 🔄 Lumix here to help you with your healthcare needs. What's on your mind today?",
+        "Hi <strong>{first_name}</strong>! 📞 It's Lumix, your trusted Health Assistant from LuminaMedix. What can I help you with today?",
+        "Good to see you, <strong>{first_name}</strong>! 😃 I'm Lumix, ready to assist you with your health concerns. How may I help?",
+        "Hello <strong>{first_name}</strong>! 🔍 Lumix here, your Health Assistant at LuminaMedix. Need assistance with anything specific today?",
+        "Hey <strong>{first_name}</strong>! 👀 I'm Lumix from LuminaMedix. Let me know how I can assist you with your health today.",
+        "Hi <strong>{first_name}</strong>, Lumix speaking. 🎤 Welcome to LuminaMedix. What can I do for you today?",
+        "Hello <strong>{first_name}</strong>! 🏥 I'm Lumix, your AI companion from LuminaMedix. How can I assist you in achieving better health today?",
+        "Greetings <strong>{first_name}</strong>! 🌿 Lumix at LuminaMedix here. How can I support your wellness journey today?",
+        "Hi <strong>{first_name}</strong>! 🌼 Lumix from LuminaMedix here. What can I do to help you feel your best today?",
+        "Hello <strong>{first_name}</strong>! 🌸 I'm Lumix, your friendly Health Assistant. How can I assist you with your health today?",
+        "Good morning, <strong>{first_name}</strong>! ☀️ Lumix here to help you start your day on a healthy note. What can I assist you with?",
+        "Hi <strong>{first_name}</strong>! 🌺 This is Lumix from LuminaMedix. How can I help you achieve your health goals today?",
+        "Welcome <strong>{first_name}</strong>! 🌼 Lumix here, your personal health assistant. How can I support your health journey today?",
+        "Hello <strong>{first_name}</strong>! 🌞 I'm Lumix, your AI Health Assistant. What health concerns can I help you with today?",
+        "Hi <strong>{first_name}</strong>! 🌟 Lumix from LuminaMedix here. How can I make your day healthier and happier?",
+        "Good afternoon, <strong>{first_name}</strong>! 🌅 Lumix here to assist you with any health questions. How can I help?",
+        "Hi <strong>{first_name}</strong>! 🌻 I'm Lumix, your dedicated health companion. What can I do for you today?",
+        "Hello <strong>{first_name}</strong>! 🌷 Lumix here from LuminaMedix. How can I support your health and wellness today?",
+        "Greetings <strong>{first_name}</strong>! 🌟 I'm Lumix, your AI Health Assistant. How may I assist you in achieving better health today?",
+        "Hi <strong>{first_name}</strong>! 🌼 Lumix here to help you with your health needs. What can I do for you today?",
+        "Good evening, <strong>{first_name}</strong>! 🌙 Lumix from LuminaMedix here. How can I assist you with your health tonight?",
+        "Hello <strong>{first_name}</strong>! 🌺 I'm Lumix, your friendly health guide. How can I support your health journey today?",
+        "Hi <strong>{first_name}</strong>! 🌸 Lumix here to assist you with any health concerns. What can I help you with today?",
+        "Welcome <strong>{first_name}</strong>! 🌿 Lumix from LuminaMedix at your service. How can I support your health today?",
+        "Good to see you, <strong>{first_name}</strong>! 🌞 I'm Lumix, your dedicated health assistant. How can I help you today?",
+        "Hello <strong>{first_name}</strong>! 🌟 Lumix here to assist you with your health needs. What can I do for you today?",
+        "Hi <strong>{first_name}</strong>! 🌼 This is Lumix from LuminaMedix. How can I support your health and wellness today?",
+        "Greetings <strong>{first_name}</strong>! 🌸 Lumix here to help you with any health questions. How can I assist you today?",
+        "Welcome back, <strong>{first_name}</strong>! 🌿 Lumix here to support your health journey. What can I help you with today?",
+        "Hi <strong>{first_name}</strong>! 🌞 I'm Lumix, your AI Health Assistant. How can I assist you with your health today?",
+        "Hello <strong>{first_name}</strong>! 🌟 Lumix from LuminaMedix here. How can I support your health and wellness today?",
+        "Good day, <strong>{first_name}</strong>! 🌻 Lumix here to help you with your health needs. What can I do for you today?",
+        "Hi <strong>{first_name}</strong>! 🌺 This is Lumix from LuminaMedix. How can I assist you with your health today?",
+        "Hello <strong>{first_name}</strong>! 🌷 Lumix here to support your health journey. What can I help you with today?",
+        "Greetings <strong>{first_name}</strong>! 🌟 I'm Lumix, your AI Health Assistant. How can I assist you in achieving better health today?"
+    ]
+
+
+    # Select a random greeting message
+    greeting_message = random.choice(greetings).format(first_name=client_account.first_name)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        message = data.get('message')
+        message = data.get('message')
+        language = data.get('language', 'en')
+        topic = data.get('topic')
+        if topic:
+            message = f"Tell me about {topic}"
+
+        if message:
+            user_context = (
+                f"User information: Name: {client_account.first_name} {client_account.last_name}, "
+                f"Email: {client_account.email}, Phone: {client_account.phone_number}, Address: {client_account.address}"
+            )
+            advanced_instruction = (
+                "Your task is to assist patients with general health information and management. "
+                "You should provide detailed information about symptoms, potential causes, and possible treatments for common ailments. "
+                "Additionally, offer advice on preventive measures, lifestyle changes, and when to seek professional medical advice. "
+                "Ensure to use patient-friendly language and make the information as concise as possible. "
+                "Highlight any important terms or actions in **bold** for better readability. "
+                "Maintain a supportive and empathetic tone throughout your responses. "
+                "Here are some specific guidelines to follow: "
+
+                "1. **Symptom Lists**: When listing symptoms, provide a clear and concise list of symptoms associated with the condition. "
+                "   Example: <ul><li>Headache</li><li>Fever</li><li>Cough</li></ul> "
+
+                "2. **Treatment Options**: Discuss potential treatment options in a prioritized manner, indicating the most common or effective treatments first. "
+                "   Example: <ol><li>Rest and hydration</li><li>Over-the-counter medications</li><li>Consult a doctor if symptoms persist</li></ol> "
+
+                "3. **Preventive Measures**: Offer actionable preventive measures to help patients avoid common health issues. "
+                "   Example: <ul><li>Wash hands regularly</li><li>Maintain a balanced diet</li><li>Exercise regularly</li></ul> "
+
+                "4. **Professional Advice**: Always recommend seeking professional medical advice if symptoms persist or worsen. "
+                "   Example: <p>If symptoms persist for more than a week, please consult a healthcare professional.</p> "
+
+                "5. **Lab Results Interpretation**: Provide clear explanations of lab results, including what the results mean and the normal ranges. "
+                "   Example: <table><tr><th>Test</th><th>Result</th><th>Normal Range</th></tr><tr><td>Sodium</td><td>139 mEq/L</td><td>135-145 mEq/L</td></tr></table> "
+
+                "6. **Appointment Management**: Give clear instructions for managing appointments, including how to reschedule, edit, and cancel appointments. "
+                "   Example: <p>To reschedule your appointment, click the 'Reschedule' button next to the appointment details.</p> "
+
+                "7. **Doctor Information**: Present information about doctors, including their specialization, status, and schedule. "
+                "   Example: <table><tr><th>Doctor</th><th>Specialization</th><th>Status</th><th>Schedule</th></tr><tr><td>Dr. John Doe</td><td>Cardiology</td><td>Active</td><td>Mon-Fri, 9am-5pm</td></tr></table> "
+
+                "8. **Health Tips**: Provide general health tips and lifestyle advice to promote overall well-being. "
+                "   Example: <ul><li>Stay hydrated</li><li>Get at least 7-8 hours of sleep</li><li>Avoid smoking and excessive alcohol consumption</li></ul> "
+
+                "9. **Emergency Situations**: Clearly outline steps to take in emergency situations, emphasizing the importance of seeking immediate medical attention. "
+                "   Example: <p>If you experience severe chest pain, difficulty breathing, or sudden loss of consciousness, call emergency services immediately.</p> "
+
+                "10. **Medication Information**: Provide detailed information about common medications, including usage, dosage, and potential side effects. "
+                "    Example: <p>Paracetamol: Used to relieve pain and reduce fever. Dosage: 500mg every 4-6 hours as needed. Do not exceed 4g per day.</p> "
+
+                "11. **Health Monitoring**: Encourage patients to monitor their health metrics regularly and provide guidance on how to do so. "
+                "    Example: <p>Keep track of your blood pressure, blood sugar levels, and weight regularly to manage your health effectively.</p> "
+
+                "12. **Mental Health Support**: Offer support and resources for mental health, emphasizing the importance of seeking help when needed. "
+                "    Example: <p>If you are feeling overwhelmed or anxious, consider speaking to a mental health professional. There are also many online resources and support groups available.</p> "
+
+                "13. **Query Limitations**: You are only permitted to answer health-related questions or queries about personal information such as names and appointments. "
+                "    If a user asks about unrelated subjects, inform them that you cannot provide information on that topic. "
+                "    Example: <p>I'm sorry, but I can only assist with health-related questions and information about your appointments. Please contact the appropriate service for other inquiries.</p> "
+            )
+
+            formatting_instruction = (
+                "Use HTML tags to format the response appropriately and enhance readability. "
+                "Here are some specific guidelines to follow: "
+
+                "1. **Bold Text**: Use the <strong> tag to make important terms or actions bold. "
+                "   Example: <strong>important term</strong> "
+
+                "2. **Line Breaks**: Use the <br> tag to create line breaks where necessary. "
+                "   Example: <p>Line one.<br>Line two.</p> "
+
+                "3. **Unordered Lists**: Use the <ul> and <li> tags to create unordered lists for symptoms, preventive measures, and health tips. "
+                "   Example: <ul><li>Symptom 1</li><li>Symptom 2</li></ul> "
+
+                "4. **Ordered Lists**: Use the <ol> and <li> tags to create ordered lists for treatment options or steps to follow. "
+                "   Example: <ol><li>Step 1</li><li>Step 2</li></ol> "
+
+                "5. **Paragraphs**: Use the <p> tag to create paragraphs for general information and advice. "
+                "   Example: <p>This is a paragraph.</p> "
+
+                "6. **Tables**: Use the <table>, <tr>, <th>, and <td> tags to present tabular data clearly. "
+                "   Example: <table><tr><th>Test</th><th>Result</th><th>Normal Range</th></tr><tr><td>Sodium</td><td>139 mEq/L</td><td>135-145 mEq/L</td></tr></table> "
+
+                "7. **Color Coding**: Use inline CSS to apply color coding to differentiate between different types of information. "
+                "   Example: <p style='color: green;'>Positive action.</p> <p style='color: red;'>Warning or important note.</p> "
+
+                "8. **Visual Aids**: Include visual aids such as images or icons to enhance understanding. "
+                "   Example: <p><img src='hydration.png' alt='Stay Hydrated' width='100' height='100'> Stay hydrated by drinking at least 8 glasses of water a day.</p> "
+
+                "9. **Interactive Elements**: Suggest interactive elements like quizzes or self-assessment tools to engage users. "
+                "   Example: <p>Take our <a href='self-assessment.html'>self-assessment quiz</a> to understand your symptoms better.</p> "
+
+                "10. **Consistent Font Size**: Ensure all text is of consistent font size, except for titles and headings. "
+                "    Example: Use <h1>, <h2>, etc., for headings and <p> for regular text. "
+
+                "11. **Titles and Headings**: Use <h1>, <h2>, <h3>, etc., to create a hierarchy of titles and headings. "
+                "    Example: <h1>Main Title</h1> <h2>Subheading</h2> "
+
+                "12. **Spacing and Alignment**: Ensure adequate spacing between elements for a clean and organized layout. "
+                "    Example: Use margin and padding CSS properties to adjust spacing. "
+
+                "By following these formatting guidelines, you will be able to create visually appealing and easy-to-read responses that enhance the user experience."
+                )
+
+            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\nAI:"
+
+            try:
+                genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content(prompt)
+                bot_reply = response.text.strip()
+
+                # Add logic to check for specific queries like appointments
+                if 'appointment' in message.lower():
+                    appointments = Appointment.query.filter_by(client_id=client_account.client_id).all()
+                    if appointments:
+                        appointment_details = [
+                            f"Appointment with Dr. {appt.doctor.first_name} {appt.doctor.last_name} on {appt.appointment_date.strftime('%Y-%m-%d')} at {appt.appointment_time.strftime('%I:%M %p')}"
+                            for appt in appointments
+                        ]
+                        appointment_reply = "You have the following appointments:\n" + "\n".join(appointment_details)
+                    else:
+                        appointment_reply = "You do not have any scheduled appointments."
+                    bot_reply = f"<strong>Appointment Information:</strong>\n{appointment_reply}"
+
+                # Format the AI's response
+                bot_reply = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', bot_reply)
+                bot_reply = re.sub(r'(\d+)\.\s', r'<br>\1. ', bot_reply)  # New line for each numbered point
+                bot_reply = re.sub(r'•\s', r'<br>• ', bot_reply)  # New line for each bullet point
+                bot_reply = re.sub(r'(\b[A-Z][a-z]*:)', r'<br><strong>\1</strong>', bot_reply)  # Bold headings
+                bot_reply = re.sub(r'\* (.*?)\n', r'<br>• \1<br>', bot_reply)  # New line for each single star list item
+
+                return jsonify({'success': True, 'bot_reply': bot_reply}), 200
+            except Exception as e:
+                return jsonify({'success': False, 'error': str(e)}), 500
+
+        return jsonify({'success': False, 'error': 'Missing message'}), 400
+
+    return render_template('clients/chatbot.html', first_name=client_account.first_name, greeting_message=greeting_message)
+
+
+#<-------------------------- profile -------------------------------->
 @bp.route('/profile')
 def profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('auth.signin'))
+    
+    client_account = ClientAccounts.query.get(user_id)
+    patient_info = Patient.query.get(user_id)
+    
+    if request.method == 'POST':
+        form_name = request.form.get('form_name')
+        
+        if form_name == 'personal_info':
+            client_account.first_name = request.form.get('first_name')
+            client_account.last_name = request.form.get('last_name')
+            if patient_info:
+                patient_info.dob = request.form.get('dob')
+                patient_info.gender = request.form.get('gender')
+            db.session.commit()
+            flash('Personal information updated successfully', 'success')
+        
+        elif form_name == 'contact_details':
+            client_account.email = request.form.get('email')
+            client_account.phone_number = request.form.get('phone')
+            client_account.address = request.form.get('address')
+            db.session.commit()
+            flash('Contact details updated successfully', 'success')
+        
+        elif form_name == 'preferences':
+            client_account.language = request.form.get('language')
+            client_account.timezone = request.form.get('timezone')
+            client_account.email_notifications = 'email_notifications' in request.form
+            client_account.sms_notifications = 'sms_notifications' in request.form
+            db.session.commit()
+            flash('Preferences updated successfully', 'success')
+        
+        elif form_name == 'security_settings':
+            # Implement password change logic here
+            pass
+
+    return render_template('clients/profile.html', client_account=client_account, patient_info=patient_info)
+
+
+@bp.route('/profile/update_personal_info', methods=['POST'])
+def update_personal_info():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
     
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    return render_template('clients/profile.html', user=user)
+    client_account = ClientAccounts.query.get(user_id)
+    patient_info = Patient.query.get(user_id)
 
-
-@bp.route('/update_profile', methods=['POST'])
-def update_profile():
-    if 'user' not in session or session.get('user_type') != 'patient':
-        return redirect(url_for('auth.signin'))
-    
-    user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    
-    user.first_name = request.form.get('first_name')
-    user.last_name = request.form.get('last_name')
-    user.email = request.form.get('email')
-    user.phone = request.form.get('phone')
-    user.address = request.form.get('address')
-    user.city = request.form.get('city')
-    user.state = request.form.get('state')
-    user.zipcode = request.form.get('zipcode')
-    
+    client_account.first_name = request.form['first_name']
+    client_account.last_name = request.form['last_name']
+    patient_info.dob = request.form['dob']
+    patient_info.gender = request.form['gender']
     db.session.commit()
-    return redirect(url_for('patient.profile'))
+    flash('Personal information updated successfully!', 'success')
+    return redirect(url_for('client.profile'))
 
+
+@bp.route('/profile/update_contact_details', methods=['POST'])
+def update_contact_details():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+    
+    user_id = session.get('user_id')
+    client_account = ClientAccounts.query.get(user_id)
+
+    client_account.email = request.form['email']
+    client_account.phone_number = request.form['phone']
+    client_account.address = request.form['address']
+    db.session.commit()
+    flash('Contact details updated successfully!', 'success')
+    return redirect(url_for('client.profile'))
+
+
+@bp.route('/profile/update_preferences', methods=['POST'])
+def update_preferences():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+    
+    user_id = session.get('user_id')
+    client_account = ClientAccounts.query.get(user_id)
+
+    client_account.language = request.form['language']
+    client_account.timezone = request.form['timezone']
+    client_account.email_notifications = 'email_notifications' in request.form
+    client_account.sms_notifications = 'sms_notifications' in request.form
+    db.session.commit()
+    flash('Preferences updated successfully!', 'success')
+    return redirect(url_for('client.profile'))
+
+
+@bp.route('/profile/update_security_settings', methods=['POST'])
+def update_security_settings():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+    
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
+
+    if not user.check_password(current_password):
+        flash('Current password is incorrect', 'danger')
+    elif new_password != confirm_password:
+        flash('New passwords do not match', 'danger')
+    else:
+        user.set_password(new_password)
+        db.session.commit()
+        flash('Password updated successfully!', 'success')
+
+    return redirect(url_for('client.profile'))
 
 
 #<-------------------------- pretty date -------------------------------->

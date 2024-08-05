@@ -73,7 +73,7 @@ class ClientAccounts(db.Model):
 class Patient(db.Model):
     __tablename__ = 'patients'
     patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'), primary_key=True) 
-    dob = db.Column(db.Date)
+    dob = db.Column(db.Date, nullable=True)
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
