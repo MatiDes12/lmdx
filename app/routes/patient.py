@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
 import google.generativeai as genai
 from dotenv import load_dotenv
+from .instructions import advanced_instruction, formatting_instruction, greetings
+import datetime
 
 from sqlalchemy import and_, or_
 
@@ -24,6 +26,13 @@ load_dotenv()
 UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'lab_results')
 UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'profile_pictures')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Get the current time
+current_time = datetime.datetime.now()
+
+# Format the time to include hour, minute, and AM/PM
+formatted_time = current_time.strftime("%I:%M %p")
+
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -61,7 +70,7 @@ def patient_dashboard():
             
                     
             # Fetch today's and tomorrow's appointments
-            today_date = datetime.now().date()
+            today_date = datetime.datetime.now().date()
             tomorrow_date = today_date + timedelta(days=1)
 
             today_appointments = Appointment.query.filter_by(client_id=user_id, appointment_date=today_date, status='Scheduled').all()
@@ -95,7 +104,7 @@ def patient_dashboard():
 
 
 def get_time_ago(timestamp):
-    now = datetime.utcnow()
+    now = datetime.datetime.utcnow()
     diff = now - timestamp
     seconds = diff.total_seconds()
 
@@ -120,8 +129,8 @@ def generate_available_times(doctor_id, appointment_date):
 
     # Strip whitespace and parse times
     working_hours = doctor.time.split(' - ')
-    start_time = datetime.strptime(working_hours[0].strip(), "%I:%M %p")
-    end_time = datetime.strptime(working_hours[1].strip(), "%I:%M %p")
+    start_time = datetime.datetime.strptime(working_hours[0].strip(), "%I:%M %p")
+    end_time = datetime.datetime.strptime(working_hours[1].strip(), "%I:%M %p")
 
     available_times = []
     while start_time < end_time:
@@ -141,14 +150,14 @@ def generate_available_times(doctor_id, appointment_date):
     print(f"Booked times for Doctor {doctor_id} on {appointment_date}: {booked_times}")
 
     # Get current date and time
-    current_datetime = datetime.now()
+    current_datetime = datetime.datetime.now()
 
     # Filter out booked times and past times for the current day
     available_times = [
         time for time in available_times
         if time not in booked_times and (
             appointment_date != current_datetime.date().strftime("%Y-%m-%d") or 
-            datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime
+            datetime.datetime.strptime(f"{appointment_date} {time}", "%Y-%m-%d %I:%M %p") > current_datetime
         )
     ]
     
@@ -165,7 +174,7 @@ def get_available_times():
     doctor_id = request.args.get('doctor_id')
     date_str = request.args.get('date')
     if doctor_id and date_str:
-        date = datetime.strptime(date_str, "%Y-%m-%d")
+        date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
         day_index = date.weekday()  # Monday is 0 and Sunday is 6
 
         doctor = Doctor.query.get(doctor_id)
@@ -227,8 +236,8 @@ def appointments():
         new_appointment = Appointment(
             client_id=client_id,
             doctor_id=doctor_id,
-            appointment_date=datetime.strptime(appointment_date, "%Y-%m-%d").date(),
-            appointment_time=datetime.strptime(appointment_time, "%I:%M %p").time(),
+            appointment_date=datetime.datetime.strptime(appointment_date, "%Y-%m-%d").date(),
+            appointment_time=datetime.datetime.strptime(appointment_time, "%I:%M %p").time(),
             status='Scheduled',
             reason=reason,
             notes=enhanced_notes
@@ -249,7 +258,7 @@ def appointments():
         return redirect(url_for('auth.signin'))
 
     # Filter appointments for the specific client ID
-    now = datetime.now()
+    now = datetime.datetime.now()
     upcoming_appointments = Appointment.query.filter(
         Appointment.client_id == client_id,  # Filter for the logged-in user's appointments
         (Appointment.appointment_date > now.date()) | 
@@ -345,7 +354,7 @@ def send_message():
         sender_id = session.get('user_id')
         doctor_id = data.get('doctor_id')
         body = data.get('message')
-        timestamp = datetime.utcnow()
+        timestamp = datetime.datetime.utcnow()
 
         account = Account.query.filter_by(doctor_id=doctor_id).first()
         if not account:
@@ -480,19 +489,17 @@ def fetch_user_lab_results(user_id):
     return None
 
 def fetch_user_doctors(user_id):
-    Doctors = Doctor.query.filter_by(doctor_id=user_id).all()
-    if Doctors:
+    doctors = Doctor.query.filter_by(status='Active').all()
+    if doctors:
         return [
             {
-                'doctor_name': doctor.doctor_name,
+                'doctor_name': f"Dr. {doctor.first_name} {doctor.last_name}",
                 'specialization': doctor.specialization,
                 'schedule': doctor.schedule,
                 'time': doctor.time
             }
-            for doctor in Doctors
+            for doctor in doctors
         ]
-    
-    return None
 
 @bp.route('/chatbot', methods=['GET', 'POST'])
 def chatbot():
@@ -546,51 +553,6 @@ def chatbot():
     else:
         doctor_info = "No doctor appointments found."
 
-    # List of greeting messages
-    greetings = [
-        "Hi <strong>{first_name}</strong>! 😊 I'm Lumix, your dedicated Health Assistant at LuminaMedix. How can I help you today?",
-        "Welcome <strong>{first_name}</strong>! 👋 This is Lumix from LuminaMedix. What can I assist you with today?",
-        "Good day, <strong>{first_name}</strong>! 🌞 I'm Lumix, your AI Health Companion. How may I support your health needs today?",
-        "Hello <strong>{first_name}</strong>! 🌟 Lumix here, your personal health guide from LuminaMedix. What assistance do you need?",
-        "Greetings <strong>{first_name}</strong>! 🙌 I am Lumix, your AI Health Assistant at LuminaMedix. How may I be of service today?",
-        "Hi there, <strong>{first_name}</strong>! 🤗 I'm Lumix from LuminaMedix. What health queries do you have today?",
-        "Hello <strong>{first_name}</strong>! 💪 Lumix at your service from LuminaMedix. How can I make your day healthier?",
-        "Welcome back, <strong>{first_name}</strong>! 🔄 Lumix here to help you with your healthcare needs. What's on your mind today?",
-        "Hi <strong>{first_name}</strong>! 📞 It's Lumix, your trusted Health Assistant from LuminaMedix. What can I help you with today?",
-        "Good to see you, <strong>{first_name}</strong>! 😃 I'm Lumix, ready to assist you with your health concerns. How may I help?",
-        "Hello <strong>{first_name}</strong>! 🔍 Lumix here, your Health Assistant at LuminaMedix. Need assistance with anything specific today?",
-        "Hey <strong>{first_name}</strong>! 👀 I'm Lumix from LuminaMedix. Let me know how I can assist you with your health today.",
-        "Hi <strong>{first_name}</strong>, Lumix speaking. 🎤 Welcome to LuminaMedix. What can I do for you today?",
-        "Hello <strong>{first_name}</strong>! 🏥 I'm Lumix, your AI companion from LuminaMedix. How can I assist you in achieving better health today?",
-        "Greetings <strong>{first_name}</strong>! 🌿 Lumix at LuminaMedix here. How can I support your wellness journey today?",
-        "Hi <strong>{first_name}</strong>! 🌼 Lumix from LuminaMedix here. What can I do to help you feel your best today?",
-        "Hello <strong>{first_name}</strong>! 🌸 I'm Lumix, your friendly Health Assistant. How can I assist you with your health today?",
-        "Good morning, <strong>{first_name}</strong>! ☀️ Lumix here to help you start your day on a healthy note. What can I assist you with?",
-        "Hi <strong>{first_name}</strong>! 🌺 This is Lumix from LuminaMedix. How can I help you achieve your health goals today?",
-        "Welcome <strong>{first_name}</strong>! 🌼 Lumix here, your personal health assistant. How can I support your health journey today?",
-        "Hello <strong>{first_name}</strong>! 🌞 I'm Lumix, your AI Health Assistant. What health concerns can I help you with today?",
-        "Hi <strong>{first_name}</strong>! 🌟 Lumix from LuminaMedix here. How can I make your day healthier and happier?",
-        "Good afternoon, <strong>{first_name}</strong>! 🌅 Lumix here to assist you with any health questions. How can I help?",
-        "Hi <strong>{first_name}</strong>! 🌻 I'm Lumix, your dedicated health companion. What can I do for you today?",
-        "Hello <strong>{first_name}</strong>! 🌷 Lumix here from LuminaMedix. How can I support your health and wellness today?",
-        "Greetings <strong>{first_name}</strong>! 🌟 I'm Lumix, your AI Health Assistant. How may I assist you in achieving better health today?",
-        "Hi <strong>{first_name}</strong>! 🌼 Lumix here to help you with your health needs. What can I do for you today?",
-        "Good evening, <strong>{first_name}</strong>! 🌙 Lumix from LuminaMedix here. How can I assist you with your health tonight?",
-        "Hello <strong>{first_name}</strong>! 🌺 I'm Lumix, your friendly health guide. How can I support your health journey today?",
-        "Hi <strong>{first_name}</strong>! 🌸 Lumix here to assist you with any health concerns. What can I help you with today?",
-        "Welcome <strong>{first_name}</strong>! 🌿 Lumix from LuminaMedix at your service. How can I support your health today?",
-        "Good to see you, <strong>{first_name}</strong>! 🌞 I'm Lumix, your dedicated health assistant. How can I help you today?",
-        "Hello <strong>{first_name}</strong>! 🌟 Lumix here to assist you with your health needs. What can I do for you today?",
-        "Hi <strong>{first_name}</strong>! 🌼 This is Lumix from LuminaMedix. How can I support your health and wellness today?",
-        "Greetings <strong>{first_name}</strong>! 🌸 Lumix here to help you with any health questions. How can I assist you today?",
-        "Welcome back, <strong>{first_name}</strong>! 🌿 Lumix here to support your health journey. What can I help you with today?",
-        "Hi <strong>{first_name}</strong>! 🌞 I'm Lumix, your AI Health Assistant. How can I assist you with your health today?",
-        "Hello <strong>{first_name}</strong>! 🌟 Lumix from LuminaMedix here. How can I support your health and wellness today?",
-        "Good day, <strong>{first_name}</strong>! 🌻 Lumix here to help you with your health needs. What can I do for you today?",
-        "Hi <strong>{first_name}</strong>! 🌺 This is Lumix from LuminaMedix. How can I assist you with your health today?",
-        "Hello <strong>{first_name}</strong>! 🌷 Lumix here to support your health journey. What can I help you with today?",
-        "Greetings <strong>{first_name}</strong>! 🌟 I'm Lumix, your AI Health Assistant. How can I assist you in achieving better health today?"
-    ]
 
 
     # Select a random greeting message
@@ -610,100 +572,9 @@ def chatbot():
                 f"User information: Name: {client_account.first_name} {client_account.last_name}, "
                 f"Email: {client_account.email}, Phone: {client_account.phone_number}"
             )
-            advanced_instruction = (
-                "Your task is to assist patients with general health information and management. "
-                "You should provide detailed information about symptoms, potential causes, and possible treatments for common ailments. "
-                "Additionally, offer advice on preventive measures, lifestyle changes, and when to seek professional medical advice. "
-                "Ensure to use patient-friendly language and make the information as concise as possible. "
-                "Highlight any important terms or actions in **bold** for better readability. "
-                "Maintain a supportive and empathetic tone throughout your responses. "
-                "Here are some specific guidelines to follow: "
 
-                "1. **Symptom Lists**: When listing symptoms, provide a clear and concise list of symptoms associated with the condition. "
-                "   Example: <ul><li>Headache</li><li>Fever</li><li>Cough</li></ul> "
 
-                "2. **Treatment Options**: Discuss potential treatment options in a prioritized manner, indicating the most common or effective treatments first. "
-                "   Example: <ol><li>Rest and hydration</li><li>Over-the-counter medications</li><li>Consult a doctor if symptoms persist</li></ol> "
-
-                "3. **Preventive Measures**: Offer actionable preventive measures to help patients avoid common health issues. "
-                "   Example: <ul><li>Wash hands regularly</li><li>Maintain a balanced diet</li><li>Exercise regularly</li></ul> "
-
-                "4. **Professional Advice**: Always recommend seeking professional medical advice if symptoms persist or worsen. "
-                "   Example: <p>If symptoms persist for more than a week, please consult a healthcare professional.</p> "
-
-                "5. **Lab Results Interpretation**: Provide clear explanations of lab results, including what the results mean and the normal ranges. "
-                "   Example: <table><tr><th>Test</th><th>Result</th><th>Normal Range</th></tr><tr><td>Sodium</td><td>139 mEq/L</td><td>135-145 mEq/L</td></tr></table> "
-
-                "6. **Appointment Management**: Give clear instructions for managing appointments, including how to reschedule, edit, and cancel appointments. "
-                "   Example: <p>To reschedule your appointment, click the 'Reschedule' button next to the appointment details.</p> "
-
-                "7. **Doctor Information**: Present information about doctors, including their specialization, status, and schedule. "
-                "   Example: <table><tr><th>Doctor</th><th>Specialization</th><th>Status</th><th>Schedule</th></tr><tr><td>Dr. John Doe</td><td>Cardiology</td><td>Active</td><td>Mon-Fri, 9am-5pm</td></tr></table> "
-
-                "8. **Health Tips**: Provide general health tips and lifestyle advice to promote overall well-being. "
-                "   Example: <ul><li>Stay hydrated</li><li>Get at least 7-8 hours of sleep</li><li>Avoid smoking and excessive alcohol consumption</li></ul> "
-
-                "9. **Emergency Situations**: Clearly outline steps to take in emergency situations, emphasizing the importance of seeking immediate medical attention. "
-                "   Example: <p>If you experience severe chest pain, difficulty breathing, or sudden loss of consciousness, call emergency services immediately.</p> "
-
-                "10. **Medication Information**: Provide detailed information about common medications, including usage, dosage, and potential side effects. "
-                "    Example: <p>Paracetamol: Used to relieve pain and reduce fever. Dosage: 500mg every 4-6 hours as needed. Do not exceed 4g per day.</p> "
-
-                "11. **Health Monitoring**: Encourage patients to monitor their health metrics regularly and provide guidance on how to do so. "
-                "    Example: <p>Keep track of your blood pressure, blood sugar levels, and weight regularly to manage your health effectively.</p> "
-
-                "12. **Mental Health Support**: Offer support and resources for mental health, emphasizing the importance of seeking help when needed. "
-                "    Example: <p>If you are feeling overwhelmed or anxious, consider speaking to a mental health professional. There are also many online resources and support groups available.</p> "
-
-                "13. **Query Limitations**: You are only permitted to answer health-related questions or queries about personal information such as names and appointments. "
-                "    If a user asks about unrelated subjects, inform them that you cannot provide information on that topic. "
-                "    Example: <p>I'm sorry, but I can only assist with health-related questions and information about your appointments. Please contact the appropriate service for other inquiries.</p> "
-            )
-
-            formatting_instruction = (
-                "Use HTML tags to format the response appropriately and enhance readability. "
-                "Here are some specific guidelines to follow: "
-
-                "1. **Bold Text**: Use the <strong> tag to make important terms or actions bold. "
-                "   Example: <strong>important term</strong> "
-
-                "2. **Line Breaks**: Use the <br> tag to create line breaks where necessary. "
-                "   Example: <p>Line one.<br>Line two.</p> "
-
-                "3. **Unordered Lists**: Use the <ul> and <li> tags to create unordered lists for symptoms, preventive measures, and health tips. "
-                "   Example: <ul><li>Symptom 1</li><li>Symptom 2</li></ul> "
-
-                "4. **Ordered Lists**: Use the <ol> and <li> tags to create ordered lists for treatment options or steps to follow. "
-                "   Example: <ol><li>Step 1</li><li>Step 2</li></ol> "
-
-                "5. **Paragraphs**: Use the <p> tag to create paragraphs for general information and advice. "
-                "   Example: <p>This is a paragraph.</p> "
-
-                "6. **Tables**: Use the <table>, <tr>, <th>, and <td> tags to present tabular data clearly. "
-                "   Example: <table><tr><th>Test</th><th>Result</th><th>Normal Range</th></tr><tr><td>Sodium</td><td>139 mEq/L</td><td>135-145 mEq/L</td></tr></table> "
-
-                "7. **Color Coding**: Use inline CSS to apply color coding to differentiate between different types of information. "
-                "   Example: <p style='color: green;'>Positive action.</p> <p style='color: red;'>Warning or important note.</p> "
-
-                "8. **Visual Aids**: Include visual aids such as images or icons to enhance understanding. "
-                "   Example: <p><img src='hydration.png' alt='Stay Hydrated' width='100' height='100'> Stay hydrated by drinking at least 8 glasses of water a day.</p> "
-
-                "9. **Interactive Elements**: Suggest interactive elements like quizzes or self-assessment tools to engage users. "
-                "   Example: <p>Take our <a href='self-assessment.html'>self-assessment quiz</a> to understand your symptoms better.</p> "
-
-                "10. **Consistent Font Size**: Ensure all text is of consistent font size, except for titles and headings. "
-                "    Example: Use <h1>, <h2>, etc., for headings and <p> for regular text. "
-
-                "11. **Titles and Headings**: Use <h1>, <h2>, <h3>, etc., to create a hierarchy of titles and headings. "
-                "    Example: <h1>Main Title</h1> <h2>Subheading</h2> "
-
-                "12. **Spacing and Alignment**: Ensure adequate spacing between elements for a clean and organized layout. "
-                "    Example: Use margin and padding CSS properties to adjust spacing. "
-
-                "By following these formatting guidelines, you will be able to create visually appealing and easy-to-read responses that enhance the user experience."
-                )
-
-            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info}"
+            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info} \n Current time: {formatted_time}"
 
             try:
                 genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
@@ -771,7 +642,7 @@ def profile():
                 # Convert the date string to a date object
                 dob_str = request.form.get('dob')
                 if dob_str:
-                    patient_info.dob = datetime.strptime(dob_str, '%Y-%m-%d').date()  # Convert string to date
+                    patient_info.dob = datetime.datetime.strptime(dob_str, '%Y-%m-%d').date()  # Convert string to date
                 else:
                     patient_info.dob = None
 
@@ -848,7 +719,7 @@ def update_personal_info():
     # Convert the date string to a date object
     dob_str = request.form.get('dob')
     if dob_str:
-        patient_info.dob = datetime.strptime(dob_str, '%Y-%m-%d').date()  # Convert string to date
+        patient_info.dob = datetime.datetime.strptime(dob_str, '%Y-%m-%d').date()  # Convert string to date
     else:
         patient_info.dob = None
 
@@ -930,9 +801,9 @@ def pretty_date(time=False):
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
     'just now', etc.
     """
-    now = datetime.now()
+    now = datetime.datetime.now()
     if type(time) is int:
-        diff = now - datetime.fromtimestamp(time)
+        diff = now - datetime.datetime.fromtimestamp(time)
     elif isinstance(time, datetime):
         diff = now - time
     elif not time:
@@ -995,13 +866,13 @@ def medication():
         medication_id = request.form.get('medication_id')
         reminder_time = request.form.get('reminder_time')
         
-        new_reminder = Reminder(medication_id=medication_id, time=datetime.strptime(reminder_time, "%H:%M").time())
+        new_reminder = Reminder(medication_id=medication_id, time=datetime.datetime.strptime(reminder_time, "%H:%M").time())
         db.session.add(new_reminder)
         db.session.commit()
         return redirect(url_for('patient.medication'))
     
     medications = Medication.query.all()
-    today_reminders = Reminder.query.filter(Reminder.time >= datetime.now().time()).all()
+    today_reminders = Reminder.query.filter(Reminder.time >= datetime.datetime.now().time()).all()
     return render_template('clients/medication.html', medications=medications, today_reminders=today_reminders)
 
 @bp.route('/set_reminder', methods=['POST'])
@@ -1009,7 +880,7 @@ def set_reminder():
     medication_id = request.form.get('medication_id')
     reminder_time = request.form.get('reminder_time')
     
-    new_reminder = Reminder(medication_id=medication_id, time=datetime.strptime(reminder_time, "%H:%M").time())
+    new_reminder = Reminder(medication_id=medication_id, time=datetime.datetime.strptime(reminder_time, "%H:%M").time())
     db.session.add(new_reminder)
     db.session.commit()
     
