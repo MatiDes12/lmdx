@@ -1,0 +1,290 @@
+{% extends 'clients/base.html' %}
+{% block navbar %}
+    {% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
+<style>
+    #chat-messages {
+        height: 500px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+    .message {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    .message.user {
+        justify-content: flex-end;
+    }
+    .message .content {
+        max-width: 75%;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .message .user .content {
+        background-color: #e0ffe0;  /* Light green for user */
+        order: 1;  /* To position the content to the left of the image */
+    }
+    .message .ai .content {
+        background-color: #e0f7ff;  /* Light blue for AI */
+    }
+    .message .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin: 0 10px;
+    }
+    .message .user .avatar {
+        order: 2;  /* To position the avatar to the right of the content */
+    }
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 2s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<div class="px-6 py-4 bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 rounded-lg mb-6 text-white">
+        <h1 class="text-3xl font-bold text-white">AI Health Assistant</h1>
+        <p class="text-white text-sm mt-2">Ask health-related questions and get information from our AI assistant.</p>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Chat Header -->
+        <div class="flex justify-between items-center border-b-2 border-gray-200 px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100">
+            <button id="clear-chat" class="bg-red-600 text-white hover:bg-red-800 font-bold py-2 px-4 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed" class="w-5 h-5 text-gray-500 mr-2">
+                    <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                </svg>
+                Clear Chat
+            </button>
+            <div class="relative flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#6b7280" class="w-5 h-5 text-gray-500 mr-2">
+                    <path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-155.5t86-127Q252-817 325-848.5T480-880q83 0 155.5 31.5t127 86q54.5 54.5 86 127T880-480q0 82-31.5 155t-86 127.5q-54.5 54.5-127 86T480-80Zm0-82q26-36 45-75t31-83H404q12 44 31 83t45 75Zm-104-16q-18-33-31.5-68.5T322-320H204q29 50 72.5 87t99.5 55Zm208 0q56-18 99.5-55t72.5-87H638q-9 38-22.5 73.5T584-178ZM170-400h136q-3-20-4.5-39.5T300-480q0-21 1.5-40.5T306-560H170q-5 20-7.5 39.5T160-480q0 21 2.5 40.5T170-400Zm216 0h188q3-20 4.5-39.5T580-480q0-21-1.5-40.5T574-560H386q-3 20-4.5 39.5T380-480q0 21 1.5 40.5T386-400Zm268 0h136q5-20 7.5-39.5T800-480q0-21-2.5-40.5T790-560H654q3 20 4.5 39.5T660-480q0 21-1.5 40.5T654-400Zm-16-240h118q-29-50-72.5-87T584-782q18 33 31.5 68.5T638-640Zm-234 0h152q-12-44-31-83t-45-75q-26 36-45 75t-31 83Zm-200 0h118q9-38 22.5-73.5T376-782q-56 18-99.5 55T204-640Z"/>
+                </svg>
+                <select id="language-select" class="w-full md:w-auto px-7 py-2 bg-white text-gray-700 border border-gray-300 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 appearance-none">
+                    <option value="af">Afrikaans</option>
+                    <option value="ar">Arabic</option>
+                    <option value="amh">Amharic</option>
+                    <option value="bn">Bengali</option>
+                    <option value="de">German</option>
+                    <option value="en" selected>English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ru">Russian</option>
+                    <option value="sw">Swahili</option>
+                    <option value="zh">Chinese</option>                
+                </select>
+                
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="h-96 overflow-y-auto p-4 space-y-4">
+            <!-- AI Welcome Message -->
+            <div class="message ai">
+                <div class="avatar">
+                    <img class="h-10 w-10 rounded-full object-cover" src="/static/images/ai-avatar.png" alt="AI Avatar">
+                </div>
+                <div class="content bg-blue-100 rounded-lg p-3 max-w-3/4 ml-3">
+                    <p class="text-sm text-gray-800">{{ greeting_message | safe }}</p>
+                </div>
+            </div>
+            <!-- User messages will be dynamically added here -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t-2 border-gray-200 px-4 py-4 sm:mb-0">
+            <div class="relative flex">
+                <input type="text" id="user-input" placeholder="Type your health question here..." class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-100 rounded-full py-3">
+                <div class="absolute left-0 inset-y-0 flex items-center">
+                    <button type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button type="button" id="send-button" class="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-600 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6 transform rotate-90">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Topics -->
+    <div class="mt-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Popular Health Topics</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <button class="health-topic bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Cardiovascular Health">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                <span>Cardiovascular Health</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Nutrition & Diet">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z"></path>
+                </svg>
+                <span>Nutrition & Diet</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Mental Health">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Mental Health</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Sleep & Wellness">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <span>Sleep & Wellness</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Women's Health">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                <span>Women's Health</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Chronic Conditions">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span>Chronic Conditions</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Immunizations">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2s2-.9 2-2v-2c0-1.1-.9-2-2-2zm-2 4h4m-2-7V4m0 16v-2m-7-7H4m16 0h-2m-9.293 9.293l-1.414-1.414M18.707 5.707l-1.414-1.414M5.707 5.707L4.293 7.121M18.707 18.707l-1.414 1.414"></path>
+                </svg>
+                <span>Immunizations</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Infectious Diseases">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2s2-.9 2-2v-2c0-1.1-.9-2-2-2zm-2 4h4m-2-7V4m0 16v-2m-7-7H4m16 0h-2m-9.293 9.293l-1.414-1.414M18.707 5.707l-1.414-1.414M5.707 5.707L4.293 7.121M18.707 18.707l-1.414 1.414"></path>
+                </svg>
+                <span>Infectious Diseases</span>
+            </button>
+            <button class="health-topic bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform active:ring-4 active:ring-blue-300 flex items-center space-x-3" data-topic="Physical Therapy">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>Physical Therapy</span>
+                <span class="absolute inset-0 rounded-lg border-2 border-transparent transition duration-300 ease-in-out"></span>
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const clearChatButton = document.getElementById('clear-chat');
+        const languageSelect = document.getElementById('language-select');
+        const healthTopics = document.querySelectorAll('.health-topic');
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.innerHTML = `
+                <div class="flex ${isUser ? 'justify-end' : ''}">
+                    ${isUser ? '' : '<div class="avatar"><img class="h-10 w-10 rounded-full object-cover" src="/static/images/ai-avatar.png" alt="AI Avatar"></div>'}
+                    <div class="${isUser ? 'bg-green-100' : 'bg-blue-100'} rounded-lg p-3 max-w-3/4 ml-3">
+                        <p class="text-sm text-gray-800">${message}</p>
+                    </div>
+                    ${isUser ? '<div class="avatar"><img class="h-10 w-10 rounded-full object-cover" src="/static/images/profilePic.jpg" alt="User Avatar"></div>' : ''}
+                </div>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showLoader() {
+            const loaderDiv = document.createElement('div');
+            loaderDiv.className = 'loader';
+            loaderDiv.id = 'loader';
+            chatMessages.appendChild(loaderDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeLoader() {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.remove();
+            }
+        }
+
+        function handleUserInput(topic = null) {
+            const message = userInput.value.trim();
+            const language = languageSelect.value;
+            if (message || topic) {
+                if (!topic) {
+                    addMessage(message, true);
+                }
+                userInput.value = '';
+                showLoader();
+
+                fetch('{{ url_for("patient.chatbot") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message, language: language, topic: topic }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    removeLoader();
+                    if (data.success) {
+                        addMessage(data.bot_reply);
+                    } else {
+                        addMessage('An error occurred while processing your request.');
+                    }
+                })
+                .catch(error => {
+                    removeLoader();
+                    addMessage('An error occurred while processing your request.');
+                });
+            }
+        }
+
+        function clearChat() {
+            chatMessages.innerHTML = '';
+            addMessage("{{ greeting_message | safe }}");
+        }
+
+        sendButton.addEventListener('click', () => handleUserInput());
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUserInput();
+            }
+        });
+        clearChatButton.addEventListener('click', clearChat);
+
+        healthTopics.forEach(button => {
+            button.addEventListener('click', () => {
+                const topic = button.getAttribute('data-topic');
+                handleUserInput(topic);
+            });
+        });
+    </script>
+{% endblock %}
