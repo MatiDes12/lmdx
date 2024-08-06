@@ -40,7 +40,7 @@
         </h2>
         <div class="mb-4">
             <label for="patient_dropdown" class="block text-sm font-medium text-gray-700">Select Patient with Completed Appointment</label>
-            <select id="patient_dropdown" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            <select id="patient_dropdown" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm p-2 bg-gray-50 border border-gray-200" required>
                 <option value="" disabled selected>Select a patient</option>
                 {% for patient in patients %}
                 <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>

@@ -13,9 +13,9 @@
 {% block content %}
 <div class="p-4">
  <!-- Welcome Section -->
- <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{ first_name }} {{ last_name }}!</h1>
-    <p class="mt-1 text-gray-600 dark:text-gray-400">Here is an overview of your dashboard with quick stats and latest updates.</p>
+ <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg shadow-lg mb-4">
+    <h1 class="text-2xl font-bold text-white dark:text-white">Welcome, {{ first_name }} {{ last_name }}!</h1>
+    <p class="mt-1 text-white dark:text-gray-100">Here is an overview of your dashboard with quick stats and latest updates.</p>
   </div>
 
   <div class="grid grid-cols-3 gap-4">
@@ -56,7 +56,7 @@
       </div>
 
     <!-- Recent Notifications Section -->
-    <div class="col-span-1 mt-4">
+    <div class="col-span-1">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Recent Notifications</h2>
         <div class="space-y-2 overflow-y-auto max-h-60">
         {% for notification in notifications %}
@@ -79,7 +79,10 @@
   <div class="grid grid-cols-3 gap-4 mt-4">
       <!-- Pending Tasks -->
       <div class="col-span-1">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Pending Tasks</h2>
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-2 text-white flex items-center">
+            <h2 class="text-xl font-semibold text-white dark:text-white mb-2">Pending Tasks</h2>
+        </div>
+          
           <div class="space-y-2">
               <!-- Example Task -->
               <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -101,7 +104,9 @@
 
       <!-- Quick Links Section -->
       <div class="col-span-1">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Quick Links</h2>
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-2 text-white flex items-center">
+            <h2 class="text-xl font-semibold text-white dark:text-white mb-2">Quick Links</h2>
+        </div>
           <div class="space-y-2">
               <a href="{{ url_for('doctor.reports') }}" class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -125,8 +130,11 @@
       </div>
 
         <!-- Upcoming Appointments Section -->
-        <div class="col-span-1 mt-4">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Upcoming Appointments</h2>
+        <div class="col-span-1">
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-2 text-white flex items-center">
+                <h2 class="text-xl font-semibold text-white dark:text-white mb-2">Upcoming Appointments</h2>
+            </div>
+            
             <div class="space-y-2">
             {% for appointment in upcoming_appointments %}
             <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center">
@@ -145,7 +153,12 @@
 
       <!-- Staff Schedules Section -->
       <div class="col-span-1">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Staff Schedules</h2>
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg mb-6 text-white flex items-center">
+            <div>
+                <h1 class="text-3xl font-bold">Staff Schedules</h1>
+                <p>Quick overview of staff schedules</p>
+            </div>
+        </div>
           <div class="space-y-2">
               <!-- Example Schedule -->
               <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -160,7 +173,12 @@
 
       <!-- Patient Statistics Section -->
       <div class="col-span-1">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Patient Statistics</h2>
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg mb-6 text-white flex items-center">
+            <div>
+                <h1 class="text-3xl font-bold">Patient Statistics</h1>
+                <p>Quick overview of patient data</p>
+            </div>
+        </div>
           <div class="space-y-2">
               <!-- Example Statistic -->
               <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -172,6 +190,29 @@
               </div>
           </div>
       </div>
+     <!-- AI Suggestions Section -->
+     <div class="container mx-auto">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg mb-5 text-white flex items-center">
+            <div>
+                <h1 class="text-3xl font-bold">AI Suggestions</h1>
+                <p>Automated suggestions to assist with your workflow</p>
+            </div>
+        </div>
+    
+        <div class="bg-white shadow-md rounded-lg p-4 space-y-4">
+            {% if suggestions %}
+                {% for suggestion in suggestions %}
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+                        <p class="text-sm text-gray-700">{{ suggestion }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+                    <p class="text-sm text-gray-700">No suggestions available.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
   </div>
 </div>
 

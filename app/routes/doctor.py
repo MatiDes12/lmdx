@@ -1,4 +1,5 @@
 import os
+import random
 from flask import Blueprint, flash, jsonify, render_template, request, send_from_directory, session, redirect, url_for
 import pytz
 from ..models_db import LabResult, LabTest, Patient, Doctor, Appointment, Message, Prescription, Settings, User, Account, ClientAccounts, Notification
@@ -75,6 +76,17 @@ def doctor_dashboard():
         unread_messages_count=unread_messages_count,
         notifications=unread_notifications
     )
+
+
+
+#<---------------------- AI Suggestions ----------------------->
+@bp.route('/ai-suggestions')
+def ai_suggestions():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+    
+    return render_template('doctors/dashboard.html')
+
 
 
 #<----------------------Appointments----------------------->

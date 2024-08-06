@@ -382,7 +382,7 @@ def send_message():
         new_notification = Notification(
             doctor_id=account.doctor_id, 
             patient_id=receiver_id,
-            message=f"New message from your doctor: {body}",
+            message=f"New message from your patient: {body}",
             notification_type='message',
             timestamp=timestamp,
             is_read=False
