@@ -981,66 +981,11 @@ def firebase_login_required(f):
     return decorated_function
 
 @bp.route('/settings', methods=['GET', 'POST'])
-@firebase_login_required
 def settings():
-    user = User.query.filter_by(email=session.get('email')).first()
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
 
-    if not user:
-        user = User(email=session.get('email'), user_type='doctor')
-        db.session.add(user)
-        db.session.commit()
-
-    if not user.settings:
-        user.settings = Settings(user_id=user.user_id)
-        db.session.add(user.settings)
-        db.session.commit()
-
-    if request.method == 'POST':
-        try:
-            # General Settings
-            user.settings.language = request.form.get('language')
-            user.settings.timezone = request.form.get('timezone')
-            user.settings.dark_mode = 'dark_mode' in request.form
-            
-            # Patient Management Settings
-            user.settings.default_patient_view = request.form.get('default_view')
-            user.settings.show_inactive_patients = 'show_inactive' in request.form
-            user.settings.records_per_page = int(request.form.get('records_per_page', 20))
-            
-            # Doctor Management Settings
-            user.settings.default_specialization_filter = request.form.get('specialization_filter')
-            user.settings.show_doctor_schedules = 'show_schedule' in request.form
-            
-            # Analytics Settings
-            user.settings.default_chart_type = request.form.get('default_chart')
-            user.settings.auto_refresh_analytics = 'auto_refresh' in request.form
-            user.settings.refresh_interval = int(request.form.get('refresh_interval', 5))
-            
-            # Notification Settings
-            user.settings.email_notifications = 'email_notifications' in request.form
-            user.settings.sms_notifications = 'sms_notifications' in request.form
-            user.settings.notification_frequency = request.form.get('notification_frequency')
-            
-            # Security Settings
-            user.settings.two_factor_auth = 'two_factor_auth' in request.form
-            user.settings.session_timeout = int(request.form.get('session_timeout', 30))
-            user.settings.password_expiry = int(request.form.get('password_expiry', 90))
-            
-            db.session.commit()
-            flash('Settings updated successfully', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'An error occurred while updating settings: {str(e)}', 'error')
-        
-        return redirect(url_for('doctors.settings'))
-    
-    timezones = pytz.all_timezones
-    specializations = ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'General Surgery', 'Psychiatry', 'Endocrinology']
-    
-    return render_template('doctors/settings.html', 
-                           settings=user.settings, 
-                           timezones=timezones, 
-                           specializations=specializations)
+    return render_template('doctors/settings.html')
 
 @bp.route('/settings/toggle_dark_mode', methods=['POST'])
 @firebase_login_required
@@ -1078,3 +1023,40 @@ def test_notification():
         return jsonify({'success': True, 'message': 'Test SMS sent successfully'})
     
     return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
+
+#<----------------------Dashboard Navbar----------------------->
+@bp.route('/patient-records')
+def patient_records():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+    return render_template('doctors/patient_records.html')
+
+@bp.route('/clinical-reports')
+def clinical_reports():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+    return render_template('doctors/clinical_reports.html')
+
+@bp.route('/ai-diagnostics')
+def ai_diagnostics():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+    return render_template('doctors/ai_diagnostics.html')
+
+@bp.route('/healthcare-insights')
+def healthcare_insights():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+    return render_template('doctors/healthcare_insights.html')
+
+@bp.route('/profile')
+def profile():
+    if 'user' not in session or session.get('user_type') != 'doctor':
+        return redirect(url_for('auth.signin'))
+    return render_template('doctors/profile.html')
+
+@bp.route('/notifications')
+def notifications():
+    if 'user' not in session or session.get('user_type') != 'doctor':
+        return redirect(url_for('auth.signin'))
+    return render_template('doctors/notifications.html')
