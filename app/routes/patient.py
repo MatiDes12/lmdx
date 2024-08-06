@@ -3,7 +3,7 @@ import os
 import random
 import re
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
-from ..models_db import ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Reminder, User, Message, Visit
+from ..models_db import ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Prescription, Reminder, User, Message, Visit
 from ..models_db import ClientAccounts, Doctor, Appointment, LabResult, LabTest, Medication, Patient, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
@@ -891,34 +891,59 @@ def test_results():
 
     return render_template('clients/test_results.html', test_results=test_results)
 
-#<-------------------------- medication -------------------------------->
+# <-------------------------- medication -------------------------------->
 @bp.route('/medication', methods=['GET', 'POST'])
 def medication():
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
-    
+
+    client_id = session.get('user_id')
+
     if request.method == 'POST':
-        medication_id = request.form.get('medication_id')
+        prescription_id = request.form.get('prescription_id')
         reminder_time = request.form.get('reminder_time')
         
-        new_reminder = Reminder(medication_id=medication_id, time=datetime.datetime.strptime(reminder_time, "%H:%M").time())
+        new_reminder = Reminder(
+            prescription_id=prescription_id,
+            time=datetime.strptime(reminder_time, "%H:%M").time()
+        )
         db.session.add(new_reminder)
         db.session.commit()
+        flash('Reminder set successfully!', 'success')
         return redirect(url_for('patient.medication'))
     
-    medications = Medication.query.all()
-    today_reminders = Reminder.query.filter(Reminder.time >= datetime.datetime.now().time()).all()
-    return render_template('clients/medication.html', medications=medications, today_reminders=today_reminders)
+    # Fetch prescriptions for the logged-in patient
+    prescriptions = Prescription.query.filter_by(patient_id=client_id).all()
+    print("prescriptions: ", prescriptions)
+    # Fetch today's reminders
+    today_reminders = Reminder.query.join(Prescription).filter(
+        Reminder.time >= datetime.datetime.now().time(),
+        Prescription.patient_id == client_id
+    ).all()
+
+    return render_template(
+        'clients/medication.html',
+        prescriptions=prescriptions,
+        today_reminders=today_reminders
+    )
 
 @bp.route('/set_reminder', methods=['POST'])
 def set_reminder():
-    medication_id = request.form.get('medication_id')
-    reminder_time = request.form.get('reminder_time')
     
-    new_reminder = Reminder(medication_id=medication_id, time=datetime.datetime.strptime(reminder_time, "%H:%M").time())
+    prescription_id = request.form.get('prescription_id')
+    reminder_time = request.form.get('reminder_time')
+    # medication_id = Prescription.query.filter_by(prescription_id).all()
+    print("medication_id: ",prescription_id)
+    
+    new_reminder = Reminder(
+        prescription_id=prescription_id,
+        # medication_id = prescription_id.medication_id,
+        time=datetime.datetime.strptime(reminder_time, "%H:%M").time()
+    )
     db.session.add(new_reminder)
     db.session.commit()
     
+    flash('Reminder set successfully!', 'success')
     return redirect(url_for('patient.medication'))
 
 @bp.route('/schedule_now')
@@ -965,61 +990,6 @@ def visits():
 
     return render_template('clients/visits.html', visits=visits, latest_visit=latest_visit_details, follow_up_actions=follow_up_actions)
 
-# @bp.route('/visits')
-# def visits():
-#     if 'user' not in session or session.get('user_type') != 'patient':
-#         return redirect(url_for('auth.signin'))
-    
-#     # Fetch visit history, latest visit details, and follow-up actions from the database
-#     visits = [
-#         {"date": datetime(2024, 7, 15), "doctor_name": "Dr. John Smith", "summary": "Routine check-up, recommended vitamin D supplementation.", "next_steps": "Follow-up in 3 months."},
-#         {"date": datetime(2024, 10, 20), "doctor_name": "Dr. Jane Doe", "summary": "Follow-up visit, improved health markers.", "next_steps": "Annual check-up scheduled for next year."},
-#         {"date": datetime(2025, 1, 10), "doctor_name": "Dr. John Smith", "summary": "Discussing long-term treatment options for chronic conditions.", "next_steps": "Review new medications in 6 months."}
-#     ]
-    
-#     latest_visit = {
-#         "symptoms": ["Fatigue", "Joint pain", "Occasional headaches"],
-#         "medications": [
-#             {"name": "Vitamin D", "action": "New prescription", "action_color": "green"},
-#             {"name": "Ibuprofen", "action": "Dosage increased", "action_color": "yellow"},
-#             {"name": "Allergy medication", "action": "Discontinued", "action_color": "red"}
-#         ],
-#         "notes": "Patient shows improvement in overall health markers. Recommended lifestyle changes appear to be effective. Continue monitoring and adjust treatment plan as needed."
-#     }
-    
-#     follow_up_actions = [
-#         {"title": "Blood Test", "description": "Schedule a follow-up blood test in 2 weeks", "action_text": "Schedule Now"},
-#         {"title": "Specialist Referral", "description": "Book an appointment with a rheumatologist", "action_text": "Find Specialist"},
-#         {"title": "Medication Review", "description": "Review effectiveness of new prescriptions in 1 month", "action_text": "Set Reminder"}
-#     ]
-    
-#     return render_template('clients/visits.html', visits=visits, latest_visit=latest_visit_details, follow_up_actions=follow_up_actions)
-
-# @bp.route('/view_details/<int:visit_id>')
-# def view_details(visit_id):
-#     visit = Visit.query.get_or_404(visit_id)
-#     return render_template('view_details.html', visit=visit)
-
-# @bp.route('/schedule_now')
-# def schedule_now():
-#     # Logic to schedule a blood test
-#     return redirect(url_for('visit_summary'))
-
-# @bp.route('/find_specialist')
-# def find_specialist():
-#     # Logic to find a specialist
-#     return redirect(url_for('visit_summary'))
-
-# @bp.route('/set_reminder', methods=['POST'])
-# def set_reminder():
-#     medication_id = request.form.get('medication_id')
-#     reminder_time = request.form.get('reminder_time')
-    
-#     new_reminder = Reminder(medication_id=medication_id, time=datetime.strptime(reminder_time, "%H:%M").time())
-#     db.session.add(new_reminder)
-#     db.session.commit()
-    
-#     return redirect(url_for('visit_summary'))
 
 #<-------------------------- billing -------------------------------->
 @bp.route('/billing')
@@ -1049,31 +1019,3 @@ def health_tips():
         "Manage stress through mindfulness, meditation, or talking to a professional."
     ]
     return render_template('clients/health_tips.html', tips=tips)
-
-
-#<-------------------------- profile_settings -------------------------------->
-
-# @bp.route('/profile_settings', methods=['GET', 'POST'])
-# @login_required  # Ensure user is logged in
-# def profile_settings():
-#     user_id = current_user.user_id  # Assuming you have a way to get the current logged in user's ID
-#     patient = Patient.query.filter_by(user_id=user_id).first()
-
-#     if request.method == 'POST':
-#         dob = request.form.get('dob')
-#         insurance_number = request.form.get('insurance_number')
-#         gender = request.form.get('gender')
-
-#         # Validations can be added here
-#         if dob:
-#             patient.dob = datetime.strptime(dob, '%Y-%m-%d')  # Make sure the date format matches the input
-#         if insurance_number:
-#             patient.insurance_number = insurance_number
-#         if gender:
-#             patient.gender = gender
-
-#         db.session.commit()
-#         flash('Profile updated successfully!', 'success')
-#         return redirect(url_for('profile_settings'))
-
-#     return render_template('profile_settings.html', patient=patient)'
