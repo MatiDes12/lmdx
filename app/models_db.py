@@ -220,7 +220,9 @@ class Reminder(db.Model):
     medication_id = db.Column(db.String(255), db.ForeignKey('medication.medication_id'))
     prescription_id = db.Column(db.Integer, db.ForeignKey('prescription.prescription_id'))
     time = db.Column(db.Time, nullable=False)
-
+    taken = db.Column(db.Boolean, default=False)  # Add this field
+    repeat = db.Column(db.Boolean, default=False)  # Add this field
+    
     medication = db.relationship('Medication', backref=db.backref('reminders', lazy=True))
     prescription = db.relationship('Prescription', backref=db.backref('reminders', lazy=True))
 

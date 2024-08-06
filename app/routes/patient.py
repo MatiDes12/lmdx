@@ -905,7 +905,7 @@ def medication():
         
         new_reminder = Reminder(
             prescription_id=prescription_id,
-            time=datetime.strptime(reminder_time, "%H:%M").time()
+            time=datetime.datetime.strptime(reminder_time, "%H:%M").time()
         )
         db.session.add(new_reminder)
         db.session.commit()
@@ -929,15 +929,12 @@ def medication():
 
 @bp.route('/set_reminder', methods=['POST'])
 def set_reminder():
-    
     prescription_id = request.form.get('prescription_id')
     reminder_time = request.form.get('reminder_time')
-    # medication_id = Prescription.query.filter_by(prescription_id).all()
     print("medication_id: ",prescription_id)
     
     new_reminder = Reminder(
         prescription_id=prescription_id,
-        # medication_id = prescription_id.medication_id,
         time=datetime.datetime.strptime(reminder_time, "%H:%M").time()
     )
     db.session.add(new_reminder)
@@ -946,15 +943,32 @@ def set_reminder():
     flash('Reminder set successfully!', 'success')
     return redirect(url_for('patient.medication'))
 
-@bp.route('/schedule_now')
-def schedule_now():
-    # Logic to schedule a blood test
-    return redirect(url_for('dashboard'))
+@bp.route('/mark_as_taken/<int:reminder_id>', methods=['POST'])
+def mark_as_taken(reminder_id):
+    reminder = Reminder.query.get(reminder_id)
+    if reminder:
+        reminder.taken = True
+        db.session.commit()
+        return '', 204
+    return '', 404
 
-@bp.route('/find_specialist')
-def find_specialist():
-    # Logic to find a specialist
-    return redirect(url_for('dashboard'))
+@bp.route('/repeat_reminder/<int:reminder_id>', methods=['POST'])
+def repeat_reminder(reminder_id):
+    reminder = Reminder.query.get(reminder_id)
+    if reminder:
+        reminder.repeat = True
+        db.session.commit()
+        return '', 204
+    return '', 404
+
+@bp.route('/delete_reminder/<int:reminder_id>', methods=['POST'])
+def delete_reminder(reminder_id):
+    reminder = Reminder.query.get(reminder_id)
+    if reminder:
+        db.session.delete(reminder)
+        db.session.commit()
+        return '', 204
+    return '', 404
 
 #<-------------------------- visits -------------------------------->
 @bp.route('/visits')
