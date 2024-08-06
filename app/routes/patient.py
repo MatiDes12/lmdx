@@ -13,7 +13,10 @@ from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
 import google.generativeai as genai
 from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import auth as firebase_auth
 from .instructions import advanced_instruction, formatting_instruction, greetings
+from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
 from sqlalchemy import and_, or_
@@ -779,23 +782,50 @@ def update_preferences():
 @bp.route('/profile/update_security_settings', methods=['POST'])
 def update_security_settings():
     if 'user' not in session or session.get('user_type') != 'patient':
+        flash('Unauthorized access', 'danger')
         return redirect(url_for('auth.signin'))
     
-    user_id = session.get('user_id')
-    user = User.query.get(user_id)
+    firebase_uid = session.get('user_id')
+    if not firebase_uid:
+        flash('User not found in session', 'danger')
+        return redirect(url_for('auth.signin'))
+
+    # Debugging: Print the firebase_uid
+    print(f"Firebase UID from session: {firebase_uid}")
+
+    # Fetch the user from the database using firebase_uid
+    user = User.query.filter_by(firebase_uid=firebase_uid).first()
+
+    # Debugging: Check if the user is found
+    if user is None:
+        print("User not found in the database")
+        flash('User not found in the database', 'danger')
+        return redirect(url_for('patient.profile'))
+    else:
+        print(f"User found: {user.username}, Firebase UID: {user.firebase_uid}")
 
     current_password = request.form['current_password']
     new_password = request.form['new_password']
     confirm_password = request.form['confirm_password']
 
+    # Check the current password
     if not user.check_password(current_password):
         flash('Current password is incorrect', 'danger')
     elif new_password != confirm_password:
         flash('New passwords do not match', 'danger')
     else:
-        user.set_password(new_password)
-        db.session.commit()
-        flash('Password updated successfully!', 'success')
+        try:
+            # Update the password in Firebase
+            firebase_auth.update_user(user.firebase_uid, password=new_password)
+
+            # Optionally, update the password hash in your local database if you store it
+            user.set_password(new_password)
+            db.session.commit()
+
+            flash('Password updated successfully!', 'success')
+        except firebase_admin.exceptions.FirebaseError as e:
+            print(f"Firebase error: {e}")  # Debugging Firebase errors
+            flash(f'An error occurred while updating the password in Firebase: {str(e)}', 'danger')
 
     return redirect(url_for('patient.profile'))
 

@@ -233,12 +233,14 @@ def generate_account(doctor_id):
         db.session.commit()
 
         # Create a new user in the User table
+        
         new_user = User(
             username=username,
             email=email,
             password_hash=hashed_password,
             user_type='doctor',  
-            created_at=datetime.now()
+            created_at=datetime.now(),
+            firebase_uid = "None"
         )
         db.session.add(new_user)
         db.session.commit()

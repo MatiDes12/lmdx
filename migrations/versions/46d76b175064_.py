@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: dcd88e105749
+Revision ID: 46d76b175064
 Revises: 
-Create Date: 2024-08-05 02:35:12.952756
+Create Date: 2024-08-05 19:08:46.019633
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'dcd88e105749'
+revision = '46d76b175064'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -124,8 +124,10 @@ def upgrade():
     sa.Column('last_login', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('firebase_uid', sa.String(length=255), nullable=False),
     sa.PrimaryKeyConstraint('user_id'),
-    sa.UniqueConstraint('email')
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('firebase_uid')
     )
     op.create_table('account',
     sa.Column('id', sa.String(length=255), nullable=False),

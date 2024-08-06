@@ -52,6 +52,7 @@ def signup():
                 </script>
             '''
 
+        # Prepare user data based on type
         if user_type == 'organization':
             name = request.form['name']
             org_name = request.form['org_name']
@@ -64,10 +65,8 @@ def signup():
                     </script>
                 '''
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            new_user = User(username=name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
-            db.session.add(new_user)
-            db.session.commit()
             user_data = {'full_name': name, 'email': email, 'organization': org_name, 'phone_number': phone_number}
+            
         elif user_type == 'patient':
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
@@ -79,12 +78,9 @@ def signup():
                 '''
             user_data = {'first_name': first_name, 'last_name': last_name, 'email': email, 'phone_number': phone_number}
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            new_user = User(username=first_name + " " + last_name, email=email, password_hash=hashed_password, user_type=user_type, created_at=datetime.now())
-            db.session.add(new_user)
-            db.session.commit()
 
         try:
-            # Check if the email already exists
+            # Check if the email already exists in Firebase
             try:
                 existing_user = firebase.auth().get_account_info(email)
                 return render_template('auth/signup.html', user_type=user_type) + '''
@@ -108,6 +104,18 @@ def signup():
             # Save additional data to the Firebase database based on user type
             if user_type == 'organization':
                 firebase_db.child("Organization").child(firebase_user_id).set(user_data, token=id_token)
+
+                # Create and commit the new user
+                new_user = User(
+                    username=name,
+                    email=email,
+                    password_hash=hashed_password,
+                    user_type=user_type,
+                    firebase_uid=firebase_user_id,  # Assign Firebase UID
+                    created_at=datetime.now()
+                )
+                db.session.add(new_user)
+                db.session.commit()
                 
                 try:
                     # Attempt to add the new organization to the session and commit
@@ -132,6 +140,18 @@ def signup():
 
             if user_type == 'patient':
                 firebase_db.child("ClientAccounts").child(firebase_user_id).set(user_data, token=id_token)
+
+                # Create and commit the new user
+                new_user = User(
+                    username=first_name + " " + last_name,
+                    email=email,
+                    password_hash=hashed_password,
+                    user_type=user_type,
+                    firebase_uid=firebase_user_id,  # Assign Firebase UID
+                    created_at=datetime.now()
+                )
+                db.session.add(new_user)
+                db.session.commit()
 
                 # Create a new Client record in SQLAlchemy
                 new_client = ClientAccounts(

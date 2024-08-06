@@ -14,15 +14,19 @@ def initialize_firebase():
         raise ValueError("Missing or invalid FIREBASE_ADMINSDK_JSON in .env file")
 
     # Parse the JSON string into a Python dictionary
-    firebase_credentials = json.loads(firebase_json)
+    try:
+        firebase_credentials = json.loads(firebase_json)
+    except json.JSONDecodeError as e:
+        raise ValueError("Invalid JSON for FIREBASE_ADMINSDK_JSON: " + str(e))
 
     # Use the parsed credentials dictionary to initialize Firebase
     cred = credentials.Certificate(firebase_credentials)
     
-    # Explicitly set the Firebase project ID
-    firebase_admin.initialize_app(cred, {
-        'projectId': 'luminamedix'
-    })
+    # Initialize the Firebase app only if it's not already initialized
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(cred, {
+            'projectId': firebase_credentials.get('project_id', 'luminamedix')
+        })
     
     # Initialize Firestore client
     db = firestore.client()
