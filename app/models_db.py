@@ -19,7 +19,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     settings = db.relationship('Settings', backref='user', uselist=False)
-    firebase_uid = db.Column(db.String(255), nullable=False, unique=True)
+    firebase_uid = db.Column(db.String(255), nullable=False, unique=False)
 
     def set_password(self, password):
         """Generate a BCrypt hash for the password."""
@@ -217,19 +217,29 @@ class Medication(db.Model):
 
 class Reminder(db.Model):
     reminder_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    medication_id = db.Column(db.Integer, db.ForeignKey('medication.medication_id'))
+    medication_id = db.Column(db.String(255), db.ForeignKey('medication.medication_id'))
+    prescription_id = db.Column(db.Integer, db.ForeignKey('prescription.prescription_id'))
     time = db.Column(db.Time, nullable=False)
+
     medication = db.relationship('Medication', backref=db.backref('reminders', lazy=True))
+    prescription = db.relationship('Prescription', backref=db.backref('reminders', lazy=True))
+
 
 class Prescription(db.Model):
     prescription_id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
-    medication_id = db.Column(db.Integer, db.ForeignKey('medication.medication_id'))
+    patient_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))  # Add this foreign key
+    medication_id = db.Column(db.Integer, db.ForeignKey('medication.medication_id'), nullable=False)  
     dosage = db.Column(db.String(100), nullable=False)
     frequency = db.Column(db.String(100), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date)
 
+    doctor = db.relationship('Doctor', backref='prescriptions')
+    patient = db.relationship('ClientAccounts', backref='prescriptions')  # Correct the relationship
+    medication = db.relationship('Medication', backref='prescriptions')  # Add this relationship
+
+    
 class Room(db.Model):
     room_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     room_number = db.Column(db.String(20), unique=True, nullable=False)

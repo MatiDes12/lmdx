@@ -918,30 +918,69 @@ def add_lab_test():
 #<----------------------prescription and medical history----------------------->
 @bp.route('/prescription', methods=['GET', 'POST'])
 def prescription():
-    if 'user' not in session:
+    if 'user' not in session or session.get('user_type') != 'doctors':
         return redirect(url_for('auth.signin'))
+
+    firebase_user_id = session.get('user_id')
+    account = Account.query.filter_by(id=firebase_user_id).first()
     
+    if not account:
+        flash('Doctor account not found', 'error')
+        return redirect(url_for('auth.signin'))
+
+    doctor_id = account.doctor_id
+
+    # Fetch completed appointments with patient details
+    completed_appointments = (
+        db.session.query(Appointment)
+        .filter_by(doctor_id=doctor_id, status='Completed')
+        .join(ClientAccounts, Appointment.client_id == ClientAccounts.client_id)
+        .all()
+    )
+    print("completed_appointments", completed_appointments)
+    
+    # Handle form submission for creating a prescription
     if request.method == 'POST':
         patient_id = request.form.get('patient_id')
-        prescription = request.form.get('prescription')
-        notes = request.form.get('notes')
-        appointment_id = request.form.get('appointment_id')
-        
-        new_prescription = Prescription(
-            patient_id=patient_id,
-            doctor_id=session.get('user_id'),
-            appointment_id=appointment_id,
-            prescription=prescription,
-            notes=notes
-        )
-        db.session.add(new_prescription)
-        db.session.commit()
-        
-        flash('Prescription added successfully!', 'success')
-        return redirect(url_for('doctor.prescription'))
-    
-    return render_template('doctors/prescription.html')
+        medication_id = request.form.get('medication')  # Ensure this fetches the medication_id correctly
+        dosage = request.form.get('dosage')
+        frequency = request.form.get('frequency')
+        duration = request.form.get('duration')
 
+        try:
+            # Parse start and end dates
+            start_date = datetime.now().date()
+            end_date = start_date + timedelta(days=int(duration.split()[0]))  # Assuming '7 days'
+
+            # Create and add a new prescription to the database
+            prescription = Prescription(
+                doctor_id=doctor_id,
+                patient_id=patient_id,
+                medication_id=medication_id,
+                dosage=dosage,
+                frequency=frequency,
+                start_date=start_date,
+                end_date=end_date
+            )
+            db.session.add(prescription)
+            db.session.commit()
+            flash('Prescription created successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating prescription: {str(e)}', 'danger')
+        return redirect(url_for('doctor.prescription'))
+
+    # Fetch all prescriptions for this doctor to display
+    prescriptions = (
+        db.session.query(Prescription)
+        .filter_by(doctor_id=doctor_id)
+        .all()
+    )
+
+    return render_template('doctors/prescription.html', completed_appointments=completed_appointments, prescriptions=prescriptions)
+
+
+#<----------------------monitor----------------------->
 
 @bp.route('/monitor', methods=['GET'])
 def monitor():
