@@ -39,11 +39,15 @@
                     Patient
                 </label>
                 <div class="relative">
-                    <select name="patient_id" id="patient" class="block w-full mt-1 rounded-full border-gray-300 border-2 border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 appearance-none px-3 py-2">
-                        {% for patient in patients %}
-                        <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
-                        {% endfor %}
-                    </select>
+                    <select name="patient_id" id="patient" class="block w-full mt-1 rounded-full border-2 border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 appearance-none px-3 py-2">
+                        {% if patients %}
+                            {% for patient in patients %}
+                                <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled selected style="color: gray;">No patients available</option>
+                        {% endif %}
+                    </select>                                                      
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                     </div>
@@ -74,7 +78,7 @@
                 <input id="duration" name="duration" type="text" placeholder="e.g., 7 days" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2">
             </div>
             <div class="flex justify-end">
-                <button class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 hover:from-green-500 hover:via-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
                     Create Prescription
                 </button>
             </div>
