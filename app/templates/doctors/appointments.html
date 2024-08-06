@@ -34,6 +34,7 @@
                         <option value="Scheduled" {% if status_filter == 'Scheduled' %}selected{% endif %}>Scheduled</option>
                         <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
                         <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
                     </select>
                 </div>
                 <div>
@@ -68,7 +69,11 @@
                     <tr>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex items-center">
-                                <div class="ml-3">
+                                <div class="flex items-center space-x-3">
+
+                                    <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-gray-200">
+                                        <img id="profileImage" src="{{ url_for('static', filename='images/default-avatar.png' ~ appointment.client.profile_image) }}" alt="Profile Image" class="object-cover w-full h-full" />
+                                    </div>
                                     <p class="text-gray-900 whitespace-no-wrap">{{ appointment.client.first_name }} {{ appointment.client.last_name }}</p>
                                 </div>
                             </div>
@@ -79,24 +84,23 @@
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p class="text-gray-900 whitespace-no-wrap">{{ appointment.appointment_time.strftime('%I:%M %p') }}</p>
                         </td>
-
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight
+                            <span class="relative inline px-3 py-1 text-sm font-normal rounded-full text-emerald-500 gap-x-2 bg-emerald-100/60 dark:bg-gray-800
                                 {% if appointment.status == 'Scheduled' %}
-                                    text-green-900
+                                    text-blue-500
                                 {% elif appointment.status == 'Completed' %}
-                                    text-blue-900
+                                    text-green-500
                                 {% elif appointment.status == 'Pending' %}
-                                    text-yellow-900
+                                    text-yellow-500
                                 {% elif appointment.status == 'Cancelled' %}
-                                    text-red-900
+                                    text-red-500
                                 {% endif %}
                             ">
                                 <span aria-hidden class="absolute inset-0 
                                     {% if appointment.status == 'Scheduled' %}
-                                        bg-green-200
-                                    {% elif appointment.status == 'Completed' %}
                                         bg-blue-200
+                                    {% elif appointment.status == 'Completed' %}
+                                        bg-green-200
                                     {% elif appointment.status == 'Pending' %}
                                         bg-yellow-200
                                     {% elif appointment.status == 'Cancelled' %}
@@ -105,21 +109,39 @@
                                 opacity-50 rounded-full"></span>
                                 <span class="relative">{{ appointment.status }}</span>
                             </span>
-                        </td>                        
-
+                        </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm break-words">
                             <p class="text-gray-900">{{ appointment.reason }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm break-words">
-                            <p class="text-gray-900">{{ appointment.notes }}</p>
+                            <p class="text-gray-900">
+                                {% if appointment.notes|length > 20 %}
+                                    {{ appointment.notes[:15] }}.....
+                                {% else %}
+                                    {{ appointment.notes }}
+                                {% endif %}
+                            </p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id) }}" class="btn btn-reschedule">Reschedule</a>
-                            <a href="{{ url_for('doctor.edit_appointment', appointment_id=appointment.appointment_id) }}" class="btn btn-edit">Edit</a>
-                            <form action="{{ url_for('doctor.cancel_appointment', appointment_id=appointment.appointment_id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-cancel">Cancel</button>
-                            </form>
-                        </td>                                                                                                               
+                            <div class="flex items-center space-x-4">
+                                <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id) }}">
+                                    <span class="hidden md:inline text-sm border border-green-400 text-green-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-green-400 hover:text-white">Reschedule</span>
+                                </a>
+                                <a href="{{ url_for('doctor.edit_appointment', appointment_id=appointment.appointment_id) }}" class="text-gray-500 transition-colors duration-200 hover:text-blue-500 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
+                                    </svg>
+                                </a>
+                                <form action="{{ url_for('doctor.cancel_appointment', appointment_id=appointment.appointment_id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        
                     </tr>
                     {% endfor %}
                 </tbody>

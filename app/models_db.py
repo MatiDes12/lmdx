@@ -148,7 +148,7 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Ensure this matches the actual table name
     appointment_date = db.Column(db.Date, nullable=False)
     appointment_time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.Enum('Scheduled', 'Completed', 'Cancelled', name='appointment_status_enum'), default='Scheduled')
+    status = db.Column(db.Enum('Scheduled', 'Completed', 'Cancelled', 'Pending', name='appointment_status_enum'), default='Scheduled')
     reason = db.Column(db.Text)
     notes = db.Column(db.Text)
     

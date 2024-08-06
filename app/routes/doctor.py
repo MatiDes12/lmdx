@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, flash, jsonify, render_template, request, send_from_directory, session, redirect, url_for
 import pytz
-from ..models_db import LabResult, LabTest, Patient, Doctor, Appointment, Message, Settings, User, Account, ClientAccounts, Notification
+from ..models_db import LabResult, LabTest, Patient, Doctor, Appointment, Message, Prescription, Settings, User, Account, ClientAccounts, Notification
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from functools import wraps
@@ -908,6 +908,25 @@ def add_lab_test():
 def prescription():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
+    
+    if request.method == 'POST':
+        patient_id = request.form.get('patient_id')
+        prescription = request.form.get('prescription')
+        notes = request.form.get('notes')
+        appointment_id = request.form.get('appointment_id')
+        
+        new_prescription = Prescription(
+            patient_id=patient_id,
+            doctor_id=session.get('user_id'),
+            appointment_id=appointment_id,
+            prescription=prescription,
+            notes=notes
+        )
+        db.session.add(new_prescription)
+        db.session.commit()
+        
+        flash('Prescription added successfully!', 'success')
+        return redirect(url_for('doctor.prescription'))
     
     return render_template('doctors/prescription.html')
 
