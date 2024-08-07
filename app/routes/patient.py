@@ -41,7 +41,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER_PROF, exist_ok=True)
 
 #<-------------------------- dashboard -------------------------------->
-
 @bp.route('/dashboard')
 def patient_dashboard():
     if 'user' not in session or session.get('user_type') != 'patient':
@@ -59,7 +58,6 @@ def patient_dashboard():
 
             unread_messages_count = Message.query.filter_by(recipient_id=user_id, is_read=False).count()
 
-
             # Fetch unread notifications
             notifications = []
             notification_data = Notification.query.filter_by(patient_id=user_id, is_read=False).all()
@@ -71,8 +69,35 @@ def patient_dashboard():
                         'message': notification.message,
                         'time_ago': get_time_ago(notification.timestamp)
                     })
+
+            # Fetch recent activities (example)
+            recent_activities = [
+                "Logged in",
+                "Viewed test results",
+                "Updated profile information"
+            ]
             
-                    
+            # Fetch health tips (example)
+            health_tips = [
+                "Drink at least 8 glasses of water daily.",
+                "Get at least 30 minutes of exercise every day.",
+                "Eat a balanced diet rich in fruits and vegetables."
+            ]
+
+            # Fetch health news (example)
+            health_news = [
+                "New advances in heart disease treatment.",
+                "How to manage diabetes with diet.",
+                "The benefits of regular physical activity."
+            ]
+
+            # Fetch health goals (example)
+            health_goals = [
+                "Lose 5 pounds in the next month.",
+                "Run a 5k marathon.",
+                "Reduce cholesterol levels by 10%."
+            ]
+            
             # Fetch today's and tomorrow's appointments
             today_date = datetime.datetime.now().date()
             tomorrow_date = today_date + timedelta(days=1)
@@ -96,7 +121,23 @@ def patient_dashboard():
                     'time_ago': 'Tomorrow'
                 })
 
-            return render_template('clients/dashboard.html', first_name=first_name, last_name=last_name, notifications=notifications, unread_messages_count=unread_messages_count)
+            # Fetch tasks (example)
+            tasks = [
+                "Complete health survey",
+                "Update medication list",
+                "Review health tips"
+            ]
+
+            return render_template('clients/dashboard.html', 
+                                   first_name=first_name, 
+                                   last_name=last_name, 
+                                   notifications=notifications, 
+                                   unread_messages_count=unread_messages_count,
+                                   recent_activities=recent_activities,
+                                   health_tips=health_tips,
+                                   health_news=health_news,
+                                   health_goals=health_goals,
+                                   tasks=tasks)
 
         else:
             flash('Unable to fetch user details.', 'error')
@@ -105,6 +146,8 @@ def patient_dashboard():
         flash('Error accessing user information.', 'error')
         print(f"Firebase fetch error: {e}")
         return redirect(url_for('auth.signin'))
+
+
 
 
 def get_time_ago(timestamp):
@@ -123,6 +166,32 @@ def get_time_ago(timestamp):
         return f"{days} days ago" if days > 1 else "1 day ago"
 
 
+
+#<-------------------------- payments -------------------------------->
+@bp.route('/payments', methods=['GET', 'POST'])
+def payments():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+
+    user_id = session.get('user_id')
+    client_account = ClientAccounts.query.get(user_id)
+
+    if request.method == 'POST':
+        # Extract payment details from the form
+        card_number = request.form.get('card_number')
+        card_holder = request.form.get('card_holder')
+        expiry_month = request.form.get('expiry_month')
+        expiry_year = request.form.get('expiry_year')
+        cvv = request.form.get('cvv')
+
+        # Perform payment processing here
+        # For demonstration purposes, we'll just print the details
+        print(f"Payment details: Card Number: {card_number}, Card Holder: {card_holder}, Expiry: {expiry_month}/{expiry_year}, CVV: {cvv}")
+
+        flash('Payment processed successfully!', 'success')
+        return redirect(url_for('patient.payments'))
+
+    return render_template('clients/payments.html', client_account=client_account)
 #<-------------------------- appointments -------------------------------->
 
 def generate_available_times(doctor_id, appointment_date):
@@ -461,20 +530,19 @@ def fetch_user_appointment(user_id):
     return None
 
 def fetch_user_medication(user_id):
-    medications = Medication.query.filter_by(client_id=user_id).all()
+    medications = Prescription.query.filter_by(patient_id=user_id).all()
     if medications:
         return [
             {
-                'medication_name': med.medication_name,
+                'medication_name': med.medication_id,  # Assuming you meant to use `med.medication.medication_name`
                 'dosage': med.dosage,
-                'frequency': med.frequency,
-                'start_date': med.start_date.strftime('%Y-%m-%d'),
-                'end_date': med.end_date.strftime('%Y-%m-%d'),
-                'notes': med.notes if med.notes else 'No additional notes'
+                'frequency': med.frequency
             }
             for med in medications
         ]
     return None
+
+
 
 def fetch_user_lab_results(user_id):
     lab_results = LabResult.query.filter_by(patient_id=user_id).all()
@@ -530,7 +598,7 @@ def chatbot():
     medication_details = fetch_user_medication(user_id)
     if medication_details:
         medication_info = [
-            f"{med['medication_name']} - Dosage: {med['dosage']}, Frequency: {med['frequency']}, Notes: {med['notes']}"
+            f"{med['medication_name']} - Dosage: {med['dosage']}, Frequency: {med['frequency']}"
             for med in medication_details
         ]
         print(medication_info)
@@ -557,7 +625,16 @@ def chatbot():
     else:
         doctor_info = "No doctor appointments found."
 
-
+    # Fetch user medication information
+    Prescription = fetch_user_medication(user_id)
+    if Prescription:
+        Prescription_info = [
+            f"{medication['medication_name']} - Dosage: {medication['dosage']}, Frequency: {medication['frequency']}"
+            for medication in Prescription
+        ]
+        print(Prescription_info)
+    else:
+        Prescription_info = "No active medications found."
 
     # Select a random greeting message
     greeting_message = random.choice(greetings).format(first_name=client_account.first_name)
@@ -578,7 +655,7 @@ def chatbot():
             )
 
 
-            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info} \n Current time: {formatted_time}"
+            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info} \n Current time: {formatted_time} \n Prescription Information: {Prescription_info}"
 
             try:
                 genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])

@@ -11,5 +11,126 @@
 {% endblock %}
 
 {% block content %}
-<p>Content for Monitor.</p>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Patient Monitoring</h1>
+        <p>Monitor various health metrics in real-time with advanced visualizations.</p>
+    </div>
+
+    <!-- Monitoring Sections -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- EKG Monitoring -->
+        <div class="bg-white rounded-2xl p-6 shadow-inner">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M4.93 4.93a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0m-14.14-14.14a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0" />
+                </svg>
+                EKG Monitoring
+            </h3>
+            <canvas id="ekgChart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Blood Pressure Monitoring -->
+        <div class="bg-white rounded-2xl p-6 shadow-inner">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M4.93 4.93a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0m-14.14-14.14a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0" />
+                </svg>
+                Blood Pressure Monitoring
+            </h3>
+            <canvas id="bpChart" class="w-full h-64"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript for EKG and Blood Pressure Charts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // EKG Chart
+    var ctxEkg = document.getElementById('ekgChart').getContext('2d');
+    var ekgChart = new Chart(ctxEkg, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: 50}, (_, i) => i + 1),
+            datasets: [{
+                label: 'EKG',
+                data: Array.from({length: 50}, () => Math.random() * 100),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 0
+            },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Blood Pressure Chart
+    var ctxBp = document.getElementById('bpChart').getContext('2d');
+    var bpChart = new Chart(ctxBp, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: 50}, (_, i) => i + 1),
+            datasets: [{
+                label: 'Systolic',
+                data: Array.from({length: 50}, () => 120 + Math.random() * 20),
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1
+            }, {
+                label: 'Diastolic',
+                data: Array.from({length: 50}, () => 80 + Math.random() * 10),
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 0
+            },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Update charts with new data every second
+    setInterval(function() {
+        ekgChart.data.datasets[0].data.shift();
+        ekgChart.data.datasets[0].data.push(Math.random() * 100);
+        ekgChart.update();
+
+        bpChart.data.datasets[0].data.shift();
+        bpChart.data.datasets[0].data.push(120 + Math.random() * 20);
+        bpChart.data.datasets[1].data.shift();
+        bpChart.data.datasets[1].data.push(80 + Math.random() * 10);
+        bpChart.update();
+    }, 1000);
+});
+</script>
 {% endblock %}

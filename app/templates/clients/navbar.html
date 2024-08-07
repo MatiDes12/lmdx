@@ -15,20 +15,22 @@
             <!-- Communication Section -->
             <div class="space-y-3">
                 <label class="px-3 text-xs text-gray-500 uppercase dark:text-gray-400">Communication</label>
-                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 relative" href="{{ url_for('patient.messages') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#6b7280">
-                        <path d="M320-520q17 0 28.5-11.5T360-560q0-17-11.5-28.5T320-600q-17 0-28.5 11.5T280-560q0 17 11.5 28.5T320-520Zm160 0q17 0 28.5-11.5T520-560q0-17-11.5-28.5T480-600q-17 0-28.5 11.5T440-560q0 17 11.5 28.5T480-520Zm160 0q17 0 28.5-11.5T680-560q0-17-11.5-28.5T640-600q-17 0-28.5 11.5T600-560q0 17 11.5 28.5T640-520ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/>
-                    </svg>
-                    <span class="mx-2 text-sm font-medium">Messages</span>
-                    {% if unread_messages_count|default(0) > 0 %}
-                    <span class="absolute top-0 right-0 mt-1 mr-1 inline-flex items-center justify-center w-3 h-3 bg-red-600 text-white text-xs font-bold rounded-full"></span>
-                    {% endif %}
-                </a>
-
                 <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 relative" href="{{ url_for('patient.chatbot') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#6b7280">
                         <path d="M200-120q-33 0-56.5-23.5T120-200v-160h80v160h160v80H200Zm560 0H600v-80h160v-160h80v160q0 33-23.5 56.5T760-120ZM120-760q0-33 23.5-56.5T200-840h160v80H200v160h-80v-160Zm720 0v160h-80v-160H600v-80h160q33 0 56.5 23.5T840-760ZM480-240q21 0 35.5-14.5T530-290q0-21-14.5-35.5T480-340q-21 0-35.5 14.5T430-290q0 21 14.5 35.5T480-240Zm-36-153h73q0-34 8-52t35-45q35-35 46.5-56.5T618-598q0-54-39-88t-99-34q-50 0-86 26t-52 74l66 27q7-26 26.5-42.5T480-652q29 0 46.5 15.5T544-595q0 20-9.5 37.5T502-521q-33 29-45.5 56T444-393Z"/></svg>
                     <span class="mx-2 text-sm font-medium">AI Chat</span>
+                </a>
+                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700 relative" href="{{ url_for('patient.messages') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M26 33H29.5C36.4036 33 42 27.4036 42 20.5C42 13.5964 36.4036 8 29.5 8H18.5C11.5964 8 6 13.5964 6 20.5C6 28.4145 11.2167 33.2537 16.9239 36.2262C19.7585 37.7025 22.6136 38.6566 24.7728 39.2414C25.2149 39.3611 25.626 39.4649 26 39.5542V33ZM28 42C28 42 27.2439 41.8897 26 41.6077C20.2362 40.3007 4 35.305 4 20.5C4 12.4919 10.4919 6 18.5 6H29.5C37.5081 6 44 12.4919 44 20.5C44 28.5081 37.5081 35 29.5 35H28V42Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 22C24.5523 22 25 21.5523 25 21C25 20.4477 24.5523 20 24 20C23.4477 20 23 20.4477 23 21C23 21.5523 23.4477 22 24 22ZM24 24C25.6569 24 27 22.6569 27 21C27 19.3431 25.6569 18 24 18C22.3431 18 21 19.3431 21 21C21 22.6569 22.3431 24 24 24Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M32 22C32.5523 22 33 21.5523 33 21C33 20.4477 32.5523 20 32 20C31.4477 20 31 20.4477 31 21C31 21.5523 31.4477 22 32 22ZM32 24C33.6569 24 35 22.6569 35 21C35 19.3431 33.6569 18 32 18C30.3431 18 29 19.3431 29 21C29 22.6569 30.3431 24 32 24Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M16 22C16.5523 22 17 21.5523 17 21C17 20.4477 16.5523 20 16 20C15.4477 20 15 20.4477 15 21C15 21.5523 15.4477 22 16 22ZM16 24C17.6569 24 19 22.6569 19 21C19 19.3431 17.6569 18 16 18C14.3431 18 13 19.3431 13 21C13 22.6569 14.3431 24 16 24Z" fill="currentColor"/>
+                        </svg>
+                    <span class="mx-2 text-sm font-medium">Messages</span>
+                    {% if unread_messages_count|default(0) > 0 %}
+                    <span class="absolute top-0 right-0 mt-1 mr-1 inline-flex items-center justify-center w-3 h-3 bg-red-600 text-white text-xs font-bold rounded-full"></span>
+                    {% endif %}
                 </a>
 
             </div>
@@ -41,20 +43,41 @@
                     <span class="mx-2 text-sm font-medium">Visits</span>
                 </a>
 
-                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.test_results') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#6b7280"><path d="M320-480v-80h320v80H320Zm0-160v-80h320v80H320Zm-80 240h300q29 0 54 12.5t42 35.5l84 110v-558H240v400Zm0 240h442L573-303q-6-8-14.5-12.5T540-320H240v160Zm480 80H240q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h480q33 0 56.5 23.5T800-800v640q0 33-23.5 56.5T720-80Zm-480-80v-640 640Zm0-160v-80 80Z"/></svg>
-                    <span class="mx-2 text-sm font-medium">Test Results</span>
-                </a>
-
                 <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.medication') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#6b7280"><path d="M345-120q-94 0-159.5-65.5T120-345q0-45 17-86t49-73l270-270q32-32 73-49t86-17q94 0 159.5 65.5T840-615q0 45-17 86t-49 73L504-186q-32 32-73 49t-86 17Zm266-286 107-106q20-20 31-47t11-56q0-60-42.5-102.5T615-760q-29 0-56 11t-47 31L406-611l205 205ZM345-200q29 0 56-11t47-31l106-107-205-205-107 106q-20 20-31 47t-11 56q0 60 42.5 102.5T345-200Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 21C18.0899 21 21 18.0899 21 14.5C21 10.9101 18.0899 8 14.5 8C10.9101 8 8 10.9101 8 14.5C8 18.0899 10.9101 21 14.5 21ZM14.5 23C19.1944 23 23 19.1944 23 14.5C23 9.80558 19.1944 6 14.5 6C9.80558 6 6 9.80558 6 14.5C6 19.1944 9.80558 23 14.5 23Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.3396 11.9556C18.6447 12.4159 18.5188 13.0364 18.0585 13.3415L12.0465 17.3261C11.5861 17.6312 10.9656 17.5053 10.6605 17.0449C10.3554 16.5846 10.4812 15.9641 10.9416 15.659L16.9536 11.6744C17.4139 11.3693 18.0345 11.4952 18.3396 11.9556Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M33.5 21C37.0899 21 40 18.0899 40 14.5C40 10.9101 37.0899 8 33.5 8C29.9101 8 27 10.9101 27 14.5C27 18.0899 29.9101 21 33.5 21ZM33.5 23C38.1944 23 42 19.1944 42 14.5C42 9.80558 38.1944 6 33.5 6C28.8056 6 25 9.80558 25 14.5C25 19.1944 28.8056 23 33.5 23Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M31.9029 10.1797C32.421 9.98825 32.9961 10.253 33.1876 10.771L35.6884 17.5361C35.8799 18.0541 35.6152 18.6293 35.0971 18.8208C34.5791 19.0122 34.0039 18.7475 33.8124 18.2295L31.3117 11.4644C31.1202 10.9464 31.3849 10.3712 31.9029 10.1797Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 40C18.0899 40 21 37.0899 21 33.5C21 29.9101 18.0899 27 14.5 27C10.9101 27 8 29.9101 8 33.5C8 37.0899 10.9101 40 14.5 40ZM14.5 42C19.1944 42 23 38.1944 23 33.5C23 28.8056 19.1944 25 14.5 25C9.80558 25 6 28.8056 6 33.5C6 38.1944 9.80558 42 14.5 42Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M16.2747 37.7509C15.7651 37.9636 15.1794 37.723 14.9666 37.2133L12.1879 30.5576C11.9751 30.048 12.2157 29.4623 12.7254 29.2495C13.235 29.0368 13.8207 29.2774 14.0335 29.7871L16.8122 36.4428C17.025 36.9524 16.7844 37.5381 16.2747 37.7509Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M33.5 40C37.0899 40 40 37.0899 40 33.5C40 29.9101 37.0899 27 33.5 27C29.9101 27 27 29.9101 27 33.5C27 37.0899 29.9101 40 33.5 40ZM33.5 42C38.1944 42 42 38.1944 42 33.5C42 28.8056 38.1944 25 33.5 25C28.8056 25 25 28.8056 25 33.5C25 38.1944 28.8056 42 33.5 42Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M36.9885 30.4922C37.3492 30.9105 37.3025 31.5419 36.8842 31.9026L31.4219 36.6125C31.0037 36.9732 30.3722 36.9265 30.0116 36.5082C29.6509 36.09 29.6976 35.4585 30.1159 35.0979L35.5781 30.3879C35.9964 30.0273 36.6278 30.074 36.9885 30.4922Z" fill="currentColor"/>
+                        </svg>
                     <span class="mx-2 text-sm font-medium">Medication</span>
                 </a>
 
-                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.appointments') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 019 9v.375M10.125 2.25A3.375 3.375 0 0113.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 013.375 3.375M9 15l2.25 2.25L15 12" />
+                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.test_results') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8 11C8 10.4477 8.44771 10 9 10H17C17.5523 10 18 10.4477 18 11C18 11.5523 17.5523 12 17 12V19H20V12C19.4477 12 19 11.5523 19 11C19 10.4477 19.4477 10 20 10H28C28.5523 10 29 10.4477 29 11C29 11.5523 28.5523 12 28 12V19H31V12C30.4477 12 30 11.5523 30 11C30 10.4477 30.4477 10 31 10H39C39.5523 10 40 10.4477 40 11C40 11.5523 39.5523 12 39 12V19H41V16H43V19H44V21H43V34H44V36H43V38H41V36H7V38H5V36H4V34H5V21H4V19H5V16H7V19H9V12C8.44771 12 8 11.5523 8 11ZM7 34H41V21H39V29C39 31.2091 37.2091 33 35 33C32.7909 33 31 31.2091 31 29V21H28V29C28 31.2091 26.2091 33 24 33C21.7909 33 20 31.2091 20 29V21H17V29C17 31.2091 15.2091 33 13 33C10.7909 33 9 31.2091 9 29V21H7V34ZM15 12V19H11V12H15ZM26 19L22 19V12H26V19ZM37 19H33V12H37V19ZM11 29V21H15V29C15 30.1046 14.1046 31 13 31C11.8954 31 11 30.1046 11 29ZM22 29V21L26 21V29C26 30.1046 25.1046 31 24 31C22.8954 31 22 30.1046 22 29ZM33 29V21H37V29C37 30.1046 36.1046 31 35 31C33.8954 31 33 30.1046 33 29Z" fill="currentColor"/>
                     </svg>
+                    <span class="mx-2 text-sm font-medium">Test Results</span>
+                </a>
+
+
+                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.appointments') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17 25H15V27H17V25ZM15 23C13.8954 23 13 23.8954 13 25V27C13 28.1046 13.8954 29 15 29H17C18.1046 29 19 28.1046 19 27V25C19 23.8954 18.1046 23 17 23H15Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M25 25H23V27H25V25ZM23 23C21.8954 23 21 23.8954 21 25V27C21 28.1046 21.8954 29 23 29H25C26.1046 29 27 28.1046 27 27V25C27 23.8954 26.1046 23 25 23H23Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M33 25H31V27H33V25ZM31 23C29.8954 23 29 23.8954 29 25V27C29 28.1046 29.8954 29 31 29H33C34.1046 29 35 28.1046 35 27V25C35 23.8954 34.1046 23 33 23H31Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17 33H15V35H17V33ZM15 31C13.8954 31 13 31.8954 13 33V35C13 36.1046 13.8954 37 15 37H17C18.1046 37 19 36.1046 19 35V33C19 31.8954 18.1046 31 17 31H15Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M25 33H23V35H25V33ZM23 31C21.8954 31 21 31.8954 21 33V35C21 36.1046 21.8954 37 23 37H25C26.1046 37 27 36.1046 27 35V33C27 31.8954 26.1046 31 25 31H23Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M33 33H31V35H33V33ZM31 31C29.8954 31 29 31.8954 29 33V35C29 36.1046 29.8954 37 31 37H33C34.1046 37 35 36.1046 35 35V33C35 31.8954 34.1046 31 33 31H31Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10 11C9.44772 11 9 11.4477 9 12V39C9 39.5523 9.44772 40 10 40H38C38.5509 40 39 39.5515 39 38.9978V12.0022C39 11.4485 38.5509 11 38 11H35V9H38C39.6583 9 41 10.3467 41 12.0022V38.9978C41 40.6533 39.6583 42 38 42H10C8.34315 42 7 40.6569 7 39V12C7 10.3431 8.34315 9 10 9H15V11H10ZM31 11H19V9H31V11Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M39 20H9V18H39V20Z" fill="currentColor"/>
+                        <path d="M15 7C15 6.44772 15.4477 6 16 6C16.5523 6 17 6.44772 17 7V14C17 14.5523 16.5523 15 16 15C15.4477 15 15 14.5523 15 14V7Z" fill="currentColor"/>
+                        <path d="M31 7C31 6.44772 31.4477 6 32 6C32.5523 6 33 6.44772 33 7V14C33 14.5523 32.5523 15 32 15C31.4477 15 31 14.5523 31 14V7Z" fill="currentColor"/>
+                        </svg>
                     <span class="mx-2 text-sm font-medium">Appointments</span>
                 </a>
             </div>
@@ -63,8 +86,20 @@
             <div class="space-y-3">
                 <label class="px-3 text-xs text-gray-500 uppercase dark:text-gray-400">Financial</label>
                 <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.billing') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#6b7280"><path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.4894 32V36C10.4894 37.1046 11.3848 38 12.4894 38H42.4894C43.5939 38 44.4894 37.1046 44.4894 36V20C44.4894 18.8954 43.5939 18 42.4894 18H40V21.6687C40.108 21.8295 40.2315 21.9798 40.3692 22.1174C40.6477 22.396 40.9785 22.617 41.3424 22.7677C41.7061 22.9184 42.0958 22.9959 42.4894 22.9961V33C42.1013 33.0023 41.7174 33.0798 41.3588 33.2284C40.9948 33.3791 40.6641 33.6001 40.3855 33.8787C40.1069 34.1573 39.886 34.488 39.7352 34.8519C39.5844 35.2159 39.5068 35.606 39.5068 36H15.4852C15.4804 35.6188 15.403 35.2419 15.2571 34.8895C15.1063 34.5256 14.8853 34.1949 14.6067 33.9163C14.3282 33.6377 13.9975 33.4167 13.6335 33.266C13.2707 33.1157 12.882 33.0381 12.4894 33.0376V32H10.4894Z" fill="currentColor"/>
+                        <path d="M25 20C25 22.2091 23.2091 24 21 24C18.7909 24 17 22.2091 17 20C17 17.7909 18.7909 16 21 16C23.2091 16 25 17.7909 25 20Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M6 10C4.89543 10 4 10.8954 4 12V28C4 29.1046 4.89543 30 6 30H36C37.1046 30 38 29.1046 38 28V12C38 10.8954 37.1046 10 36 10H6ZM8.99817 12H33.0011C33.0016 12.3926 33.0792 12.7814 33.2295 13.1441C33.3802 13.5081 33.6012 13.8388 33.8798 14.1174C34.1584 14.396 34.4891 14.617 34.853 14.7677C35.2167 14.9184 35.6064 14.9959 36 14.9961V25.0001C35.612 25.0023 35.228 25.0798 34.8694 25.2284C34.5054 25.3791 34.1747 25.6001 33.8961 25.8787C33.6176 26.1573 33.3966 26.488 33.2458 26.8519C33.0951 27.2159 33.0175 27.606 33.0175 28H8.99581C8.99103 27.6188 8.91365 27.2419 8.76768 26.8895C8.61692 26.5256 8.39594 26.1949 8.11737 25.9163C7.83879 25.6377 7.50807 25.4167 7.1441 25.266C6.78134 25.1157 6.39262 25.0381 6 25.0376L6 15C6.39334 14.9998 6.78281 14.9222 7.14622 14.7716C7.5102 14.6209 7.84091 14.3999 8.11949 14.1213C8.39807 13.8427 8.61904 13.512 8.76981 13.1481C8.92057 12.7841 8.99817 12.394 8.99817 12Z" fill="currentColor"/>
+                        </svg>
                     <span class="mx-2 text-sm font-medium">Billing</span>
+                </a>
+                
+                <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.payments') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7 38C5.34315 38 4 36.6569 4 35V13C4 11.3431 5.34315 10 7 10H41C42.6569 10 44 11.3431 44 13V35C44 36.6569 42.6569 38 41 38H7ZM6 13C6 12.4477 6.44772 12 7 12H41C41.5523 12 42 12.4477 42 13V16H6V13ZM7 36C6.44772 36 6 35.5523 6 35V24H42V35C42 35.5523 41.5523 36 41 36H7Z" fill="currentColor"/>
+                        </svg>
+
+                    <span class="mx-2 text-sm font-medium">Payments</span>
                 </a>
 
                 <a class="flex items-center px-3 py-2 text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700" href="{{ url_for('patient.insurance') }}">
