@@ -219,6 +219,7 @@ class Reminder(db.Model):
     reminder_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     medication_id = db.Column(db.String(255), db.ForeignKey('medication.medication_id'))
     prescription_id = db.Column(db.Integer, db.ForeignKey('prescription.prescription_id'))
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
     time = db.Column(db.Time, nullable=False)
     taken = db.Column(db.Boolean, default=False)  # Add this field
     repeat = db.Column(db.Boolean, default=False)  # Add this field

@@ -584,8 +584,10 @@ def patients():
     page = request.args.get('page', 1, type=int)
 
     # Query patients who have completed appointments with the logged-in doctor
-    patients_query = db.session.query(ClientAccounts, Appointment).join(
+    patients_query = db.session.query(ClientAccounts, Appointment, Patient).join(
         Appointment, ClientAccounts.client_id == Appointment.client_id
+    ).join(
+        Patient, ClientAccounts.client_id == Patient.patient_id
     ).filter(
         Appointment.doctor_id == doctor_id,
         Appointment.status == 'Completed'  # Filter for completed appointments
@@ -603,12 +605,25 @@ def patients():
     if status_filter:
         patients_query = patients_query.filter(Appointment.status == status_filter)
 
+    # Calculate the patient's age
+    patients = []
+    for client_account, appointment, patient in patients_query.all():
+        # Calculate age
+        today = datetime.now().date()
+        if patient.dob:
+            age = today.year - patient.dob.year - ((today.month, today.day) < (patient.dob.month, patient.dob.day))
+        else:
+            age = 'N/A'  # Use 'N/A' when DOB is not available
+
+        # Append the patient data with age
+        patients.append((client_account, appointment, patient, age))
+
     # Implement pagination for the patient list
     pagination = patients_query.paginate(page=page, per_page=7)
 
     return render_template(
         'doctors/patients.html',
-        patients=pagination.items,
+        patients=patients,  # Use the new patients list with age
         pagination=pagination,
         search_query=search_query,
         status_filter=status_filter

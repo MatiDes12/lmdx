@@ -80,10 +80,9 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Medication Reminders</h2>
             <p class="text-gray-600">Set reminders for your medications to help you remember to take them on time.</p>
         </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Today's Schedule -->
-            <div class="bg-white rounded-2xl p-6 shadow-inner">
+        <div class="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-6">
+
+            <div class="bg-white rounded-2xl p-6 shadow-inner flex-1">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -112,10 +111,16 @@
                         <div class="text-right">
                             <p class="text-lg font-bold text-gray-600">{{ reminder.time.strftime('%I:%M %p') }}</p>
                             <div class="group relative mt-2 text-gray-500 text-sm flex items-center space-x-2">
-                                <button class="mark-as-taken mt-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-full text-sm hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105"
-                                    data-id="{{ reminder.reminder_id }}">
-                                    Mark as Taken
-                                </button>
+                                {% if reminder.taken %}
+                                    <span class="bg-green-500 text-white px-4 py-2 rounded-full text-sm cursor-not-allowed">
+                                        Taken
+                                    </span>
+                                {% else %}
+                                    <button class="mark-as-taken mt-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-full text-sm hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105"
+                                        data-id="{{ reminder.reminder_id }}">
+                                        Mark as Taken
+                                    </button>
+                                {% endif %}
                                 <div class="group relative">
                                     <button class="repeat-reminder mt-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-full text-sm hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105"
                                         data-id="{{ reminder.reminder_id }}">
@@ -139,11 +144,50 @@
                         </div>
                     </div>
                     {% endfor %}
+                    <hr class="my-8 border-gray-300" >
+                    <div id="tomorrow-reminders" >
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Tomorrow's Wellness Plan</h3>
+                        <div class="space-y-4">
+                            {% for reminder in tomorrow_reminders %}
+                            <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-xl flex items-center justify-between transform transition-all duration-300 hover:scale-105 hover:shadow-md">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M24 21C27.5899 21 30.5 18.0899 30.5 14.5C30.5 10.9101 27.5899 8 24 8C20.4101 8 17.5 10.9101 17.5 14.5C17.5 18.0899 20.4101 21 24 21ZM24 23C28.6944 23 32.5 19.1944 32.5 14.5C32.5 9.80558 28.6944 6 24 6C19.3056 6 15.5 9.80558 15.5 14.5C15.5 19.1944 19.3056 23 24 23Z" fill="currentColor"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M24.3845 9.91006C24.9349 9.95616 25.3437 10.4397 25.2976 10.99L24.6955 18.1774C24.6494 18.7277 24.1659 19.1365 23.6155 19.0904C23.0652 19.0443 22.6564 18.5608 22.7025 18.0104L23.3046 10.8231C23.3507 10.2727 23.8342 9.86395 24.3845 9.91006Z" fill="currentColor"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 40C18.0899 40 21 37.0899 21 33.5C21 29.9101 18.0899 27 14.5 27C10.9101 27 8 29.9101 8 33.5C8 37.0899 10.9101 40 14.5 40ZM14.5 42C19.1944 42 23 38.1944 23 33.5C23 28.8056 19.1944 25 14.5 25C9.80558 25 6 28.8056 6 33.5C6 38.1944 9.80558 42 14.5 42Z" fill="currentColor"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M17.7571 36.7573C17.3666 37.1479 16.7335 37.1479 16.3429 36.7573L11.2429 31.6573C10.8524 31.2668 10.8524 30.6336 11.2429 30.2431C11.6335 29.8526 12.2666 29.8526 12.6571 30.2431L17.7571 35.3431C18.1477 35.7336 18.1477 36.3668 17.7571 36.7573Z" fill="currentColor"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M33.5 38C37.0899 38 40 35.0899 40 31.5C40 27.9101 37.0899 25 33.5 25C29.9101 25 27 27.9101 27 31.5C27 35.0899 29.9101 38 33.5 38ZM33.5 40C38.1944 40 42 36.1944 42 31.5C42 26.8056 38.1944 23 33.5 23C28.8056 23 25 26.8056 25 31.5C25 36.1944 28.8056 40 33.5 40Z" fill="currentColor"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M37.7588 29.745C37.9693 30.2556 37.7259 30.8401 37.2153 31.0506L30.5469 33.7987C30.0362 34.0091 29.4517 33.7658 29.2413 33.2551C29.0308 32.7445 29.2742 32.16 29.7848 31.9496L36.4532 29.2014C36.9639 28.991 37.5484 29.2344 37.7588 29.745Z" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-lg text-gray-800">{{ reminder.prescription.medication_id }}</p>
+                                        <p class="text-sm text-gray-600">{{ reminder.prescription.dosage }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-600">{{ reminder.time.strftime('%I:%M %p') }}</p>
+                                    <div class="group relative mt-2 text-gray-500 text-sm flex items-center space-x-2">
+                                        <button class="mark-as-taken mt-2 bg-gray-400 text-white px-4 py-2 rounded-full text-sm cursor-not-allowed"
+                                            data-id="{{ reminder.reminder_id }}" disabled>
+                                            Mark as Taken
+                                        </button>
+                                        <button class="repeat-reminder mt-2 bg-gray-400 text-white px-4 py-2 rounded-full text-sm cursor-not-allowed"
+                                            data-id="{{ reminder.reminder_id }}" disabled>
+                                            Repeat
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </div>            
 
-            <!-- Set Reminders -->
-            <div class="bg-white rounded-2xl p-6 shadow-inner">
+            <!-- Set Reminders Section (Right) -->
+            <div class="bg-white rounded-2xl p-6 shadow-inner flex-1">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -174,6 +218,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <script>
@@ -187,8 +232,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (response.ok) {
                         this.innerHTML = '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
                         this.classList.remove('bg-gradient-to-r', 'from-gray-500', 'to-gray-600');
-                        this.classList.add('bg-green-500');
-                        this.disabled = true;
+                        this.classList.add('bg-green-500', 'cursor-not-allowed');
+                        this.setAttribute('disabled', true); // Disable the button
                     }
                 });
         });
@@ -200,12 +245,45 @@ document.addEventListener('DOMContentLoaded', function() {
             const reminderId = this.getAttribute('data-id');
             fetch(`/patient/repeat_reminder/${reminderId}`, { method: 'POST' })
                 .then(response => {
-                    if (response.ok) {
-                        alert('Reminder set to repeat daily');
+                    if (response.ok) {                        
+                        // Duplicate the reminder card for tomorrow
+                        const reminderElement = this.closest('.bg-gradient-to-r').cloneNode(true);
+
+                        // Change button states to reflect disabled state for tomorrow
+                        const markAsTakenButton = reminderElement.querySelector('.mark-as-taken');
+                        const repeatReminderButton = reminderElement.querySelector('.repeat-reminder');
+
+                        markAsTakenButton.disabled = true;
+                        repeatReminderButton.disabled = true;
+
+                        // Update button styles to gray
+                        markAsTakenButton.classList.remove('bg-gradient-to-r', 'from-gray-500', 'to-gray-600');
+                        markAsTakenButton.classList.add('bg-gray-400');
+                        repeatReminderButton.classList.remove('bg-gradient-to-r', 'from-gray-500', 'to-gray-600');
+                        repeatReminderButton.classList.add('bg-gray-400');
+
+                        // Remove event listeners from cloned buttons
+                        const newMarkAsTakenButton = markAsTakenButton.cloneNode(true);
+                        const newRepeatReminderButton = repeatReminderButton.cloneNode(true);
+
+                        markAsTakenButton.parentNode.replaceChild(newMarkAsTakenButton, markAsTakenButton);
+                        repeatReminderButton.parentNode.replaceChild(newRepeatReminderButton, repeatReminderButton);
+
+                        // Append the cloned reminder to the tomorrow section
+                        document.getElementById('tomorrow-reminders').querySelector('.space-y-4').appendChild(reminderElement);
+                        
+                        document.getElementById('tomorrow-reminders').classList.remove('hidden');
+                        window.location.reload(); 
+
+                        // Instead of reloading, append the new element
+                        alert('Reminder repeated for tomorrow!');
+                    } else {
+                        alert('Failed to repeat reminder.');
                     }
                 });
         });
     });
+
 
     // Handle Delete button
     document.querySelectorAll('.delete-reminder').forEach(button => {
@@ -216,6 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => {
                     if (response.ok) {
                         this.closest('.bg-gradient-to-r').remove();
+                        window.location.reload();
                     }
                 });
         });
