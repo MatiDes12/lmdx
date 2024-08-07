@@ -18,6 +18,7 @@ from firebase_admin import auth as firebase_auth
 from .instructions import advanced_instruction, formatting_instruction, greetings
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from sqlalchemy import and_, or_
 
@@ -975,43 +976,56 @@ def medication():
         return redirect(url_for('auth.signin'))
 
     client_id = session.get('user_id')
+    today = datetime.datetime.now().date()
+    tomorrow = today + timedelta(days=1)
 
     if request.method == 'POST':
         prescription_id = request.form.get('prescription_id')
         reminder_time = request.form.get('reminder_time')
-        
+
+        # Add new reminder for the chosen date
         new_reminder = Reminder(
             prescription_id=prescription_id,
+            date=today,  # Assume creating reminder for today; handle this logic appropriately
             time=datetime.datetime.strptime(reminder_time, "%H:%M").time()
         )
         db.session.add(new_reminder)
         db.session.commit()
-        flash('Reminder set successfully!', 'success')
+        flash('Reminder set successfully for today!', 'success')
         return redirect(url_for('patient.medication'))
     
     # Fetch prescriptions for the logged-in patient
     prescriptions = Prescription.query.filter_by(patient_id=client_id).all()
-    print("prescriptions: ", prescriptions)
+
     # Fetch today's reminders
     today_reminders = Reminder.query.join(Prescription).filter(
-        Reminder.time >= datetime.datetime.now().time(),
-        Prescription.patient_id == client_id
+        Reminder.date == today,
+        Prescription.patient_id == client_id,
+        # Reminder.taken == False
+    ).all()
+
+    # Fetch tomorrow's reminders
+    tomorrow_reminders = Reminder.query.join(Prescription).filter(
+        Reminder.date == tomorrow,
+        Prescription.patient_id == client_id,
+        # Reminder.taken == False
     ).all()
 
     return render_template(
         'clients/medication.html',
         prescriptions=prescriptions,
-        today_reminders=today_reminders
+        today_reminders=today_reminders,
+        tomorrow_reminders=tomorrow_reminders
     )
-
 @bp.route('/set_reminder', methods=['POST'])
 def set_reminder():
     prescription_id = request.form.get('prescription_id')
     reminder_time = request.form.get('reminder_time')
-    print("medication_id: ",prescription_id)
+    print("medication_id: ", prescription_id)
     
     new_reminder = Reminder(
         prescription_id=prescription_id,
+        date=datetime.datetime.now().date(),  # Set to today's date
         time=datetime.datetime.strptime(reminder_time, "%H:%M").time()
     )
     db.session.add(new_reminder)
@@ -1020,23 +1034,50 @@ def set_reminder():
     flash('Reminder set successfully!', 'success')
     return redirect(url_for('patient.medication'))
 
+
 @bp.route('/mark_as_taken/<int:reminder_id>', methods=['POST'])
 def mark_as_taken(reminder_id):
     reminder = Reminder.query.get(reminder_id)
     if reminder:
         reminder.taken = True
         db.session.commit()
-        return '', 204
-    return '', 404
+        return jsonify({'success': True}), 200
+    return jsonify({'error': 'Reminder not found'}), 404
+
+def move_taken_reminders_to_tomorrow():
+    today = datetime.datetime.now().date()
+    tomorrow = today + datetime.timedelta(days=1)
+    taken_reminders = Reminder.query.filter_by(date=today, taken=True).all()
+    for reminder in taken_reminders:
+        reminder.date = tomorrow
+        reminder.taken = False  # Reset for tomorrow
+    db.session.commit()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(move_taken_reminders_to_tomorrow, 'cron', hour=0)
+scheduler.start()
+
 
 @bp.route('/repeat_reminder/<int:reminder_id>', methods=['POST'])
 def repeat_reminder(reminder_id):
     reminder = Reminder.query.get(reminder_id)
     if reminder:
-        reminder.repeat = True
-        db.session.commit()
-        return '', 204
-    return '', 404
+        # Create a new reminder for tomorrow
+        new_reminder = Reminder(
+            prescription_id=reminder.prescription_id,
+            date=reminder.date + datetime.timedelta(days=1),  # Schedule for tomorrow
+            time=reminder.time,
+            taken=False,
+            repeat=True  # Mark as repeated
+        )
+        db.session.add(new_reminder)
+        db.session.commit()     
+
+        # Redirect to the medication page to trigger a page reload
+        return redirect(url_for('patient.medication'))
+    
+    flash('Failed to repeat reminder.', 'danger')
+    return redirect(url_for('patient.medication'))
 
 @bp.route('/delete_reminder/<int:reminder_id>', methods=['POST'])
 def delete_reminder(reminder_id):
