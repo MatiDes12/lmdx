@@ -59,13 +59,13 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="patient_name">
                         Patient Name
                     </label>
-                    <input type="text" id="patient_name" name="search" value="{{ search_query }}" placeholder="Search by patient name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="patient_name" name="search" value="{{ search_query }}" placeholder="Search by patient name" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
                         Status
                     </label>
-                    <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <select id="status" name="status" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         <option value="">All</option>
                         <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
                         <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
@@ -78,13 +78,13 @@
                         Age Range
                     </label>
                     <div class="flex space-x-2">
-                        <input type="number" id="age_min" name="age_min" placeholder="Min" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <input type="number" id="age_max" name="age_max" placeholder="Max" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <input type="number" id="age_min" name="age_min" placeholder="Min" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <input type="number" id="age_max" name="age_max" placeholder="Max" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     </div>
                 </div>
             </div>
             <div class="flex justify-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
                     Search Patients
                 </button>
             </div>
@@ -143,11 +143,11 @@
                             <p class="text-gray-900 whitespace-no-wrap">{{ age }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                            <span class="relative inline-block px-3 py-1 font-semibold text-green-500 leading-tight">
                                 <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
                                 <span class="relative">
                                     {% if client_account.type == 'client' %}
-                                        Patient
+                                        Active
                                     {% else %}
                                         {{ client_account.type }}
                                     {% endif %}
@@ -159,10 +159,11 @@
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex space-x-2">
-                                <a href="{{ url_for('doctor.patient_profile', client_id=client_account.client_id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
-                                <a href="{{ url_for('doctor.edit_patient', client_id=client_account.client_id) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
-                                <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id, status='Scheduled') }}" class="text-green-600 hover:text-green-900">Schedule</a>
-                                <a href="{{ url_for('doctor.update_patient_status', client_id=client_account.client_id, status='Alert') }}" class="text-red-600 hover:text-red-900">Alert</a>
+                                <a href="{{ url_for('doctor.patient_profile', client_id=client_account.client_id) }}">
+                                    <span class="hidden md:inline text-sm border border-green-400 text-green-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-green-400 hover:text-white">View Profile</span>
+                                </a>
+                                <a href="{{ url_for('doctor.reschedule_appointment', appointment_id=appointment.appointment_id, status='Scheduled') }}">
+                                    <span class="hidden md:inline text-sm border border-blue-400 text-blue-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-blue-400 hover:text-white">Reschedule</span>
                             </div>
                         </td>
                     </tr>

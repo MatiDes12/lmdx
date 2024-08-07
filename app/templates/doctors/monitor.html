@@ -18,119 +18,129 @@
         <p>Monitor various health metrics in real-time with advanced visualizations.</p>
     </div>
 
-    <!-- Monitoring Sections -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- EKG Monitoring -->
-        <div class="bg-white rounded-2xl p-6 shadow-inner">
-            <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M4.93 4.93a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0m-14.14-14.14a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0" />
+    <!-- Filter and Search Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Filter Health Metrics
+        </h2>
+        <div class="flex justify-between items-center">
+            <form action="" method="GET" class="flex flex-wrap gap-4 items-center">
+                <input type="text" id="search" name="search" placeholder="Search Patient..." class="shadow appearance-none border rounded-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full md:w-auto">
+                <select id="filter" name="filter" class="shadow appearance-none border rounded-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full md:w-auto">
+                    <option value="all">All Metrics</option>
+                    <option value="EKG">EKG</option>
+                    <option value="Blood Pressure">Blood Pressure</option>
+                    <option value="Heart Rate">Heart Rate</option>
+                    <option value="Temperature">Temperature</option>
+                </select>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
+                    Apply Filters
+                </button>
+            </form>
+            <div class="flex items-center space-x-2">
+                <span class="text-sm font-semibold">Connection:</span>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" id="connectionIcon" fill="#e8eaed">
+                    <path d="M160-400q-33 0-56.5-23.5T80-480q0-33 23.5-56.5T160-560q33 0 56.5 23.5T240-480q0 33-23.5 56.5T160-400Zm66 228-56-56 174-174 56 56-174 174Zm120-388L172-734l56-56 174 174-56 56ZM480-80q-33 0-56.5-23.5T400-160q0-33 23.5-56.5T480-240q33 0 56.5 23.5T560-160q0 33-23.5 56.5T480-80Zm0-640q-33 0-56.5-23.5T400-800q0-33 23.5-56.5T480-880q33 0 56.5 23.5T560-800q0 33-23.5 56.5T480-720Zm134 162-56-58 176-174 56 56-176 176Zm120 386L560-346l56-56 174 174-56 56Zm66-228q-33 0-56.5-23.5T720-480q0-33 23.5-56.5T800-560q33 0 56.5 23.5T880-480q0 33-23.5 56.5T800-400Z"/>
                 </svg>
-                EKG Monitoring
-            </h3>
-            <canvas id="ekgChart" class="w-full h-64"></canvas>
+            </div>
         </div>
+    </div>
 
-        <!-- Blood Pressure Monitoring -->
-        <div class="bg-white rounded-2xl p-6 shadow-inner">
-            <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M4.93 4.93a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0m-14.14-14.14a10.5 10.5 0 0114.14 0m-14.14 14.14a10.5 10.5 0 0114.14 0" />
-                </svg>
-                Blood Pressure Monitoring
-            </h3>
-            <canvas id="bpChart" class="w-full h-64"></canvas>
-        </div>
+    <!-- Monitoring Sections -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="chartsContainer">
+        <!-- Dynamic chart containers will be added here -->
     </div>
 </div>
 
-<!-- Chart.js Library -->
+<!-- Chart.js Library and Zoom Plugin -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 
-<!-- JavaScript for EKG and Blood Pressure Charts -->
+<!-- JavaScript for Dynamic Content, Real-Time Updates, and Animation -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // EKG Chart
-    var ctxEkg = document.getElementById('ekgChart').getContext('2d');
-    var ekgChart = new Chart(ctxEkg, {
-        type: 'line',
-        data: {
-            labels: Array.from({length: 50}, (_, i) => i + 1),
-            datasets: [{
-                label: 'EKG',
-                data: Array.from({length: 50}, () => Math.random() * 100),
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                fill: false,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            animation: {
-                duration: 0
-            },
-            scales: {
-                x: {
-                    display: false
-                },
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+    const connectionIcon = document.getElementById('connectionIcon');
+    const chartsContainer = document.getElementById('chartsContainer');
+    const filterSelect = document.getElementById('filter');
 
-    // Blood Pressure Chart
-    var ctxBp = document.getElementById('bpChart').getContext('2d');
-    var bpChart = new Chart(ctxBp, {
-        type: 'line',
-        data: {
-            labels: Array.from({length: 50}, (_, i) => i + 1),
-            datasets: [{
-                label: 'Systolic',
-                data: Array.from({length: 50}, () => 120 + Math.random() * 20),
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 2,
-                fill: false,
-                tension: 0.1
-            }, {
-                label: 'Diastolic',
-                data: Array.from({length: 50}, () => 80 + Math.random() * 10),
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 2,
-                fill: false,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            animation: {
-                duration: 0
-            },
-            scales: {
-                x: {
-                    display: false
-                },
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Update charts with new data every second
-    setInterval(function() {
-        ekgChart.data.datasets[0].data.shift();
-        ekgChart.data.datasets[0].data.push(Math.random() * 100);
-        ekgChart.update();
-
-        bpChart.data.datasets[0].data.shift();
-        bpChart.data.datasets[0].data.push(120 + Math.random() * 20);
-        bpChart.data.datasets[1].data.shift();
-        bpChart.data.datasets[1].data.push(80 + Math.random() * 10);
-        bpChart.update();
+    setInterval(() => {
+        const isConnected = Math.random() > 0.5;
+        connectionIcon.setAttribute('fill', isConnected ? '#4CAF50' : '#f44336');
     }, 1000);
+
+    function setupChart(ctx, label, color) {
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 60}, (_, i) => i),
+                datasets: [{ label: label, data: Array.from({length: 60}, () => Math.random() * 100), borderColor: color, borderWidth: 2, fill: false, tension: 0.1 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        },
+                        zoom: {
+                            wheel: { enabled: true },
+                            pinch: { enabled: true },
+                            mode: 'xy'
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Function to create a chart and its associated controls
+    function createChart(metric, color) {
+        const div = document.createElement('div');
+        div.className = 'chart-container bg-white rounded-2xl p-6 shadow-lg flex-grow';
+        div.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mb-4">${metric} Monitoring</h3><canvas></canvas><div class="flex mt-4 space-x-4 items-center">
+            <button class="zoom-in bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Zoom In</button>
+            <button class="zoom-out bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Zoom Out</button>
+            <button class="reset bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full">Reset</button></div>`;
+        chartsContainer.appendChild(div);
+        const canvas = div.querySelector('canvas');
+        const chart = setupChart(canvas.getContext('2d'), metric, color);
+
+        // Bind zoom in/out and reset buttons
+        div.querySelector('.zoom-in').addEventListener('click', () => {
+            chart.zoom(1.1);
+        });
+        div.querySelector('.zoom-out').addEventListener('click', () => {
+            chart.zoom(0.9);
+        });
+        div.querySelector('.reset').addEventListener('click', () => {
+            chart.resetZoom();
+        });
+    }
+
+    createChart('EKG', 'rgba(255, 99, 132, 1)');
+    createChart('Blood Pressure', 'rgba(54, 162, 235, 1)');
+    createChart('Heart Rate', 'rgba(75, 192, 192, 1)');
+    createChart('Temperature', 'rgba(153, 102, 255, 1)');
+
+    // Implement filtering logic
+    filterSelect.addEventListener('change', function() {
+        let value = filterSelect.value;
+        Array.from(chartsContainer.children).forEach((chartContainer) => {
+            if (value === 'all' || chartContainer.textContent.includes(value)) {
+                chartContainer.style.display = 'block';
+                chartContainer.classList.toggle('lg:col-span-2', value !== 'all');
+            } else {
+                chartContainer.style.display = 'none';
+            }
+        });
+    });
 });
 </script>
 {% endblock %}
