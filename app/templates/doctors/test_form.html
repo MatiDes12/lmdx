@@ -1,0 +1,142 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Doctors{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">Enter Test Data</h1>
+    <form action="{{ url_for('submit_test') }}" method="POST">
+        <input type="hidden" name="patient_id" value="{{ patient_id }}">
+        <input type="hidden" name="test_type" value="{{ test_type }}">
+        
+        {% if test_type == 'comprehensive_metabolic_panel' %}
+        <div class="mb-4">
+            <label for="sodium" class="block text-gray-700">Sodium (136-145 mmol/L):</label>
+            <input type="number" id="sodium" name="sodium" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="potassium" class="block text-gray-700">Potassium (3.5-5.0 mmol/L):</label>
+            <input type="number" id="potassium" name="potassium" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="chloride" class="block text-gray-700">Chloride (98-107 mmol/L):</label>
+            <input type="number" id="chloride" name="chloride" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="carbon_dioxide" class="block text-gray-700">Carbon Dioxide (23-29 mmol/L):</label>
+            <input type="number" id="carbon_dioxide" name="carbon_dioxide" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="glucose" class="block text-gray-700">Glucose (70-99 mg/dL):</label>
+            <input type="number" id="glucose" name="glucose" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="calcium" class="block text-gray-700">Calcium (8.5-10.2 mg/dL):</label>
+            <input type="number" id="calcium" name="calcium" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="protein" class="block text-gray-700">Total Protein (6.0-8.3 g/dL):</label>
+            <input type="number" id="protein" name="protein" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="albumin" class="block text-gray-700">Albumin (3.5-5.0 g/dL):</label>
+            <input type="number" id="albumin" name="albumin" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="bilirubin" class="block text-gray-700">Bilirubin (0.1-1.2 mg/dL):</label>
+            <input type="number" id="bilirubin" name="bilirubin" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="alkaline_phosphatase" class="block text-gray-700">Alkaline Phosphatase (44-147 IU/L):</label>
+            <input type="number" id="alkaline_phosphatase" name="alkaline_phosphatase" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="alt" class="block text-gray-700">ALT (7-56 IU/L):</label>
+            <input type="number" id="alt" name="alt" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="ast" class="block text-gray-700">AST (10-40 IU/L):</label>
+            <input type="number" id="ast" name="ast" class="block w-full mt-1">
+        </div>
+        {% elif test_type == 'lipid_panel' %}
+        <div class="mb-4">
+            <label for="cholesterol" class="block text-gray-700">Cholesterol (mg/dL):</label>
+            <input type="number" id="cholesterol" name="cholesterol" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="hdl" class="block text-gray-700">HDL (mg/dL):</label>
+            <input type="number" id="hdl" name="hdl" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="ldl" class="block text-gray-700">LDL (mg/dL):</label>
+            <input type="number" id="ldl" name="ldl" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="triglycerides" class="block text-gray-700">Triglycerides (mg/dL):</label>
+            <input type="number" id="triglycerides" name="triglycerides" class="block w-full mt-1">
+        </div>
+        {% elif test_type == 'cbc_auto_differential' %}
+        <div class="mb-4">
+            <label for="wbc" class="block text-gray-700">WBC (cells/mcL):</label>
+            <input type="number" id="wbc" name="wbc" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="rbc" class="block text-gray-700">RBC (cells/mcL):</label>
+            <input type="number" id="rbc" name="rbc" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="hemoglobin" class="block text-gray-700">Hemoglobin (g/dL):</label>
+            <input type="number" id="hemoglobin" name="hemoglobin" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="hematocrit" class="block text-gray-700">Hematocrit (%):</label>
+            <input type="number" id="hematocrit" name="hematocrit" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="mcv" class="block text-gray-700">MCV (fL):</label>
+            <input type="number" id="mcv" name="mcv" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="mch" class="block text-gray-700">MCH (pg):</label>
+            <input type="number" id="mch" name="mch" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="mchc" class="block text-gray-700">MCHC (g/dL):</label>
+            <input type="number" id="mchc" name="mchc" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="rdw" class="block text-gray-700">RDW (%):</label>
+            <input type="number" id="rdw" name="rdw" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="platelets" class="block text-gray-700">Platelets (cells/mcL):</label>
+            <input type="number" id="platelets" name="platelets" class="block w-full mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="mpv" class="block text-gray-700">MPV (fL):</label>
+            <input type="number" id="mpv" name="mpv" class="block w-full mt-1">
+        </div>
+        {% elif test_type == 'thyroid_simulating_hormone' %}
+        <div class="mb-4">
+            <label for="tsh" class="block text-gray-700">TSH (mIU/L):</label>
+            <input type="number" id="tsh" name="tsh" class="block w-full mt-1">
+        </div>
+        {% elif test_type == 'lipid_panel_direct_ldl' %}
+        <div class="mb-4">
+            <label for="ldl" class="block text-gray-700">Direct LDL (mg/dL):</label>
+            <input type="number" id="ldl" name="ldl" class="block w-full mt-1">
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+    </form>
+</div>
+{% endblock %}
