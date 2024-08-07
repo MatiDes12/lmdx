@@ -35,6 +35,7 @@
         height: 40px;
         border-radius: 50%;
         margin: 0 10px;
+        flex-shrink: 0; /* Prevent the avatar from shrinking */
     }
     .message .user .avatar {
         order: 2;  /* To position the avatar to the right of the content */
@@ -47,6 +48,11 @@
         height: 30px;
         animation: spin 2s linear infinite;
         margin: 0 auto;
+    }
+    #chat-messages .message .content {
+    flex-grow: 1; /* Allow the content to grow and take up available space */
+    word-wrap: break-word; /* Ensure long words break to avoid overflow */
+    overflow-wrap: break-word; /* Ensure long words break to avoid overflow */
     }
     @keyframes spin {
         0% { transform: rotate(0deg); }
@@ -103,16 +109,17 @@
         <!-- Chat Messages -->
         <div id="chat-messages" class="h-96 overflow-y-auto p-4 space-y-4">
             <!-- AI Welcome Message -->
-            <div class="message ai">
-                <div class="avatar">
+            <div class="message ai flex items-start space-x-4">
+                <div class="avatar flex-shrink-0">
                     <img class="h-10 w-10 rounded-full object-cover" src="/static/images/ai-avatar.png" alt="AI Avatar">
                 </div>
-                <div class="content bg-blue-100 rounded-lg p-3 max-w-3/4 ml-3">
+                <div class="content bg-blue-100 rounded-lg p-4 max-w-2">
                     <p class="text-sm text-gray-800">{{ greeting_message | safe }}</p>
                 </div>
             </div>
             <!-- User messages will be dynamically added here -->
         </div>
+
 
         <!-- Input Area -->
         <div class="border-t-2 border-gray-200 px-4 py-4 sm:mb-0">

@@ -472,41 +472,67 @@ def get_patient(patient_id):
         # Add other patient details as needed
     })
 
+
+#<---------------------- Doctor Profile ----------------------->
 @bp.route('/dashboard/doctors', methods=['GET'])
 def doctors():
     doctor_name = request.args.get('doctor_name', '').strip()
-    specialization = request.args.get('specialization', '')
-    status = request.args.get('status', '')
-
-    search_query = request.args.get('search', '').strip()
-    specialization_filter = request.args.get('specialization', 'All')
-    status_filter = request.args.get('status', 'All').lower()  # Convert to lowercase
+    specialization = request.args.get('specialization', 'All')
+    status = request.args.get('status', 'All').lower()  # Convert to lowercase
     
     page = request.args.get(get_page_parameter(), type=int, default=1)
     per_page = 10  # Number of items per page
     
-    doctors_query = Doctor.query
-    total = doctors_query.count()
-    pagination = doctors_query.paginate(page=page, per_page=per_page, error_out=False)
-    doctors = pagination.items
     query = Doctor.query
+    
     if doctor_name:
-        query = query.filter(Doctor.first_name.ilike(f'%{doctor_name}%') | Doctor.last_name.ilike(f'%{doctor_name}%'))
+        query = query.filter(Doctor.first_name.ilike(f'{doctor_name}%'))
 
     if specialization and specialization != "All":
         query = query.filter(Doctor.specialization == specialization)
 
-    if status and status != "All":
-        query = query.filter(Doctor.status == status)
-    doctors = query.all()
+    if status and status != "all":
+        query = query.filter(Doctor.status.ilike(f'%{status}%'))
+
+    total = query.count()
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    doctors = pagination.items
+    
     specializations = [s.specialization for s in Doctor.query.with_entities(Doctor.specialization).distinct()]
     
-    return render_template('doctors/doctors.html', doctors=doctors, search_query=search_query, specialization_filter=specialization_filter, status_filter=status_filter, pagination=pagination, specializations=specializations)
+    return render_template('doctors/doctors.html', doctors=doctors, specialization_filter=specialization, status_filter=status, pagination=pagination, specializations=specializations)
 
 
 
+@bp.route('/dashboard/doctors/<int:doctor_id>', methods=['GET'])
+def get_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    doctor_data = {
+        'first_name': doctor.first_name,
+        'last_name': doctor.last_name,
+        'specialization': doctor.specialization,
+        'status': doctor.status,
+        'schedule': doctor.schedule
+    }
+    return jsonify(doctor_data)
 
 
+@bp.route('/select_test', methods=['GET', 'POST'])
+def select_test():
+    if request.method == 'POST':
+        patient_id = request.form['patient_id']
+        test_type = request.form['test_type']
+        return render_template('test_form.html', patient_id=patient_id, test_type=test_type)
+    patients = Patient.query.all()  # Assuming you have a Patient model
+    return render_template('doctors/select_test.html', patients=patients)
+
+@bp.route('/submit_test', methods=['POST'])
+def submit_test():
+    patient_id = request.form['patient_id']
+    test_type = request.form['test_type']
+    test_data = request.form.to_dict()
+    # Save test data to the database
+    return jsonify({'status': 'success', 'message': 'Test data submitted successfully'})
 
 #<----------------------Add Doctor----------------------->
 @bp.route('/dashboard/add_doctor', methods=['GET', 'POST'])

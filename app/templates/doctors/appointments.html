@@ -43,11 +43,11 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="date">Date</label>
-                    <input type="date" id="date" name="date" value="{{ date_filter }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="date" id="date" name="date" value="{{ date_filter }}" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Status</label>
-                    <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <select id="status" name="status" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         <option value="">All</option>
                         <option value="Scheduled" {% if status_filter == 'Scheduled' %}selected{% endif %}>Scheduled</option>
                         <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
@@ -57,11 +57,11 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">Patient Name</label>
-                    <input type="text" id="patient" name="search" placeholder="Search by patient name" value="{{ search_query }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="patient" name="search" placeholder="Search by patient name" value="{{ search_query }}" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
             </div>
             <div class="flex justify-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Apply Filters</button>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">Apply Filters</button>
             </div>
         </form>
     </div>

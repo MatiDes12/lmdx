@@ -1,0 +1,38 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Lab Results{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">Select Test</h1>
+    <form action="{{ url_for('doctor.select_test') }}" method="POST">
+        <div class="mb-4">
+            <label for="patient_id" class="block text-gray-700">Select Patient:</label>
+            <select id="patient_id" name="patient_id" class="block w-full mt-1">
+                {% for patient in patients %}
+                <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="test_type" class="block text-gray-700">Select Test Type:</label>
+            <select id="test_type" name="test_type" class="block w-full mt-1">
+                <option value="comprehensive_metabolic_panel">Comprehensive Metabolic Panel</option>
+                <option value="lipid_panel">Lipid Panel</option>
+                <option value="cbc_auto_differential">CBC Auto Differential</option>
+                <option value="thyroid_simulating_hormone">Thyroid Simulating Hormone</option>
+                <option value="lipid_panel_direct_ldl">Lipid Panel with Direct LDL</option>
+            </select>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Next</button>
+    </form>
+</div>
+{% endblock %}

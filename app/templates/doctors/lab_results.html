@@ -1,6 +1,6 @@
 {% extends 'doctors/base.html' %}
 
-{% block title %}Lab Results{% endblock %}
+{% block title %}Doctors{% endblock %}
 
 {% block sidebar %}
 {% include 'doctors/sidebar.html' %}
@@ -11,356 +11,221 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" class="mr-4">
-            <rect width="48" height="48" fill="none"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M4.07965 18.2218L18.2218 4.07971L26 11.8579L11.8578 26L4.07965 18.2218ZM6.90808 18.2218L11.8578 23.1716L23.1715 11.8579L18.2218 6.90814L6.90808 18.2218Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.8578 23.1716L23.1715 11.8579L40.8492 29.5356C43.9734 32.6597 43.9734 37.7251 40.8492 40.8493C37.725 43.9735 32.6597 43.9735 29.5355 40.8493L11.8578 23.1716ZM14.6863 23.1716L30.9497 39.4351C33.2929 41.7782 37.0918 41.7782 39.435 39.4351C41.7781 37.0919 41.7781 33.2929 39.435 30.9498L23.1715 14.6863L14.6863 23.1716Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M19.636 23.8787L27.4142 16.1005L39.435 28.1213L31.6568 35.8995L19.636 23.8787ZM22.4644 23.8787L31.6568 33.0711L36.6066 28.1213L27.4142 18.929L22.4644 23.8787Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.32229 13.9792L15.7469 21.4038L14.3327 22.818L6.90808 15.3934L8.32229 13.9792Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.8578 10.4437L19.2824 17.8683L17.8682 19.2825L10.4436 11.8579L11.8578 10.4437Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.3934 6.90814L22.818 14.3328L21.4038 15.747L13.9791 8.32235L15.3934 6.90814Z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M25.6022 32.2314C24.9634 32.8702 24.5738 33.4408 24.4738 33.7409L22.5764 33.1084C22.8299 32.3478 23.501 31.5042 24.188 30.8172C24.9 30.1052 25.7812 29.4108 26.6134 28.9947L27.5079 30.7835C26.9259 31.0745 26.2161 31.6176 25.6022 32.2314Z" fill="currentColor"/>
-        </svg>
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold">Lab Results Management</h1>
-            <p class="text-lg">Manage and navigate through detailed lab results efficiently</p>
+        <div class="flex items-center mb-2 space-x-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48" fill="none">
+                <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+            </svg>
+            <h1 class="text-3xl font-bold">Blood Tests</h1>
+        </div>
+
+            <p>Enter test data for the selected patient.</p>
         </div>
     </div>
-
-    <!-- Patient Dropdown to Add Lab Results -->
-    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Add Lab Results
-        </h2>
-        <div class="mb-4">
-            <label for="patient_dropdown" class="block text-sm font-medium text-gray-700">Select Patient with Completed Appointment</label>
-            <select id="patient_dropdown" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm p-2 bg-gray-50 border border-gray-200" required>
-                <option value="" disabled selected>Select a patient</option>
-                {% for patient in patients %}
-                <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
-                {% endfor %}
-            </select>
+    
+    <!-- Navigation Bar -->
+    <div class="border-b-2 border-gray-300 mb-8 text-center">
+        <div class="flex space-x-4 -mb-px text-sm font-semibold text-gray-600 mt-4">
+        <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'comprehensive_metabolic_panel')">Comprehensive Metabolic Panel</button>
+        <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'lipid_panel')">Lipid Panel</button>
+        <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'cbc_auto_differential')">CBC Auto Differential</button>
+        <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'thyroid_simulating_hormone')">Thyroid Stimulating Hormone</button>
+        <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'lipid_panel_direct_ldl')">Lipid Panel with Direct LDL</button>
         </div>
     </div>
+    
+    <!-- Forms for Each Section -->
+    <form action="{{ url_for('doctor.submit_test') }}" method="POST" class="space-y-6">
+        <input type="hidden" name="patient_id" value="{{ patient_id }}">
+        <input type="hidden" name="test_type" value="{{ test_type }}">
 
-    <!-- Lab Results Filter Section -->
-    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            Filter Lab Results
-        </h2>
-        <form action="" method="GET" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="patient_name">
-                        Patient Name
-                    </label>
-                    <input type="text" id="patient_name" name="patient_name" placeholder="Search by patient name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="test_type">
-                        Test Type
-                    </label>
-                    <select id="test_type" name="test_type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">All</option>
-                        <option value="blood">Blood Work</option>
-                        <option value="urine">Urine Analysis</option>
-                        <option value="imaging">Imaging</option>
-                        <option value="biopsy">Biopsy</option>
-                        <option value="genetic">Genetic Testing</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="date_range">
-                        Date Range
-                    </label>
-                    <input type="date" id="date_range" name="date_range" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <!-- Comprehensive Metabolic Panel -->
+        <div id="comprehensive_metabolic_panel" class="test-section">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Comprehensive Metabolic Panel</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="sodium" class="block text-gray-700">Sodium (136-145 mmol/L):</label>
+                        <input type="number" id="sodium" name="sodium" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="potassium" class="block text-gray-700">Potassium (3.5-5.0 mmol/L):</label>
+                        <input type="number" id="potassium" name="potassium" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="chloride" class="block text-gray-700">Chloride (98-107 mmol/L):</label>
+                        <input type="number" id="chloride" name="chloride" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="carbon_dioxide" class="block text-gray-700">Carbon Dioxide (23-29 mmol/L):</label>
+                        <input type="number" id="carbon_dioxide" name="carbon_dioxide" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="glucose" class="block text-gray-700">Glucose (70-99 mg/dL):</label>
+                        <input type="number" id="glucose" name="glucose" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="calcium" class="block text-gray-700">Calcium (8.5-10.2 mg/dL):</label>
+                        <input type="number" id="calcium" name="calcium" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="protein" class="block text-gray-700">Total Protein (6.0-8.3 g/dL):</label>
+                        <input type="number" id="protein" name="protein" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="albumin" class="block text-gray-700">Albumin (3.5-5.0 g/dL):</label>
+                        <input type="number" id="albumin" name="albumin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="bilirubin" class="block text-gray-700">Bilirubin (0.1-1.2 mg/dL):</label>
+                        <input type="number" id="bilirubin" name="bilirubin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="alkaline_phosphatase" class="block text-gray-700">Alkaline Phosphatase (44-147 IU/L):</label>
+                        <input type="number" id="alkaline_phosphatase" name="alkaline_phosphatase" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="alt" class="block text-gray-700">ALT (7-56 IU/L):</label>
+                        <input type="number" id="alt" name="alt" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ast" class="block text-gray-700">AST (10-40 IU/L):</label>
+                        <input type="number" id="ast" name="ast" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
                 </div>
             </div>
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Apply Filters
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
 
-    <!-- Lab Results List -->
-    <div class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-            Lab Results
-        </h2>
-        {% if lab_results %}
-        <div class="overflow-x-auto">
-            <table class="min-w-full leading-normal">
-                <thead>
-                    <tr>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Patient
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Test Type
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Result Value
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Date
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Notes
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Image
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in lab_results %}
-                    <tr>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <div class="flex items-center">
-                                <div class="ml-3">
-                                    <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ result.patient.first_name }} {{ result.patient.last_name }}
-                                    </p>
-                                    <p class="text-gray-600 whitespace-no-wrap">{{ result.patient.email }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ result.test.test_name }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ result.result_value }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ result.result_date.strftime('%Y-%m-%d') }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ result.notes }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {% if result.image_path %}
-                            <a href="{{ url_for('static', filename=result.image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-900">View Image</a>
-                            {% else %}
-                            <span class="text-gray-600">No Image</span>
-                            {% endif %}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <div class="flex space-x-2">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900">View</a>
-                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <!-- Pagination -->
-        <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
-            <span class="text-xs xs:text-sm text-gray-900">
-                Showing {{ pagination.page }} to {{ pagination.pages }} of {{ pagination.total }} Entries
-            </span>
-            <div class="inline-flex mt-2 xs:mt-0">
-                {% if pagination.has_prev %}
-                <a href="{{ url_for('doctor.lab_results', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
-                    Prev
-                </a>
-                {% else %}
-                <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-l cursor-not-allowed" disabled>
-                    Prev
-                </button>
-                {% endif %}
-                
-                {% for page_num in pagination.iter_pages() %}
-                    {% if page_num %}
-                        {% if page_num != pagination.page %}
-                            <a href="{{ url_for('doctor.lab_results', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
-                                {{ page_num }}
-                            </a>
-                        {% else %}
-                            <span class="text-sm bg-blue-500 text-white font-semibold py-2 px-4">
-                                {{ page_num }}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4">...</span>
-                    {% endif %}
-                {% endfor %}
-                
-                {% if pagination.has_next %}
-                <a href="{{ url_for('doctor.lab_results', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
-                    Next
-                </a>
-                {% else %}
-                <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-r cursor-not-allowed" disabled>
-                    Next
-                </button>
-                {% endif %}
+        <!-- Lipid Panel -->
+        <div id="lipid_panel" class="test-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Lipid Panel</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="cholesterol" class="block text-gray-700">Cholesterol (mg/dL):</label>
+                        <input type="number" id="cholesterol" name="cholesterol" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="hdl" class="block text-gray-700">HDL (mg/dL):</label>
+                        <input type="number" id="hdl" name="hdl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ldl" class="block text-gray-700">LDL (mg/dL):</label>
+                        <input type="number" id="ldl" name="ldl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="triglycerides" class="block text-gray-700">Triglycerides (mg/dL):</label>
+                        <input type="number" id="triglycerides" name="triglycerides" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
             </div>
         </div>
-        {% else %}
-        <div class="text-center py-8">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No Lab Results Found</h3>
-            <p class="text-gray-500">There are currently no lab results available. Use the filter above to search for specific results or check back later.</p>
+
+        <!-- CBC Auto Differential -->
+        <div id="cbc_auto_differential" class="test-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">CBC Auto Differential</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="wbc" class="block text-gray-700">WBC (cells/mcL):</label>
+                        <input type="number" id="wbc" name="wbc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="rbc" class="block text-gray-700">RBC (cells/mcL):</label>
+                        <input type="number" id="rbc" name="rbc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="hemoglobin" class="block text-gray-700">Hemoglobin (g/dL):</label>
+                        <input type="number" id="hemoglobin" name="hemoglobin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="hematocrit" class="block text-gray-700">Hematocrit (%):</label>
+                        <input type="number" id="hematocrit" name="hematocrit" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mcv" class="block text-gray-700">MCV (fL):</label>
+                        <input type="number" id="mcv" name="mcv" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mch" class="block text-gray-700">MCH (pg):</label>
+                        <input type="number" id="mch" name="mch" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mchc" class="block text-gray-700">MCHC (g/dL):</label>
+                        <input type="number" id="mchc" name="mchc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="rdw" class="block text-gray-700">RDW (%):</label>
+                        <input type="number" id="rdw" name="rdw" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="platelets" class="block text-gray-700">Platelets (cells/mcL):</label>
+                        <input type="number" id="platelets" name="platelets" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700">MPV (fL):</label>
+                        <input type="number" id="mpv" name="mpv" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endif %}
-    </div>
+
+        <!-- Thyroid Stimulating Hormone -->
+        <div id="thyroid_simulating_hormone" class="test-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Thyroid Stimulating Hormone</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="tsh" class="block text-gray-700">TSH (mIU/L):</label>
+                        <input type="number" id="tsh" name="tsh" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lipid Panel with Direct LDL -->
+        <div id="lipid_panel_direct_ldl" class="test-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Lipid Panel with Direct LDL</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="ldl" class="block text-gray-700">Direct LDL (mg/dL):</label>
+                        <input type="number" id="ldl" name="ldl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Submit</button>
+    </form>
 </div>
-
-<!-- Lab Results Input Form Modal -->
-<div id="labResultModal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modal-title">Add Lab Result</h3>
-        </div>
-        <form id="labResultForm" action="{{ url_for('doctor.lab_results') }}" method="POST" enctype="multipart/form-data">
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="patient_id">Select Patient</label>
-                    <select name="patient_id" id="patient" required>
-                        {% for patient in patients %}
-                        <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="test_type">Select Test Type</label>
-                    <select name="test_id" id="test_type" required>
-                        {% for test in tests %}
-                        <option value="{{ test.test_id }}" data-description="{{ test.description }}">{{ test.test_name }}</option>
-                        {% endfor %}
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group" id="otherTestContainer">
-                    <label for="other_test_name">Other Test Name</label>
-                    <input type="text" name="other_test_name" id="other_test_name" placeholder="If other test name">
-                </div>                
-                <div class="form-group hidden" id="otherTestDescriptionContainer">
-                    <label for="other_test_description">Description</label>
-                    <textarea name="other_test_description" id="other_test_description" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="result_value">Result</label>
-                    <textarea name="result_value" id="result_value" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="result_date">Result Date</label>
-                    <input type="date" name="result_date" id="result_date" required>
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notes (Optional)</label>
-                    <textarea name="notes" id="notes" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="upload_file">Upload File (Optional)</label>
-                    <input type="file" name="upload_file" id="upload_file">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="submitLabResultForm()">Submit</button>
-                <button type="button" class="btn btn-secondary" onclick="closeLabResultModal()">Cancel</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
 
 <script>
-function toggleOtherTestInput() {
-var testType = document.getElementById('test_type');
-var otherTestNameInput = document.getElementById('other_test_name');
-
-// Check if the selected option is 'Other'
-if (testType.value === 'other') {
-    otherTestNameInput.disabled = false; // Enable the input
-    otherTestNameInput.focus(); // Optionally, focus the input
-} else {
-    otherTestNameInput.disabled = true; // Disable the input
-    otherTestNameInput.value = ''; // Optionally, clear the input
-}
-} 
-document.addEventListener("DOMContentLoaded", function() {
-    const testTypeSelect = document.getElementById('test_type');
-    const otherTestContainer = document.getElementById('otherTestContainer');
-    const otherTestDescriptionContainer = document.getElementById('otherTestDescriptionContainer');
-
-    // Show/Hide fields for 'Other' test type
-    testTypeSelect.addEventListener('change', function() {
-        if (testTypeSelect.value === 'other') {
-            otherTestContainer.classList.remove('hidden');
-            otherTestDescriptionContainer.classList.remove('hidden');
-        } else {
-            otherTestContainer.classList.add('hidden');
-            otherTestDescriptionContainer.classList.add('hidden');
-        }
+function showSection(sectionId) {
+    document.querySelectorAll('.test-section').forEach(section => {
+        section.classList.add('hidden');
     });
-
-    // Show the modal when a patient is selected
-    const patientDropdown = document.getElementById('patient_dropdown');
-    const labResultModal = document.getElementById('labResultModal');
-    const patientField = document.getElementById('patient');
-
-    patientDropdown.addEventListener('change', function() {
-        const selectedPatientId = patientDropdown.value;
-        if (selectedPatientId) {
-            // Set the selected patient in the modal's form
-            patientField.value = selectedPatientId;
-            // Show the modal
-            labResultModal.classList.remove('hidden');
-        }
-    });
-
-    // Remove the patient from the dropdown after form submission
-    const labResultForm = document.getElementById('labResultForm');
-    labResultForm.addEventListener('submit', function(e) {
-        e.preventDefault();  // Prevent default form submission for now
-
-        // Remove selected patient from dropdown
-        const selectedPatientId = patientField.value;
-        const optionToRemove = patientDropdown.querySelector(`option[value="${selectedPatientId}"]`);
-        if (optionToRemove) {
-            optionToRemove.remove();
-        }
-
-        // Now submit the form
-        labResultForm.submit();
-    });
-});
-
-function submitLabResultForm() {
-    document.getElementById('labResultForm').submit();
+    document.getElementById(sectionId).classList.remove('hidden');
 }
 
-function closeLabResultModal() {
-    document.getElementById('labResultModal').classList.add('hidden');
+function openTab(evt, tabName) {
+    var i, tabContent, tabLinks;
+    tabContent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+    tabLinks = document.getElementsByClassName("tabs");
+    for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" border-blue-500 text-blue-600", " border-transparent text-gray-600");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " border-blue-500 text-blue-600";
 }
+
+// Show the account settings section by default
+document.getElementById("comprehensive_metabolic_panel").style.display = "block";
 </script>
-
-
 {% endblock %}
-
-

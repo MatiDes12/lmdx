@@ -1,0 +1,241 @@
+{% extends 'clients/base.html' %}
+{% block title %}Payments{% endblock %}
+{% block navbar %}
+    {% include 'clients/navbar.html' %}
+{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Payments</h1>
+        <p>Manage your payment methods, view transaction history, and securely make payments.</p>
+    </div>
+
+
+    <!-- Payment Methods Section -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Payment Methods</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Credit Card -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-sm flex items-center relative">
+                <div class="absolute top-2 right-2 flex space-x-2">
+                    <button class="text-gray-500 transition-colors duration-200 hover:text-blue-500 focus:outline-none edit-card" data-card-id="1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                        </svg>
+                    </button>
+                    <button class="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none delete-card" data-card-id="1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div>
+                    <p class="text-lg font-semibold text-gray-800">Visa **** 1234</p>
+                    <p class="text-sm text-gray-600">Expires 12/24</p>
+                </div>
+            </div>
+            <!-- Add New Card -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-sm flex items-center justify-center">
+                <button class="text-blue-500 transition-colors duration-200 hover:text-blue-700 focus:outline-none add-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75v14.5m7.25-7.25H4.75" />
+                    </svg>
+                    <span class="ml-2">Add New Card</span>
+                </button>
+            </div>
+        </div>
+        <!-- Add New Card Modal -->
+        <div id="addCardModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="relative bg-white rounded-lg shadow-lg max-w-lg w-full">
+                    <div class="flex justify-end p-2">
+                        <button onclick="closeModal('addCardModal')" class="text-gray-400 hover:text-gray-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-medium text-gray-900" id="modal-title">Add New Card</h3>
+                        <form id="addCardForm">
+                            <div class="mt-4">
+                                <label for="cardNumber" class="block text-sm font-medium text-gray-700">Card Number</label>
+                                <input type="text" id="cardNumber" name="cardNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </div>
+                            <div class="mt-4">
+                                <label for="cardExpiry" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                                <input type="text" id="cardExpiry" name="cardExpiry" placeholder="MM/YY" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </div>
+                            <div class="mt-4">
+                                <label for="cardCVC" class="block text-sm font-medium text-gray-700">CVC</label>
+                                <input type="text" id="cardCVC" name="cardCVC" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </div>
+                            <div class="mt-6">
+                                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                                    Add Card
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History Section -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Transaction History</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ transaction.date.strftime('%Y-%m-%d') }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">{{ transaction.description }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">${{ transaction.amount }}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight
+                                {% if transaction.status == 'Completed' %}
+                                    text-green-900
+                                {% elif transaction.status == 'Pending' %}
+                                    text-yellow-900
+                                {% elif transaction.status == 'Failed' %}
+                                    text-red-900
+                                {% endif %}
+                            ">
+                                <span aria-hidden class="absolute inset-0 
+                                    {% if transaction.status == 'Completed' %}
+                                        bg-green-200
+                                    {% elif transaction.status == 'Pending' %}
+                                        bg-yellow-200
+                                    {% elif transaction.status == 'Failed' %}
+                                        bg-red-200
+                                    {% endif %}
+                                opacity-50 rounded-full"></span>
+                                <span class="relative">{{ transaction.status }}</span>
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex space-x-2">
+                                <button class="text-gray-500 transition-colors duration-200 hover:text-blue-500 focus:outline-none view-receipt" data-transaction-id="{{ transaction.id }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m4 4H9m6-8H9m4 12H9m6-16H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9m6-8H9m4 4H9" />
+                                    </svg>
+                                </button>
+                                <button class="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none dispute-transaction" data-transaction-id="{{ transaction.id }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- View Receipt Modal -->
+    <div id="viewReceiptModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="relative bg-white rounded-lg shadow-lg max-w-lg w-full">
+                <div class="flex justify-end p-2">
+                    <button onclick="closeModal('viewReceiptModal')" class="text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900" id="modal-title">Receipt Details</h3>
+                    <div id="receiptDetails" class="mt-4">
+                        <!-- Receipt details will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Dispute Transaction Modal -->
+<div id="disputeTransactionModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="relative bg-white rounded-lg shadow-lg max-w-lg w-full">
+            <div class="flex justify-end p-2">
+                <button onclick="closeModal('disputeTransactionModal')" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <h3 class="text-lg font-medium text-gray-900" id="modal-title">Dispute Transaction</h3>
+                <form id="disputeForm">
+                    <div class="mt-4">
+                        <label for="disputeReason" class="block text-sm font-medium text-gray-700">Reason for Dispute</label>
+                        <textarea id="disputeReason" name="disputeReason" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                            Submit Dispute
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const viewButtons = document.querySelectorAll('.view-receipt');
+    const disputeButtons = document.querySelectorAll('.dispute-transaction');
+
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const transactionId = this.getAttribute('data-transaction-id');
+            // Fetch and display receipt details
+            openModal('viewReceiptModal');
+        });
+    });
+
+    disputeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const transactionId = this.getAttribute('data-transaction-id');
+            // Fetch and display dispute form
+            openModal('disputeTransactionModal');
+        });
+    });
+
+    document.getElementById('disputeForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // Handle dispute submission
+        closeModal('disputeTransactionModal');
+    });
+});
+
+function openModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+</script>
+{% endblock %}

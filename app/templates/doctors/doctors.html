@@ -61,16 +61,16 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="doctor_name">
                         Doctor Name
                     </label>
-                    <input type="text" id="doctor_name" name="doctor_name" placeholder="Search by doctor name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="doctor_name" name="doctor_name" placeholder="Search by doctor name" value="{{ request.args.get('doctor_name', '') }}" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="specialization">
                         Specialization
                     </label>
-                    <select id="specialization" name="specialization" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">All</option>
+                    <select id="specialization" name="specialization" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="All" {% if specialization_filter == 'All' %}selected{% endif %}>All</option>
                         {% for spec in specializations %}
-                        <option value="{{ spec }}" {% if spec == current_specialization %}selected{% endif %}>{{ spec }}</option>
+                        <option value="{{ spec }}" {% if spec == specialization_filter %}selected{% endif %}>{{ spec }}</option>
                         {% endfor %}
                     </select>                    
                 </div>
@@ -78,15 +78,15 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
                         Status
                     </label>
-                    <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                    <select id="status" name="status" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
                     </select>
                 </div>
             </div>
             <div class="flex justify-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
                     Search Doctors
                 </button>
             </div>
@@ -166,11 +166,11 @@
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex space-x-2">
-                                <a href="#" class="btn-medical view-btn flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white font-semibold rounded-md shadow-md hover:bg-teal-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                                <a href="#" class="btn-medical view-btn flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white font-semibold rounded-full shadow-md hover:bg-teal-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
                                     <!-- <span class="icon">👁️</span> -->
                                     <span>View</span>
                                   </a>
-                                  <a href="#" class="btn-medical message-btn flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                  <a href="#" class="btn-medical message-btn flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-full shadow-md hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     <span class="icon">💬</span>
                                     <span>Message</span>
                                   </a>

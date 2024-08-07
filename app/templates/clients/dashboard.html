@@ -5,21 +5,31 @@
 {% block content %}
 <div class="p-4">
   <!-- Welcome Section -->
-  <div class="bg-gradient-to-r from-blue-500 to-teal-500 p-6 rounded-lg shadow-lg mb-6 text-white">
+  <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
     <h1 class="text-3xl font-bold">Welcome, {{ first_name }} {{ last_name }}!</h1>
     <p>Explore your health dashboard to stay on top of appointments, medications, and more.</p>
   </div>
 
   <div class="grid grid-cols-3 gap-4">
-    <!-- Left Section: Health Metrics -->
+    <!-- Left Section: Health Metrics and Recent Activity -->
     <div class="col-span-2">
-      <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+      <!-- Health Metrics -->
+      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
         Health Metrics
       </div>
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-3 gap-4 mb-4">
         <!-- Medication Reminders -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
-          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Medication</h3>
+          <div class="flex items-center mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none">
+                <rect width="48" height="48" fill="none"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 4C9.44772 4 9 4.44772 9 5V43C9 43.5523 9.44772 44 10 44H38C38.5523 44 39 43.5523 39 43V15C39 14.7348 38.8946 14.4804 38.7071 14.2929L28.7071 4.29289C28.5196 4.10536 28.2652 4 28 4H10ZM11 42V6H27V15C27 15.5523 27.4477 16 28 16H37V42H11ZM35.5858 14L29 7.41421V14H35.5858ZM17 33H19V26H20.5857L25.5858 31.0001L22.2929 34.293L23.7072 35.7072L27 32.4143L30.2928 35.7072L31.7071 34.293L28.4142 31.0001L31.7072 27.7072L30.2929 26.293L27 29.5859L23.3948 25.9808C25.4186 25.7825 27 24.0759 27 22C27 19.7909 25.2091 18 23 18H18C17.4477 18 17 18.4477 17 19V33ZM23 24H19V20H23C24.1046 20 25 20.8954 25 22C25 23.1046 24.1046 24 23 24Z" fill="currentColor"/>
+                </svg>
+            </div>
+          </div>
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Medications</h3>
+          
           <p class="text-sm text-gray-700 dark:text-gray-300">Upcoming medication schedules.</p>
           <a href="{{ url_for('patient.medication') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
               Manage Medications
@@ -28,6 +38,23 @@
 
         <!-- Appointment Reminders -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+            <div class="flex items-center mb-2">
+              <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M17 25H15V27H17V25ZM15 23C13.8954 23 13 23.8954 13 25V27C13 28.1046 13.8954 29 15 29H17C18.1046 29 19 28.1046 19 27V25C19 23.8954 18.1046 23 17 23H15Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M25 25H23V27H25V25ZM23 23C21.8954 23 21 23.8954 21 25V27C21 28.1046 21.8954 29 23 29H25C26.1046 29 27 28.1046 27 27V25C27 23.8954 26.1046 23 25 23H23Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M33 25H31V27H33V25ZM31 23C29.8954 23 29 23.8954 29 25V27C29 28.1046 29.8954 29 31 29H33C34.1046 29 35 28.1046 35 27V25C35 23.8954 34.1046 23 33 23H31Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M17 33H15V35H17V33ZM15 31C13.8954 31 13 31.8954 13 33V35C13 36.1046 13.8954 37 15 37H17C18.1046 37 19 36.1046 19 35V33C19 31.8954 18.1046 31 17 31H15Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M25 33H23V35H25V33ZM23 31C21.8954 31 21 31.8954 21 33V35C21 36.1046 21.8954 37 23 37H25C26.1046 37 27 36.1046 27 35V33C27 31.8954 26.1046 31 25 31H23Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M33 33H31V35H33V33ZM31 31C29.8954 31 29 31.8954 29 33V35C29 36.1046 29.8954 37 31 37H33C34.1046 37 35 36.1046 35 35V33C35 31.8954 34.1046 31 33 31H31Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M10 11C9.44772 11 9 11.4477 9 12V39C9 39.5523 9.44772 40 10 40H38C38.5509 40 39 39.5515 39 38.9978V12.0022C39 11.4485 38.5509 11 38 11H35V9H38C39.6583 9 41 10.3467 41 12.0022V38.9978C41 40.6533 39.6583 42 38 42H10C8.34315 42 7 40.6569 7 39V12C7 10.3431 8.34315 9 10 9H15V11H10ZM31 11H19V9H31V11Z" fill="currentColor"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M39 20H9V18H39V20Z" fill="currentColor"/>
+                  <path d="M15 7C15 6.44772 15.4477 6 16 6C16.5523 6 17 6.44772 17 7V14C17 14.5523 16.5523 15 16 15C15.4477 15 15 14.5523 15 14V7Z" fill="currentColor"/>
+                  <path d="M31 7C31 6.44772 31.4477 6 32 6C32.5523 6 33 6.44772 33 7V14C33 14.5523 32.5523 15 32 15C31.4477 15 31 14.5523 31 14V7Z" fill="currentColor"/>
+                  </svg>
+              </div>
+            </div>
+
           <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Appointments</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300">Your upcoming appointments.</p>
           <a href="{{ url_for('patient.appointments') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
@@ -37,49 +64,120 @@
 
         <!-- Test Results -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <div class="flex items-center mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 11C8 10.4477 8.44771 10 9 10H17C17.5523 10 18 10.4477 18 11C18 11.5523 17.5523 12 17 12V19H20V12C19.4477 12 19 11.5523 19 11C19 10.4477 19.4477 10 20 10H28C28.5523 10 29 10.4477 29 11C29 11.5523 28.5523 12 28 12V19H31V12C30.4477 12 30 11.5523 30 11C30 10.4477 30.4477 10 31 10H39C39.5523 10 40 10.4477 40 11C40 11.5523 39.5523 12 39 12V19H41V16H43V19H44V21H43V34H44V36H43V38H41V36H7V38H5V36H4V34H5V21H4V19H5V16H7V19H9V12C8.44771 12 8 11.5523 8 11ZM7 34H41V21H39V29C39 31.2091 37.2091 33 35 33C32.7909 33 31 31.2091 31 29V21H28V29C28 31.2091 26.2091 33 24 33C21.7909 33 20 31.2091 20 29V21H17V29C17 31.2091 15.2091 33 13 33C10.7909 33 9 31.2091 9 29V21H7V34ZM15 12V19H11V12H15ZM26 19L22 19V12H26V19ZM37 19H33V12H37V19ZM11 29V21H15V29C15 30.1046 14.1046 31 13 31C11.8954 31 11 30.1046 11 29ZM22 29V21L26 21V29C26 30.1046 25.1046 31 24 31C22.8954 31 22 30.1046 22 29ZM33 29V21H37V29C37 30.1046 36.1046 31 35 31C33.8954 31 33 30.1046 33 29Z" fill="currentColor"/>
+            </svg>
+            </div>
+          </div>
           <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Test Results</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300">Latest health test results.</p>
-          <a href="{{ url_for('patient.test_results') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-purple-800">
+          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-purple-800">
               Check Results
-          </a>
-        </div>
-
-        <!-- Lifestyle Tips -->
-        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
-          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Lifestyle Tips</h3>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Advice on healthy living habits.</p>
-          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800">
-              Explore Tips
-          </a>
-        </div>
-
-        <!-- Medical Articles -->
-        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
-          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Medical Articles</h3>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Read the latest health articles.</p>
-          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
-              Read Articles
           </a>
         </div>
 
         <!-- Health Tracker -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <div class="flex items-center mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path d="M440-40v-80q-125-14-214.5-103.5T122-438H42v-80h80q14-125 103.5-214.5T440-836v-80h80v80q125 14 214.5 103.5T838-518h80v80h-80q-14 125-103.5 214.5T520-120v80h-80Zm40-158q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Z"/>
+              </svg>
+            </div>
+          </div>
           <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Health Tracker</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300">Monitor your health metrics over time.</p>
-          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 dark:bg-teal-500 dark:hover:bg-teal-600 dark:focus:ring-teal-800">
+          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 dark:bg-teal-500 dark:hover:bg-teal-600 dark:focus:ring-teal-800">
               Track Health
           </a>
+        </div>
+
+        <!-- BMI Calculator -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <div class="flex items-center mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none">
+                <rect x="7" y="7" width="34" height="34" rx="2" stroke="white" stroke-width="2"/>
+                <path d="M15.125 23.5H12M15.125 23.5C16.1605 23.5 17 22.7165 17 21.75C17 20.7835 16.1605 20 15.125 20H12V27H15.125C16.1605 27 17 26.2165 17 25.25C17 24.2835 16.1605 23.5 15.125 23.5Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M36 20H31M33.5 27V20M36 27H31" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 27L21 20L24 23.5L27 20L27 27" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+          </div>
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">BMI Calculator</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Calculate your Body Mass Index.</p>
+          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800">
+              Calculate BMI
+          </a>
+        </div>
+
+        <!-- Blood Pressure Monitor -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
+          <div class="flex items-center mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="45" viewBox="0 0 48 48" fill="none">
+                <path d="M23.5 26.5L25 21.5L26.5 26.5L25 28.5L23.5 26.5Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M39.5076 18.8528C40.9495 18.4201 42 17.0827 42 15.5V9.5C42 7.567 40.433 6 38.5 6C36.567 6 35 7.567 35 9.5V15.5C35 17.0882 36.0578 18.4293 37.5073 18.8572C37.5156 19.982 37.53 21.0565 37.5437 22.0829L37.5437 22.084C37.5925 25.735 37.6332 28.7779 37.367 31.3076C36.9902 34.8886 36.027 37.0735 33.8843 38.3364C31.0049 40.0334 26.6466 40.621 22.9785 40.1592C21.1519 39.9292 19.5904 39.4496 18.5169 38.7934C18.0832 38.5283 17.752 38.2509 17.5114 37.9649C19.3353 37.8622 21.1162 37.5323 22.5645 36.9429C24.3416 36.2197 25.9525 34.9442 25.999 32.9293C29.3918 32.4445 32 29.5268 32 26C32 22.4735 29.3923 19.5561 26 19.0709V13.1221H25.9971C25.999 13.0815 26 13.0408 26 13C26 10.2386 21.5228 8 16 8C10.4772 8 6 10.2386 6 13C6 13.0408 6.00098 13.0815 6.00292 13.1221H6V32.8396C6 34.8246 7.66523 36.0935 9.42952 36.8249C11.0703 37.5052 13.1448 37.8844 15.2301 37.9774C15.6179 39.0406 16.4595 39.8798 17.4738 40.4998C18.8728 41.3549 20.7381 41.8929 22.7287 42.1435C26.6951 42.6429 31.5327 42.0438 34.8998 40.0594C37.865 38.3118 38.9558 35.3206 39.356 31.5168C39.6352 28.8635 39.5922 25.6347 39.5426 21.9138C39.5294 20.9275 39.5158 19.9067 39.5076 18.8528ZM38.5 8C39.3284 8 40 8.67157 40 9.5V15.5C40 16.3284 39.3284 17 38.5 17C37.6716 17 37 16.3284 37 15.5V9.5C37 8.67157 37.6716 8 38.5 8ZM24 13C24 13.2151 23.7737 13.9482 22.1766 14.7467C20.6992 15.4854 18.5183 16 16 16C13.4817 16 11.3008 15.4854 9.82336 14.7467C8.22632 13.9482 8 13.2151 8 13C8 12.7849 8.22632 12.0518 9.82336 11.2533C11.3008 10.5146 13.4817 10 16 10C18.5183 10 20.6992 10.5146 22.1766 11.2533C23.7737 12.0518 24 12.7849 24 13ZM24 16.0005C22.1755 17.2147 19.2712 18 16 18C15.6936 18 15.3903 17.9931 15.0909 17.9796V35.968C15.3957 35.9849 15.703 35.9953 16.0114 35.9988C18.179 36.0235 20.2859 35.711 21.8105 35.0905C23.3243 34.4744 23.9533 33.707 23.9975 32.9287C20.6064 32.4424 18 29.5256 18 26C18 22.4735 20.6077 19.5561 24 19.0709V16.0005ZM30 26C30 28.7614 27.7614 31 25 31C22.2386 31 20 28.7614 20 26C20 23.2386 22.2386 21 25 21C27.7614 21 30 23.2386 30 26Z" fill="currentColor"/>
+                </svg>
+            </div>
+          </div>
+          <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Blood Pressure</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Monitor your blood pressure.</p>
+          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
+              Monitor BP
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Recent Activity
+      </div>
+      <div class="space-y-2 mb-4">
+        {% for activity in recent_activities %}
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">{{ activity }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Daily Health Tips -->
+      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Daily Health Tips
+      </div>
+      <div class="space-y-2 mb-4">
+        {% for tip in health_tips %}
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">{{ tip }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Billing Information
+      </div>
+      <div class="space-y-2 mb-4">
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">Your last payment was on {{ last_payment_date }}.</p>
+        </div>
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">Your next payment is due on {{ next_payment_date }}.</p>
+        </div>
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">Your current balance is ${{ balance }}.</p>
         </div>
       </div>
     </div>
 
-
-  <!-- Right Section: Notifications and Reminders -->
-  <div class="col-span-1">
-    <div class="p-2 bg-gradient-to-r from-green-300 to-blue-500 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-        Notifications
-    </div>
-    <div class="space-y-2 notifications-container">
+    <!-- Right Section: Notifications and Reminders -->
+    <div class="col-span-1">
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+          Notifications
+      </div>
+      <div class="space-y-2 notifications-container mb-4 h-40 overflow-y-auto">
+        {% if notifications %}
         {% for notification in notifications %}
         <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div class="flex-shrink-0">
@@ -94,11 +192,53 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 text-center text-gray-700 dark:text-gray-300">
+          <p class="text-sm text-gray-700 dark:text-gray-300">No new notifications.</p>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Task Reminders -->
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+          Task Reminders
+      </div>
+      <div class="space-y-2 h-40 overflow-y-auto">
+          {% for task in tasks %}
+          <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+              <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+              <label for="task" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">{{ task }}</label>
+          </div>
+          {% endfor %}
+      </div>
+
+      <!-- Health Goals -->
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Health Goals
+      </div>
+      <div class="space-y-2 h-40 overflow-y-auto">
+        {% for goal in health_goals %}
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">{{ goal }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      <!-- Latest Health News -->
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Latest Health News
+      </div>
+      <div class="space-y-2 h-40 overflow-y-auto">
+        {% for news in health_news %}
+        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <p class="text-sm text-gray-700 dark:text-gray-300">{{ news }}</p>
+        </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
-
-
 </div>
+
 <div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
 
 <script>
@@ -113,7 +253,7 @@
               </svg>
           </div>
           <div class="px-4 py-2 -mx-3">
-              <div class="mx-3">z
+              <div class="mx-3">
                   <span class="font-semibold text-${category}-500 dark:text-${category}-400">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
                   <p class="text-sm text-gray-600 dark:text-gray-200">${message}</p>
               </div>
@@ -126,6 +266,5 @@
       }, 5000);
   }
 </script>
-
 
 {% endblock %}
