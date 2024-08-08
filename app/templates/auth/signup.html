@@ -60,12 +60,77 @@
               <input type="text" name="last_name" placeholder="Snow" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" required />
             </div>
             <div>
-              <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">State</label>
-              <input type="text" name="state" placeholder="State" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" required />
+              <div>
+                <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">State</label>
+                <select name="state" id="stateDropdown" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" required id = "stateDropdown">
+                  <option value="" disabled selected>Select State</option>
+                  <!-- First Quarter: Alabama to Hawaii -->
+                  <option value="Alabama">Alabama</option>
+                  <option value="Alaska">Alaska</option>
+                  <option value="Arizona">Arizona</option>
+                  <option value="Arkansas">Arkansas</option>
+                  <option value="California">California</option>
+                  <option value="Colorado">Colorado</option>
+                  <option value="Connecticut">Connecticut</option>
+                  <option value="Delaware">Delaware</option>
+                  <option value="Florida">Florida</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Hawaii">Hawaii</option>
+                                  
+                  <!-- Second Quarter: Idaho to Michigan -->
+                  <option value="Idaho">Idaho</option>
+                  <option value="Illinois">Illinois</option>
+                  <option value="Indiana">Indiana</option>
+                  <option value="Iowa">Iowa</option>
+                  <option value="Kansas">Kansas</option>
+                  <option value="Kentucky">Kentucky</option>
+                  <option value="Louisiana">Louisiana</option>
+                  <option value="Maine">Maine</option>
+                  <option value="Maryland">Maryland</option>
+                  <option value="Massachusetts">Massachusetts</option>
+                  <option value="Michigan">Michigan</option>
+                                  
+                  <!-- Third Quarter: Minnesota to Oregon -->
+                  <option value="Minnesota">Minnesota</option>
+                  <option value="Mississippi">Mississippi</option>
+                  <option value="Missouri">Missouri</option>
+                  <option value="Montana">Montana</option>
+                  <option value="Nebraska">Nebraska</option>
+                  <option value="Nevada">Nevada</option>
+                  <option value="New Hampshire">New Hampshire</option>
+                  <option value="New Jersey">New Jersey</option>
+                  <option value="New Mexico">New Mexico</option>
+                  <option value="New York">New York</option>
+                  <option value="North Carolina">North Carolina</option>
+                  <option value="North Dakota">North Dakota</option>
+                  <option value="Ohio">Ohio</option>
+                  <option value="Oklahoma">Oklahoma</option>
+                  <option value="Oregon">Oregon</option>
+                                  
+                  <!-- Fourth Quarter: Pennsylvania to Wyoming -->
+                  <option value="Pennsylvania">Pennsylvania</option>
+                  <option value="Rhode Island">Rhode Island</option>
+                  <option value="South Carolina">South Carolina</option>
+                  <option value="South Dakota">South Dakota</option>
+                  <option value="Tennessee">Tennessee</option>
+                  <option value="Texas">Texas</option>
+                  <option value="Utah">Utah</option>
+                  <option value="Vermont">Vermont</option>
+                  <option value="Virginia">Virginia</option>
+                  <option value="Washington">Washington</option>
+                  <option value="West Virginia">West Virginia</option>
+                  <option value="Wisconsin">Wisconsin</option>
+                  <option value="Wyoming">Wyoming</option>
+
+                </select>
+              </div>
             </div>
             <div>
               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Organization</label>
-              <input type="text" name="organization" placeholder="Organization Name" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" required />
+              <select name="organization" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" required id="organizationDropdown">
+                <option value="" disabled selected>Select Organization</option>
+                <!-- Organization options will be populated dynamically based on the selected state -->
+              </select>
             </div>
           {% endif %}
           <div>
@@ -98,12 +163,9 @@
     </div>
   </div>
 </section>
-<<<<<<< HEAD
-=======
 
 
 
->>>>>>> R_Branch
 <!-- Flash message container -->
 <div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
 
@@ -143,10 +205,35 @@
       {% endif %}
       {% endwith %}
   });
-<<<<<<< HEAD
+
+  document.getElementById('stateDropdown').addEventListener('change', function() {
+  var state = this.value;
+  console.log("Selected State: ", state); // Debugging: Check selected state
+  fetch('/static/organizations_by_state.json')  // Adjust the path according to your project structure
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Loaded Data: ", data); // Debugging: Log loaded data
+      var organizations = data[state];
+      if (!organizations) {
+        console.log("No organizations found for this state.");
+        return;
+      }
+      var orgDropdown = document.getElementById('organizationDropdown');
+      orgDropdown.innerHTML = '<option value="" disabled selected>Select Organization</option>'; // Reset with default option
+      organizations.forEach(function(org) {
+        var option = new Option(org, org);
+        orgDropdown.add(option);
+      });
+    })
+    .catch(error => console.error('Fetch error:', error)); // Debugging: Log any fetch errors
+});
+
+
   </script>
-=======
-</script>
->>>>>>> R_Branch
 
 {% endblock %}
