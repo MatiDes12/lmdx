@@ -238,7 +238,7 @@ def generate_account(doctor_id):
             username=username,
             email=email,
             password_hash=hashed_password,
-            user_type='doctor',  
+            user_type='doctors',  
             created_at=datetime.now(),
             firebase_uid = "None"
         )
@@ -987,12 +987,12 @@ def admin_help_center():
     # Logic for help center
     return render_template('admin/help_center.html')
 
-@bp.route('/admin/support/contact')
-def admin_contact_support():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-    # Logic for contacting support
-    return render_template('admin/contact_support.html')
+# @bp.route('/admin/support/contact')
+# def admin_contact_support():
+#     if 'user' not in session:
+#         return redirect(url_for('auth.signin'))
+#     # Logic for contacting support
+#     return render_template('admin/contact_support.html')
 
 # Logout
 @bp.route('/logout')

@@ -22,17 +22,17 @@
             <!-- Mobile Menu open: "block", Menu closed: "hidden" -->
             <div :class="{ 'block': isOpen, 'hidden': !isOpen }" class="absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
                 <div class="flex flex-col -mx-6 lg:flex-row lg:items-center lg:mx-8">
-                    <a href="{{ url_for('doctor.patient_records') }}" class="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Patient Records</a>
-                    <a href="{{ url_for('doctor.clinical_reports') }}" class="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Clinical Reports</a>
-                    <a href="{{ url_for('doctor.ai_diagnostics') }}" class="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">AI Diagnostics</a>
-                    <a href="{{ url_for('doctor.healthcare_insights') }}" class="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Healthcare Insights</a>
+                    <!-- Other navigation items can go here -->
                 </div>
 
-                <!--  -->
-                <button class="hidden mx-4 text-gray-600 transition-colors duration-300 transform lg:block dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 focus:text-gray-700 dark:focus:text-gray-400 focus:outline-none" aria-label="show notifications">
+                <!-- Notifications Button -->
+                <button class="hidden mx-4 text-gray-600 transition-colors duration-300 transform lg:block dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 focus:text-gray-700 dark:focus:text-gray-400 focus:outline-none" aria-label="show notifications" href="{{ url_for('doctor.messages') }}">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M15 17H20L18.5951 15.5951C18.2141 15.2141 18 14.6973 18 14.1585V11C18 8.38757 16.3304 6.16509 14 5.34142V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V5.34142C7.66962 6.16509 6 8.38757 6 11V14.1585C6 14.6973 5.78595 15.2141 5.40493 15.5951L4 17H9M15 17V18C15 19.6569 13.6569 21 12 21C10.3431 21 9 19.6569 9 18V17M15 17H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
+                    {% if unread_messages_count|default(0) > 0 %}
+                    <span class="absolute top-0 right-0 mt-0.5 mr-0.5 inline-flex items-center justify-center w-2.5 h-2.5 bg-red-500 text-white text-xs font-bold rounded-full"></span>
+                    {% endif %}
                 </button>
 
                 <!-- Profile Dropdown -->
@@ -41,22 +41,21 @@
                         <button @click="open = !open" class="flex items-center focus:outline-none">
                             <!-- Profile button and avatar -->
                             <div class="w-8 h-8 overflow-hidden border-2 border-gray-400 rounded-full">
-                                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80" alt="Profile" class="object-cover w-full h-full">
+                                <img src="{{ url_for('static', filename=doctor_info.image_path if doctor_info and doctor_info.image_path else 'images/profilePic.jpg') }}" alt="Profile" class="object-cover w-full h-full">
                             </div>
                         </button>
                         <div x-show="open" class="absolute right-0 w-48 py-2 mt-2 bg-white rounded-md shadow-xl">
-                            <a href="{{ url_for('doctor.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Profile</a>
+                            <a href="{{ url_for('doctor.settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Profile</a>
                             <a href="{{ url_for('doctor.settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Settings</a>
-                            <a href="{{ url_for('admin.admin_contact_support') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Support</a>
+                            <a href="{{ url_for('contact.contact') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Support</a>
                             <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Sign out</a>
                             <hr class="my-2 border-t border-gray-200">
                             <!-- Additional project-related links -->
-                            <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Patient Management</a>
-                            <a href="doctor.reports" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Medical Records</a>
+                            <a href="{{ url_for('doctor.patients') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Patient Management</a>
+                            <a href="{{ url_for('doctor.reports') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Medical Records</a>
                             <a href="{{ url_for('doctor.appointments') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @click="open = false">Appointment Scheduling</a>
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </div>

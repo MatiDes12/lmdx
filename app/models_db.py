@@ -115,12 +115,20 @@ class Account(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     status = db.Column(db.String(20), nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    plain_password = db.Column(db.String(255), nullable=True)
+    password = db.Column(db.String(255), nullable=False)  # Hashed password
+    plain_password = db.Column(db.String(255), nullable=True)  # Store hashed password initially, and update with new hashed password
     last_login = db.Column(db.DateTime, nullable=True)
-
+    
     doctor = db.relationship('Doctor', backref=db.backref('accounts', lazy=True))
 
+    def set_password(self, password):
+        """Generate a hash for the password."""
+        self.password = generate_password_hash(password).decode('utf-8')
+        self.plain_password = self.password
+
+    def check_password(self, password):
+        """Check if the provided password matches the stored hash."""
+        return check_password_hash(self.password, password)
 
 class Doctor(db.Model):
     __tablename__ = 'doctors'
@@ -130,9 +138,14 @@ class Doctor(db.Model):
     specialization = db.Column(db.String(100), nullable=False)
     license_number = db.Column(db.String(50), unique=True, nullable=False)
     phone_number = db.Column(db.String(20))
+    dob = db.Column(db.Date, nullable=True)  # Date of birth, requires a Date type
+    address = db.Column(db.String(255), nullable=True)  # Address of the doctor
+    gender = db.Column(db.String(20), nullable=True)  # Gender of the doctor
     status = db.Column(db.String(20), default='Inactive', nullable=False)
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
+    image_path = db.Column(db.String(255))
+
 
 class Staff(db.Model):
     staff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)

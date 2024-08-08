@@ -1,5 +1,4 @@
 import os
-import random
 from flask import Blueprint, flash, jsonify, render_template, request, send_from_directory, session, redirect, url_for
 import pytz
 from ..models_db import LabResult, LabTest, Patient, Doctor, Appointment, Message, Prescription, Settings, User, Account, ClientAccounts, Notification
@@ -14,14 +13,17 @@ from flask_paginate import Pagination, get_page_parameter
 from sqlalchemy import and_, and_, or_
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
-
+from firebase_admin import auth as firebase_auth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Define a folder where uploaded images will be stored
 UPLOAD_FOLDER = os.path.join('app', 'static', 'uploads', 'lab_results')
+UPLOAD_FOLDER_PROF = os.path.join('app', 'static', 'uploads', 'profile_pictures')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER_PROF, exist_ok=True)
+
 
 # Configure your Google Gemini API key
 GOOGLE_API_KEY1 = ''
@@ -1041,69 +1043,6 @@ def monitor():
     
     return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
 
-
-#<----------------------Firebase Authentication----------------------->
-
-def firebase_login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        id_token = request.cookies.get('token')
-        if not id_token:
-            return redirect(url_for('auth.signin'))
-        try:
-            decoded_token = auth.verify_id_token(id_token)
-            session['user_id'] = decoded_token['uid']
-            session['email'] = decoded_token['email']
-        except Exception as e:
-            flash('Authentication failed. Please sign in again.', 'error')
-            return redirect(url_for('auth.signin'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-@bp.route('/settings', methods=['GET', 'POST'])
-def settings():
-    if 'user' not in session:
-        return redirect(url_for('auth.signin'))
-
-    return render_template('doctors/settings.html')
-
-@bp.route('/settings/toggle_dark_mode', methods=['POST'])
-@firebase_login_required
-def toggle_dark_mode():
-    user = User.query.filter_by(email=session.get('email')).first()
-    if user and user.settings:
-        user.settings.dark_mode = not user.settings.dark_mode
-        db.session.commit()
-        return jsonify({'success': True, 'dark_mode': user.settings.dark_mode})
-    return jsonify({'success': False}), 400
-
-@bp.route('/settings/update_timezone', methods=['POST'])
-@firebase_login_required
-def update_timezone():
-    user = User.query.filter_by(email=session.get('email')).first()
-    if user and user.settings:
-        new_timezone = request.json.get('timezone')
-        if new_timezone in pytz.all_timezones:
-            user.settings.timezone = new_timezone
-            db.session.commit()
-            return jsonify({'success': True, 'timezone': user.settings.timezone})
-    return jsonify({'success': False}), 400
-
-@bp.route('/settings/test_notification', methods=['POST'])
-@firebase_login_required
-def test_notification():
-    notification_type = request.json.get('type')
-    user = User.query.filter_by(email=session.get('email')).first()
-    
-    if notification_type == 'email' and user.settings.email_notifications:
-        # Implement email sending logic here
-        return jsonify({'success': True, 'message': 'Test email sent successfully'})
-    elif notification_type == 'sms' and user.settings.sms_notifications:
-        # Implement SMS sending logic here
-        return jsonify({'success': True, 'message': 'Test SMS sent successfully'})
-    
-    return jsonify({'success': False, 'message': 'Notification type not enabled'}), 400
-
 #<----------------------Dashboard Navbar----------------------->
 @bp.route('/patient-records')
 def patient_records():
@@ -1129,14 +1068,87 @@ def healthcare_insights():
         return redirect(url_for('auth.signin'))
     return render_template('doctors/healthcare_insights.html')
 
-@bp.route('/profile')
-def profile():
-    if 'user' not in session or session.get('user_type') != 'doctor':
-        return redirect(url_for('auth.signin'))
-    return render_template('doctors/profile.html')
+
 
 @bp.route('/notifications')
 def notifications():
     if 'user' not in session or session.get('user_type') != 'doctor':
         return redirect(url_for('auth.signin'))
     return render_template('doctors/notifications.html')
+
+
+#<---------------------- settings ----------------------->
+
+@bp.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if 'user' not in session:
+        return redirect(url_for('auth.signin'))
+
+    user_id = session['user_id']
+    print("user_id: ", user_id)
+    user = Account.query.get(user_id)
+    print("user: ", user)
+    doctor_info = Doctor.query.get(user.doctor_id)
+    user_local = User.query.filter_by(email=user.email).first()
+
+    if request.method == 'POST':
+        form_name = request.form.get('form_name')
+
+        if form_name == 'personal_info':
+            doctor_info.first_name = request.form.get('first_name')
+            doctor_info.last_name = request.form.get('last_name')
+            doctor_info.dob = datetime.strptime(request.form.get('dob'), '%Y-%m-%d').date()
+            doctor_info.gender = request.form.get('gender')
+
+            user_local.username = f"{doctor_info.first_name} {doctor_info.last_name}"
+
+            if 'profile_picture' in request.files:
+                profile_picture = request.files['profile_picture']
+                if profile_picture and allowed_file(profile_picture.filename):
+                    filename = secure_filename(profile_picture.filename)
+                    image_path = os.path.join(UPLOAD_FOLDER_PROF, filename)
+                    profile_picture.save(image_path)
+                    doctor_info.image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
+
+            db.session.commit()
+            flash('Personal information updated successfully!', 'success')
+
+        elif form_name == 'contact_details':
+            doctor_info.phone_number = request.form.get('phone')
+            doctor_info.address = request.form.get('address')
+            db.session.commit()
+            flash('Contact details updated successfully!', 'success')
+
+        elif form_name == 'preferences':
+            user_local.language = request.form.get('language')
+            user_local.timezone = request.form.get('timezone')
+            user_local.email_notifications = 'email_notifications' in request.form
+            user_local.sms_notifications = 'sms_notifications' in request.form
+            db.session.commit()
+            flash('Preferences updated successfully!', 'success')
+
+        elif form_name == 'security_settings':
+            current_password = request.form['current_password']
+            new_password = request.form['new_password']
+            confirm_password = request.form['confirm_password']
+
+            if not check_password_hash(user.password, current_password):
+                flash('Current password is incorrect', 'danger')
+            elif new_password != confirm_password:
+                flash('New passwords do not match', 'danger')
+            else:
+                try:
+                    # Update password in Firebase
+                    firebase_auth.update_user(user_id, password=new_password)    
+                                    
+                    # Hash the new password and update local database
+                    hashed_password = generate_password_hash(new_password)
+                    user.password = hashed_password
+                    user.plain_password = hashed_password
+                    db.session.commit()
+                    
+                    flash('Password updated successfully!', 'success')
+                except Exception as e:
+                    flash(f'Error updating password: {e}', 'danger')
+
+    return render_template('doctors/settings.html', user=user, doctor_info=doctor_info, user_local=user_local)
