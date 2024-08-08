@@ -94,24 +94,25 @@
           </a>
         </div>
 
-        <!-- BMI Calculator -->
+        <!-- BMI Calculator Card -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
           <div class="flex items-center mb-2">
-            <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none">
-                <rect x="7" y="7" width="34" height="34" rx="2" stroke="white" stroke-width="2"/>
-                <path d="M15.125 23.5H12M15.125 23.5C16.1605 23.5 17 22.7165 17 21.75C17 20.7835 16.1605 20 15.125 20H12V27H15.125C16.1605 27 17 26.2165 17 25.25C17 24.2835 16.1605 23.5 15.125 23.5Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M36 20H31M33.5 27V20M36 27H31" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                <path d="M21 27L21 20L24 23.5L27 20L27 27" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
+              <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xl font-bold uppercase shadow-md hover:shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none">
+                      <rect x="7" y="7" width="34" height="34" rx="2" stroke="white" stroke-width="2"/>
+                      <path d="M15.125 23.5H12M15.125 23.5C16.1605 23.5 17 22.7165 17 21.75C17 20.7835 16.1605 20 15.125 20H12V27H15.125C16.1605 27 17 26.2165 17 25.25C17 24.2835 16.1605 23.5 15.125 23.5Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                      <path d="M36 20H31M33.5 27V20M36 27H31" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M21 27L21 20L24 23.5L27 20L27 27" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+              </div>
           </div>
           <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">BMI Calculator</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300">Calculate your Body Mass Index.</p>
-          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800">
+          <a href="{{ url_for('patient.bmi_calculator') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 dark:bg-orange-500 dark:hover:bg-orange-600 dark:focus:ring-orange-800">
               Calculate BMI
           </a>
         </div>
+
 
         <!-- Blood Pressure Monitor -->
         <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 relative">
