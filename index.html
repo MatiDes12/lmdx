@@ -1,0 +1,166 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Urine Analysis{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">Enter Urine Analysis Data</h1>
+    
+    <!-- Navigation Bar -->
+    <nav class="flex mb-4 space-x-4">
+        <button class="nav-link bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="showSection('physical_properties')">Physical Properties</button>
+        <button class="nav-link bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="showSection('chemical_properties')">Chemical Properties</button>
+        <button class="nav-link bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="showSection('microscopic_examination')">Microscopic Examination</button>
+    </nav>
+    
+    <!-- Forms for Each Section -->
+    <form action="{{ url_for('submit_urine_analysis') }}" method="POST" class="space-y-6">
+        <input type="hidden" name="patient_id" value="{{ patient_id }}">
+        
+        <!-- Physical Properties -->
+        <div id="physical_properties" class="test-section">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Physical Properties</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="color" class="block text-gray-700"><i class="fas fa-tint mr-2"></i>Color:</label>
+                        <input type="text" id="color" name="color" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="clarity" class="block text-gray-700"><i class="fas fa-eye-dropper mr-2"></i>Clarity:</label>
+                        <input type="text" id="clarity" name="clarity" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="specific_gravity" class="block text-gray-700"><i class="fas fa-balance-scale mr-2"></i>Specific Gravity (1.005-1.030):</label>
+                        <input type="number" step="0.001" id="specific_gravity" name="specific_gravity" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" oninput="checkRange(this, 1.005, 1.030)">
+                    </div>
+                    <div class="mb-4">
+                        <label for="volume" class="block text-gray-700"><i class="fas fa-flask mr-2"></i>Volume (mL):</label>
+                        <input type="number" id="volume" name="volume" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chemical Properties -->
+        <div id="chemical_properties" class="test-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Chemical Properties</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="ph" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>pH (4.5-8.0):</label>
+                        <input type="number" step="0.1" id="ph" name="ph" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" oninput="checkRange(this, 4.5, 8.0)">
+                    </div>
+                    <div class="mb-4">
+                        <label for="protein" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Protein (mg/dL):</label>
+                        <input type="number" id="protein" name="protein" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="glucose" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Glucose (mg/dL):</label>
+                        <input type="number" id="glucose" name="glucose" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ketones" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Ketones (mg/dL):</label>
+                        <input type="number" id="ketones" name="ketones" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="bilirubin" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Bilirubin (mg/dL):</label>
+                        <input type="number" id="bilirubin" name="bilirubin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="urobilinogen" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Urobilinogen (mg/dL):</label>
+                        <input type="number" id="urobilinogen" name="urobilinogen" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="nitrite" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Nitrite:</label>
+                        <input type="text" id="nitrite" name="nitrite" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="leukocyte_esterase" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Leukocyte Esterase:</label>
+                        <input type="text" id="leukocyte_esterase" name="leukocyte_esterase" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Microscopic Examination -->
+        <div id="microscopic_examination" class="test-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Microscopic Examination</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="rbc" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>RBC (cells/hpf):</label>
+                        <input type="number" id="rbc" name="rbc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="wbc" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>WBC (cells/hpf):</label>
+                        <input type="number" id="wbc" name="wbc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="epithelial_cells" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Epithelial Cells:</label>
+                        <input type="text" id="epithelial_cells" name="epithelial_cells" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="casts" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Casts:</label>
+                        <input type="text" id="casts" name="casts" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="crystals" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Crystals:</label>
+                        <input type="text" id="crystals" name="crystals" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="bacteria" class="block text-gray-700"><i class="fas fa-vial mr-2"></i>Bacteria:</label>
+                        <input type="text" id="bacteria" name="bacteria" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Submit</button>
+    </form>
+</div>
+
+<script>
+function showSection(sectionId) {
+    document.querySelectorAll('.test-section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    document.getElementById(sectionId).classList.remove('hidden');
+}
+
+function checkRange(input, min, max) {
+    const value = parseFloat(input.value);
+    if (value < min) {
+        input.style.borderColor = 'red';
+        input.style.animation = 'shake 0.5s';
+    } else if (value > max) {
+        input.style.borderColor = 'orange';
+        input.style.animation = 'shake 0.5s';
+    } else {
+        input.style.borderColor = 'green';
+        input.style.animation = 'none';
+    }
+}
+
+// Add CSS for shake animation
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+</style>
+`);
+</script>
+{% endblock %}

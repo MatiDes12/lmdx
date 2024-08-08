@@ -519,22 +519,18 @@ def get_doctor(doctor_id):
     return jsonify(doctor_data)
 
 
-@bp.route('/select_test', methods=['GET', 'POST'])
-def select_test():
+@bp.route('/test_form', methods=['GET', 'POST'])
+def test_form():
     if request.method == 'POST':
         patient_id = request.form['patient_id']
         test_type = request.form['test_type']
         return render_template('test_form.html', patient_id=patient_id, test_type=test_type)
-    patients = Patient.query.all()  # Assuming you have a Patient model
-    return render_template('doctors/select_test.html', patients=patients)
+    return render_template('doctors/test_form.html', patients=patients)
 
-@bp.route('/submit_test', methods=['POST'])
-def submit_test():
-    patient_id = request.form['patient_id']
-    test_type = request.form['test_type']
-    test_data = request.form.to_dict()
-    # Save test data to the database
-    return jsonify({'status': 'success', 'message': 'Test data submitted successfully'})
+
+@bp.route('/urine_test')
+def urine_test():
+    return render_template('doctors/urine_test.html')
 
 #<----------------------Add Doctor----------------------->
 @bp.route('/dashboard/add_doctor', methods=['GET', 'POST'])

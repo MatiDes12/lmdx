@@ -280,6 +280,126 @@ class PatientRoom(db.Model):
 #     body = db.Column(db.Text)
 #     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class BloodTest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    test_type = db.Column(db.String(255))  # e.g., "Comprehensive Metabolic Panel"
+    test_date = db.Column(db.Date, default=datetime.utcnow)
+    results = db.Column(db.JSON)  # Storing results as a JSON object
+
+    patient = db.relationship('Patient', backref='blood_tests')
+    doctor = db.relationship('Doctor', backref='ordered_tests')
+
+
+class VitalSign(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    date = db.Column(db.Date, default=datetime.utcnow)
+    time = db.Column(db.Time, default=datetime.utcnow)
+    temperature = db.Column(db.Float)
+    pulse = db.Column(db.Integer)
+    blood_pressure = db.Column(db.String(20))  # e.g., "120/80"
+    respiratory_rate = db.Column(db.Integer)
+    oxygen_saturation = db.Column(db.Integer)
+    weight = db.Column(db.Float)
+    height = db.Column(db.Float)
+    bmi = db.Column(db.Float)
+
+    patient = db.relationship('Patient', backref='vital_signs')
+    doctor = db.relationship('Doctor', backref='recorded_signs')
+
+
+class MedicalHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    date = db.Column(db.Date, default=datetime.utcnow)
+    medical_condition = db.Column(db.String(255))
+    diagnosis = db.Column(db.Text)
+    treatment = db.Column(db.Text)
+    notes = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref='medical_history')
+    doctor = db.relationship('Doctor', backref='recorded_history')
+
+
+class Procedure(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    date = db.Column(db.Date, default=datetime.utcnow)
+    procedure_name = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    notes = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref='procedures')
+    doctor = db.relationship('Doctor', backref='performed_procedures')
+
+class Admission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
+    admission_date = db.Column(db.Date, default=datetime.utcnow)
+    discharge_date = db.Column(db.Date)
+    reason = db.Column(db.Text)
+    notes = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref='admissions')
+    doctor = db.relationship('Doctor', backref='admissions')
+    room = db.relationship('Room', backref='admissions')
+
+class Discharge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    admission_id = db.Column(db.Integer, db.ForeignKey('admission.id'))
+    discharge_date = db.Column(db.Date, default=datetime.utcnow)
+    discharge_notes = db.Column(db.Text)
+
+    admission = db.relationship('Admission', backref='discharge')
+
+class Surgery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
+    surgery_date = db.Column(db.Date, default=datetime.utcnow)
+    procedure_name = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    notes = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref='surgeries')
+    doctor = db.relationship('Doctor', backref='performed_surgeries')
+    room = db.relationship('Room', backref='surgeries')
+
+class DischargeSummary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    admission_id = db.Column(db.Integer, db.ForeignKey('admission.id'))
+    discharge_date = db.Column(db.Date, default=datetime.utcnow)
+    discharge_notes = db.Column(db.Text)
+
+    admission = db.relationship('Admission', backref='discharge_summary')
+
+class Transfer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
+    transfer_date = db.Column(db.Date, default=datetime.utcnow)
+    from_room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
+    to_room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
+    reason = db.Column(db.Text)
+    notes = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref='transfers')
+    doctor = db.relationship('Doctor', backref='transfers')
+    from_room = db.relationship('Room', foreign_keys=[from_room_id], primaryjoin='Transfer.from_room_id == Room.room_id')
+    to_room = db.relationship('Room', foreign_keys=[to_room_id], primaryjoin='Transfer.to_room_id == Room.room_id')
+
+
+
+
 class Facility(db.Model):
     __tablename__ = 'facilities'
     facility_id = db.Column(db.Integer, primary_key=True, autoincrement=True)

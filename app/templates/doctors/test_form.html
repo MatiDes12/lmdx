@@ -1,6 +1,6 @@
 {% extends 'doctors/base.html' %}
 
-{% block title %}Doctors{% endblock %}
+{% block title %}Blood Tests{% endblock %}
 
 {% block sidebar %}
 {% include 'doctors/sidebar.html' %}
@@ -12,131 +12,373 @@
 
 {% block content %}
 <div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-4">Enter Test Data</h1>
-    <form action="{{ url_for('submit_test') }}" method="POST">
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center justify-between">
+        <div>
+            <div class="flex items-center mb-2 space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48" fill="none">
+                    <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+                    </svg>
+                <h1 class="text-3xl font-bold">Blood Tests</h1>
+            </div>
+            <p>Enter test data for the selected patient.</p>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="border-b-2 border-gray-300 mb-8 text-center">
+        <div class="flex space-x-4 -mb-px text-sm font-semibold text-gray-600 mt-4">
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'comprehensive_metabolic_panel')">Comprehensive Metabolic Panel</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-800" onclick="openTab(event, 'lipid_panel')">Lipid Panel with Direct LDL</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-800" onclick="openTab(event, 'cbc_auto_differential')">CBC Auto Differential</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-800" onclick="openTab(event, 'thyroid_simulating_hormone')">Thyroid Stimulating Hormone</button>
+        </div>
+    </div>
+
+    <!-- Forms for Each Section (Content hidden/shown based on selected tab) -->
+    <form action="" method="POST" class="space-y-6">
         <input type="hidden" name="patient_id" value="{{ patient_id }}">
         <input type="hidden" name="test_type" value="{{ test_type }}">
-        
-        {% if test_type == 'comprehensive_metabolic_panel' %}
-        <div class="mb-4">
-            <label for="sodium" class="block text-gray-700">Sodium (136-145 mmol/L):</label>
-            <input type="number" id="sodium" name="sodium" class="block w-full mt-1">
+
+        <!-- Dynamic sections for each test type -->
+        <div id="comprehensive_metabolic_panel" class="tab-content hidden">
+            <!-- Fields for Comprehensive Metabolic Panel -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-5 text-white flex items-center mb-2 space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none" class="text-red-500">
+                        <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+                    </svg>
+                <h2 class="text-2xl font-semibold">COMPREHENSIVE METABOLIC PANEL</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="sodium" class="block text-gray-700 mb-2 font-semibold">Sodium</label>
+                        <p class="text-sm text-gray-500">Normal Range: 135 - 145 mmol/L</p>
+                        <input type="number" id="sodium" name="sodium" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="potassium" class="block text-gray-700 mb-2 font-semibold">Potassium</label>
+                        <p class="text-sm text-gray-500">Normal Range: 3.6 - 5.1 mmol/L</p>
+                        <input type="number" id="potassium" name="potassium" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="chloride" class="block text-gray-700 mb-2 font-semibold">Chloride</label>
+                        <p class="text-sm text-gray-500">Normal Range: 98 - 107 mmol/L</p>
+                        <input type="number" id="chloride" name="chloride" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="carbon_dioxide" class="block text-gray-700 mb-2 font-semibold">Carbon Dioxide</label>
+                        <p class="text-sm text-gray-500">Normal Range: 22 - 23 mmol/L</p>
+                        <input type="number" id="carbon_dioxide" name="carbon_dioxide" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="glucose" class="block text-gray-700 mb-2 font-semibold">Glucose</label>
+                        <p class="text-sm text-gray-500">Normal Range: 70 - 99 mg/dL</p>
+                        <input type="number" id="glucose" name="glucose" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="calcium" class="block text-gray-700 mb-2 font-semibold">Calcium</label>
+                        <p class="text-sm text-gray-500">Normal Range: 8.6 - 10.3 mg/dL</p>
+                        <input type="number" id="calcium" name="calcium" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="protein" class="block text-gray-700 mb-2 font-semibold">Total Protein</label>
+                        <p class="text-sm text-gray-500">Normal Range: 6.1 - 7.9 g/dL</p>
+                        <input type="number" id="protein" name="protein" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="albumin" class="block text-gray-700 mb-2 font-semibold">Albumin</label>
+                        <p class="text-sm text-gray-500">Normal Range: 3.5 - 4.8 g/dL</p>
+                        <input type="number" id="albumin" name="albumin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="bilirubin" class="block text-gray-700 mb-2 font-semibold">Total Bilirubin</label>
+                        <p class="text-sm text-gray-500">Normal Range: 0.3 - 1.2 mg/dL</p>
+                        <input type="number" id="bilirubin" name="bilirubin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="alkaline_phosphatase" class="block text-gray-700 mb-2 font-semibold">Alkaline Phosphatase</label>
+                        <p class="text-sm text-gray-500">Normal Range: 44-147 IU/L</p>
+                        <input type="number" id="alkaline_phosphatase" name="alkaline_phosphatase" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="alt" class="block text-gray-700 mb-2 font-semibold">Anion Gap</label>
+                        <p class="text-sm text-gray-500">Normal Range: 6 - 18 mmol/L</p>
+                        <input type="number" id="anion_gap" name="anion_gap" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ast" class="block text-gray-700 mb-2 font-semibold">BUN</label>
+                        <p class="text-sm text-gray-500">Normal Range: 8 - 20 mg/dL</p>
+                        <input type="number" id="bun" name="bun" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ast" class="block text-gray-700 mb-2 font-semibold">Creatinine</label>
+                        <p class="text-sm text-gray-500">Normal Range: 0.60 - 1.30 mg/dL</p>
+                        <input type="number" id="creatinine" name="creatinine" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ast" class="block text-gray-700 mb-2 font-semibold">eGFR</label>
+                        <p class="text-sm text-gray-500">Normal Range: 60 - 120 mL/min/1.73m2</p>
+                        <input type="number" id="egfr" name="egfr" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ast" class="block text-gray-700 mb-2 font-semibold">BUN/Creatinine Ratio</label>
+                        <p class="text-sm text-gray-500">Normal Range: 12.0 - 20.0</p>
+                        <input type="number" id="total_cholesterol" name="total_cholesterol" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="alt" class="block text-gray-700 mb-2 font-semibold">ALT (SGPT)</label>
+                        <p class="text-sm text-gray-500">Normal Range: 7 - 52 unit/L</p>
+                        <input type="number" id="alt" name="alt" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ast" class="block text-gray-700 mb-2 font-semibold">AST (SGOT)</label>
+                        <p class="text-sm text-gray-500">Normal Range: 15 - 14 unit/L</p>
+                        <input type="number" id="ast" name="ast" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="potassium" class="block text-gray-700">Potassium (3.5-5.0 mmol/L):</label>
-            <input type="number" id="potassium" name="potassium" class="block w-full mt-1">
+        <div id="lipid_panel" class="tab-content hidden">
+            <!-- Fields for Lipid Panel -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-5 text-white flex items-center mb-2 space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none" class="text-red-500">
+                        <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+                    </svg>
+                <h2 class="text-2xl font-semibold">LIPID PANEL WITH REFLEX TO DIRECT LDL</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="cholesterol" class="block text-gray-700 mb-2 font-semibold">Total Cholesterol</label>
+                        <p class="text-sm text-gray-500">Normal Range: below < 200 mg/dL</p>
+                        <input type="number" id="cholesterol" name="cholesterol" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="hdl" class="block text-gray-700 mb-2 font-semibold">HDL</label>
+                        <p class="text-sm text-gray-500">Normal Range: above >= 40 mg/dL</p>
+                        <input type="number" id="hdl" name="hdl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="ldl" class="block text-gray-700 mb-2 font-semibold">LDL Calculated</label>
+                        <p class="text-sm text-gray-500">Normal Range: below < 100 mg/dL</p>
+                        <input type="number" id="ldl" name="ldl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="triglycerides" class="block text-gray-700 mb-2 font-semibold">Triglycerides</label>
+                        <p class="text-sm text-gray-500">Normal Range: below < 200 mg/dL</p>
+                        <input type="number" id="triglycerides" name="triglycerides" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="vldl" class="block text-gray-700 mb-2 font-semibold">VLDL Cholesterol Calculated</label>
+                        <p class="text-sm text-gray-500">Normal Range: 2 - 38 mg/dL</p>
+                        <input type="number" id="vldl" name="vldl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="chloride" class="block text-gray-700">Chloride (98-107 mmol/L):</label>
-            <input type="number" id="chloride" name="chloride" class="block w-full mt-1">
+        <div id="cbc_auto_differential" class="tab-content hidden">
+            <!-- Fields for CBC Auto Differential -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-5 text-white flex items-center mb-2 space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none" class="text-red-500">
+                        <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+                    </svg>
+                <h2 class="text-2xl font-semibold">CBC AUTO DIFFERENTIAL</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="wbc" class="block text-gray-700 mb-2 font-semibold">WBC (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 4.6 - 10.2 K/mcl</p>
+                        <input type="number" id="wbc" name="wbc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="rbc" class="block text-gray-700 mb-2 font-semibold">RBC (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 4.30 - 5.70 M/mcl</p>
+                        <input type="number" id="rbc" name="rbc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="hemoglobin" class="block text-gray-700 mb-2 font-semibold">Hemoglobin (g/dL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 13.5 - 17.5 g/dL</p>
+                        <input type="number" id="hemoglobin" name="hemoglobin" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="hematocrit" class="block text-gray-700 mb-2 font-semibold">Hematocrit (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 39.5 - 17.5 %</p>
+                        <input type="number" id="hematocrit" name="hematocrit" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mcv" class="block text-gray-700 mb-2 font-semibold">MCV (fL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 80.0 - 97.0 fL</p>
+                        <input type="number" id="mcv" name="mcv" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mch" class="block text-gray-700 mb-2 font-semibold">MCH (pg):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 27.0 - 34.0 pg</p>
+                        <input type="number" id="mch" name="mch" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mchc" class="block text-gray-700 mb-2 font-semibold">MCHC (g/dL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 30.8 - 35.3 g/dL</p>
+                        <input type="number" id="mchc" name="mchc" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="rdw" class="block text-gray-700 mb-2 font-semibold">RDW (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 11.0 - 14.8 %</p>
+                        <input type="number" id="rdw" name="rdw" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="platelets" class="block text-gray-700 mb-2 font-semibold">Platelets (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 142 - 424 K/mcl</p>
+                        <input type="number" id="platelets" name="platelets" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">MPV (fL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 6.2 - 12.1 fL</p>
+                        <input type="number" id="mpv" name="mpv" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Neutrophils Relative (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 38.1 - 75.5 %</p>
+                        <input type="number" id="neutrophils_relative" name="neutrophils_relative" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Lymphocytes Relative (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 15.4 - 48.3 %</p>
+                        <input type="number" id="lymphocytes_relative" name="lymphocytes_relative" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Monocytes Relative (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.0 - 12.0 %</p>
+                        <input type="number" id="monocytes_relative" name="monocytes_relative" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Eosinophils Relative (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.0 - 7.0 %</p>
+                        <input type="number" id="eosinophils_relative" name="eosinophils_relative" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Basophils Relative (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.0 - 2.0 %</p>
+                        <input type="number" id="basophils_relative" name="basophils_relative" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Neutrophils Absolute (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 1.80 - 7.70 K/mcl</p>
+                        <input type="number" id="neutrophils_absolute" name="neutrophils_absolute" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Lymphocytes Absolute (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 1.00 - 4.80 K/mcl</p>
+                        <input type="number" id="lymphocytes_absolute" name="lymphocytes_absolute" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Monocytes Absolute (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.00 - 0.80 K/mcl</p>
+                        <input type="number" id="monocytes_absolute" name="monocytes_absolute" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Eosinophils Absolute (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.00 - 0.70 K/mcl</p>
+                        <input type="number" id="eosinophils_absolute" name="eosinophils_absolute" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold">Basophils Absolute (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.00 - 0.20 K/mcl</p>
+                        <input type="number" id="basophils_absolute" name="basophils_absolute" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class = "mb-4" >
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold"> Immature Granulocytes Relative (%):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.0 - 1.2 %</p>
+                        <input type="number" id="immature_granulocytes_relative" name="immature_granulocytes_relative" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+
+                    <div class = "mb-4" >
+                        <label for="mpv" class="block text-gray-700 mb-2 font-semibold"> Immature Granulocytes Absolute (cells/mcL):</label>
+                        <p class="text-sm text-gray-500"> Normal Range: 0.00 - 0.10 K/mcl</p>
+                        <input type="number" id="immature_granulocytes_absolute" name="immature_granulocytes_absolute" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="carbon_dioxide" class="block text-gray-700">Carbon Dioxide (23-29 mmol/L):</label>
-            <input type="number" id="carbon_dioxide" name="carbon_dioxide" class="block w-full mt-1">
+        <div id="thyroid_simulating_hormone" class="tab-content hidden">
+            <!-- Fields for Thyroid Stimulating Hormone -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-5 text-white flex items-center mb-2 space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none" class="text-red-500">
+                        <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+                    </svg>
+                <h2 class="text-2xl font-semibold">THYROID STIMULATING HORMONE</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="tsh" class="block text-gray-700 mb-2 font-semibold">TSH (mIU/L):</label>
+                        <p class="text-sm text-gray-500">Normal Range: 0.45 - 5.33 mIU/L</p>
+                        <input type="number" id="tsh" name="tsh" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="glucose" class="block text-gray-700">Glucose (70-99 mg/dL):</label>
-            <input type="number" id="glucose" name="glucose" class="block w-full mt-1">
+        <div id="lipid_panel_direct_ldl" class="tab-content hidden">
+            <!-- Fields for Lipid Panel with Direct LDL -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg mb-5 text-white flex items-center mb-2 space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 48 48" fill="none" class="text-red-500">
+                        <path d="M38 30.2626C38 37.8496 31.732 44 24 44C16.268 44 10 37.8496 10 30.2626C10 18.2424 24 4 24 4C24 4 38 18.2424 38 30.2626Z" fill="currentColor"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24 42C30.6633 42 36 36.7095 36 30.2626C36 24.9058 32.8223 18.7771 29.3548 13.761C27.6552 11.3023 25.9518 9.20336 24.6725 7.71881C24.432 7.4398 24.2069 7.18289 24 6.9498C23.7931 7.18289 23.568 7.4398 23.3275 7.71881C22.0482 9.20336 20.3448 11.3023 18.6452 13.761C15.1777 18.7771 12 24.9058 12 30.2626C12 36.7095 17.3367 42 24 42ZM22.6397 5.47002C19.1224 9.40884 10 20.5597 10 30.2626C10 37.8496 16.268 44 24 44C31.732 44 38 37.8496 38 30.2626C38 20.5597 28.8776 9.40884 25.3603 5.47002C24.5203 4.52933 24 4 24 4C24 4 23.4797 4.52933 22.6397 5.47002Z" fill="currentColor"/>
+                    </svg>
+                <h2 class="text-2xl font-semibold">LIPID PANEL WITH DIRECT LDL</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="ldl" class="block text-gray-700">Direct LDL (mg/dL):</label>
+                        <input type="number" id="ldl" name="ldl" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="calcium" class="block text-gray-700">Calcium (8.5-10.2 mg/dL):</label>
-            <input type="number" id="calcium" name="calcium" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="protein" class="block text-gray-700">Total Protein (6.0-8.3 g/dL):</label>
-            <input type="number" id="protein" name="protein" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="albumin" class="block text-gray-700">Albumin (3.5-5.0 g/dL):</label>
-            <input type="number" id="albumin" name="albumin" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="bilirubin" class="block text-gray-700">Bilirubin (0.1-1.2 mg/dL):</label>
-            <input type="number" id="bilirubin" name="bilirubin" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="alkaline_phosphatase" class="block text-gray-700">Alkaline Phosphatase (44-147 IU/L):</label>
-            <input type="number" id="alkaline_phosphatase" name="alkaline_phosphatase" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="alt" class="block text-gray-700">ALT (7-56 IU/L):</label>
-            <input type="number" id="alt" name="alt" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="ast" class="block text-gray-700">AST (10-40 IU/L):</label>
-            <input type="number" id="ast" name="ast" class="block w-full mt-1">
-        </div>
-        {% elif test_type == 'lipid_panel' %}
-        <div class="mb-4">
-            <label for="cholesterol" class="block text-gray-700">Cholesterol (mg/dL):</label>
-            <input type="number" id="cholesterol" name="cholesterol" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="hdl" class="block text-gray-700">HDL (mg/dL):</label>
-            <input type="number" id="hdl" name="hdl" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="ldl" class="block text-gray-700">LDL (mg/dL):</label>
-            <input type="number" id="ldl" name="ldl" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="triglycerides" class="block text-gray-700">Triglycerides (mg/dL):</label>
-            <input type="number" id="triglycerides" name="triglycerides" class="block w-full mt-1">
-        </div>
-        {% elif test_type == 'cbc_auto_differential' %}
-        <div class="mb-4">
-            <label for="wbc" class="block text-gray-700">WBC (cells/mcL):</label>
-            <input type="number" id="wbc" name="wbc" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="rbc" class="block text-gray-700">RBC (cells/mcL):</label>
-            <input type="number" id="rbc" name="rbc" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="hemoglobin" class="block text-gray-700">Hemoglobin (g/dL):</label>
-            <input type="number" id="hemoglobin" name="hemoglobin" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="hematocrit" class="block text-gray-700">Hematocrit (%):</label>
-            <input type="number" id="hematocrit" name="hematocrit" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="mcv" class="block text-gray-700">MCV (fL):</label>
-            <input type="number" id="mcv" name="mcv" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="mch" class="block text-gray-700">MCH (pg):</label>
-            <input type="number" id="mch" name="mch" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="mchc" class="block text-gray-700">MCHC (g/dL):</label>
-            <input type="number" id="mchc" name="mchc" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="rdw" class="block text-gray-700">RDW (%):</label>
-            <input type="number" id="rdw" name="rdw" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="platelets" class="block text-gray-700">Platelets (cells/mcL):</label>
-            <input type="number" id="platelets" name="platelets" class="block w-full mt-1">
-        </div>
-        <div class="mb-4">
-            <label for="mpv" class="block text-gray-700">MPV (fL):</label>
-            <input type="number" id="mpv" name="mpv" class="block w-full mt-1">
-        </div>
-        {% elif test_type == 'thyroid_simulating_hormone' %}
-        <div class="mb-4">
-            <label for="tsh" class="block text-gray-700">TSH (mIU/L):</label>
-            <input type="number" id="tsh" name="tsh" class="block w-full mt-1">
-        </div>
-        {% elif test_type == 'lipid_panel_direct_ldl' %}
-        <div class="mb-4">
-            <label for="ldl" class="block text-gray-700">Direct LDL (mg/dL):</label>
-            <input type="number" id="ldl" name="ldl" class="block w-full mt-1">
-        </div>
-        {% endif %}
-        
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Submit</button>
     </form>
 </div>
+
+<script>
+function openTab(evt, tabName) {
+    var i, tabContent, tabLinks;
+    tabContent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+    tabLinks = document.getElementsByClassName("tabs");
+    for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" text-blue-600 border-blue-500", " text-gray-600 border-transparent");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " text-blue-600 border-blue-500";
+}
+// Initial tab to show
+document.getElementById('comprehensive_metabolic_panel').style.display = "block";
+document.getElementsByClassName("tabs")[0].className += " text-blue-600 border-blue-500";
+</script>
 {% endblock %}
+
+
+
+
+
+
+
+
+
