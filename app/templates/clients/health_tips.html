@@ -1,37 +1,277 @@
-{% extends 'clients/base.html' %}
+{% extends 'doctors/base.html' %}
+
+{% block title %}Health Tracker{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
 
 {% block navbar %}
-    {% include 'clients/navbar.html' %}
+{% include 'doctors/dashboard_navbar.html' %}
 {% endblock %}
 
 {% block content %}
-<style>
-    .container {
-    max-width: 960px; /* Wider container for better layout */
-    margin: auto;
-}
-.header {
-    background: linear-gradient(90deg, rgba(29,78,216,1) 0%, rgba(14,165,233,1) 100%);
-}
-
-.text-gray-600 {
-    color: #4a5568;
-}
-
-
-</style>
-<div class="px-6 py-4">
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-lg mb-6 text-white">
-        <h1 class="text-3xl font-bold">Today's Health Tips</h1>
-        <p>Check out these tips to improve your daily wellness routine.</p>
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Health Tracker</h1>
+        <p>Monitor your health metrics over time and take control of your well-being.</p>
     </div>
-    <div class="tips-grid grid grid-cols-2 md:grid-cols-1 gap-4">
-        {% for tip in tips %}
-            <div class="tip-card p-5 bg-white rounded-lg shadow">
-                <p class="text-gray-600" style="white-space: pre-line;">{{ tip | safe }}</p>
+
+    <!-- Health Metrics Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Blood Pressure Card -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><i class="fas fa-heartbeat mr-2"></i>Blood Pressure</h2>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-gray-700">Systolic: <span id="systolic-value" class="font-bold">120</span> mm Hg</p>
+                    <p class="text-gray-700">Diastolic: <span id="diastolic-value" class="font-bold">80</span> mm Hg</p>
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline" onclick="viewBloodPressure()">View</button>
             </div>
-        {% endfor %}
+            <canvas id="bloodPressureChart"></canvas>
+        </div>
+
+        <!-- Heart Rate Card -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><i class="fas fa-heart mr-2"></i>Heart Rate</h2>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-gray-700">Current: <span id="heart-rate-value" class="font-bold">72</span> bpm</p>
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline" onclick="viewHeartRate()">View</button>
+            </div>
+            <canvas id="heartRateChart"></canvas>
+        </div>
+
+        <!-- Weight Card -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><i class="fas fa-weight mr-2"></i>Weight</h2>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-gray-700">Current: <span id="weight-value" class="font-bold">70</span> kg</p>
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline" onclick="viewWeight()">View</button>
+            </div>
+            <canvas id="weightChart"></canvas>
+        </div>
+
+        <!-- Sleep Card -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><i class="fas fa-bed mr-2"></i>Sleep</h2>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-gray-700">Last Night: <span id="sleep-value" class="font-bold">8</span> hrs</p>
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline" onclick="viewSleep()">View</button>
+            </div>
+            <canvas id="sleepChart"></canvas>
+        </div>
+
+        <!-- Physical Activity Card -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><i class="fas fa-running mr-2"></i>Physical Activity</h2>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-gray-700">Today: <span id="activity-value" class="font-bold">30</span> mins</p>
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline" onclick="viewActivity()">View</button>
+            </div>
+            <canvas id="activityChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Detailed View Modals -->
+    <div id="detailed-view-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 w-3/4 shadow-lg relative">
+            <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">&times;</button>
+            <h2 id="modal-title" class="text-2xl font-bold mb-4"></h2>
+            <div id="modal-content">
+                <!-- Detailed content will be dynamically inserted here -->
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function viewBloodPressure() {
+    document.getElementById('modal-title').innerText = 'Blood Pressure Details';
+    document.getElementById('modal-content').innerHTML = '<canvas id="detailedBloodPressureChart"></canvas>';
+    document.getElementById('detailed-view-modal').classList.remove('hidden');
+    updateDetailedBloodPressureChart();
+}
+
+function viewHeartRate() {
+    document.getElementById('modal-title').innerText = 'Heart Rate Details';
+    document.getElementById('modal-content').innerHTML = '<canvas id="detailedHeartRateChart"></canvas>';
+    document.getElementById('detailed-view-modal').classList.remove('hidden');
+    updateDetailedHeartRateChart();
+}
+
+function viewWeight() {
+    document.getElementById('modal-title').innerText = 'Weight Details';
+    document.getElementById('modal-content').innerHTML = '<canvas id="detailedWeightChart"></canvas>';
+    document.getElementById('detailed-view-modal').classList.remove('hidden');
+    updateDetailedWeightChart();
+}
+
+function viewSleep() {
+    document.getElementById('modal-title').innerText = 'Sleep Details';
+    document.getElementById('modal-content').innerHTML = '<canvas id="detailedSleepChart"></canvas>';
+    document.getElementById('detailed-view-modal').classList.remove('hidden');
+    updateDetailedSleepChart();
+}
+
+function viewActivity() {
+    document.getElementById('modal-title').innerText = 'Physical Activity Details';
+    document.getElementById('modal-content').innerHTML = '<canvas id="detailedActivityChart"></canvas>';
+    document.getElementById('detailed-view-modal').classList.remove('hidden');
+    updateDetailedActivityChart();
+}
+
+function closeModal() {
+    document.getElementById('detailed-view-modal').classList.add('hidden');
+}
+
+function updateDetailedBloodPressureChart() {
+    const ctx = document.getElementById('detailedBloodPressureChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Systolic',
+                data: [120, 122, 118, 121, 119, 123],
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: false,
+                tension: 0.1
+            }, {
+                label: 'Diastolic',
+                data: [80, 82, 78, 81, 79, 83],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateDetailedHeartRateChart() {
+    const ctx = document.getElementById('detailedHeartRateChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Heart Rate',
+                data: [70, 72, 68, 71, 69, 73],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateDetailedWeightChart() {
+    const ctx = document.getElementById('detailedWeightChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Weight',
+                data: [70, 71, 69, 70, 72, 71],
+                borderColor: 'rgba(255, 206, 86, 1)',
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateDetailedSleepChart() {
+    const ctx = document.getElementById('detailedSleepChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Sleep',
+                data: [8, 7, 8, 6, 7, 8],
+                borderColor: 'rgba(153, 102, 255, 1)',
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateDetailedActivityChart() {
+    const ctx = document.getElementById('detailedActivityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Physical Activity',
+                data: [30, 40, 35, 50, 45, 60],
+                borderColor: 'rgba(255, 159, 64, 1)',
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Initial Chart Setup
+document.addEventListener('DOMContentLoaded', () => {
+    updateDetailedBloodPressureChart();
+    updateDetailedHeartRateChart();
+    updateDetailedWeightChart();
+    updateDetailedSleepChart();
+    updateDetailedActivityChart();
+});
+</script>
 {% endblock %}

@@ -772,7 +772,6 @@ def lab_results():
 
     firebase_user_id = session.get('user_id')
     account = Account.query.filter_by(id=firebase_user_id).first()
-
     if not account:
         flash('Doctor account not found', 'error')
         return redirect(url_for('auth.signin'))
