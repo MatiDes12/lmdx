@@ -112,7 +112,11 @@ def appointments():
     search_query = request.args.get('search')
 
     # Base query for appointments
-    query = Appointment.query.filter_by(doctor_id=doctor_id)
+    query = db.session.query(Appointment, ClientAccounts, Patient).join(
+        ClientAccounts, Appointment.client_id == ClientAccounts.client_id
+    ).join(
+        Patient, Patient.patient_id == ClientAccounts.client_id
+    ).filter(Appointment.doctor_id == doctor_id)
 
     # Apply filters
     if date_filter:
@@ -120,7 +124,7 @@ def appointments():
     if status_filter:
         query = query.filter(Appointment.status == status_filter)
     if search_query:
-        query = query.join(ClientAccounts).filter(
+        query = query.filter(
             or_(
                 ClientAccounts.first_name.ilike(f"%{search_query}%"),
                 ClientAccounts.last_name.ilike(f"%{search_query}%")
@@ -130,7 +134,6 @@ def appointments():
     appointments = query.all()
 
     return render_template('doctors/appointments.html', appointments=appointments, date_filter=date_filter, status_filter=status_filter, search_query=search_query)
-
 
 @bp.route('/edit_appointment/<int:appointment_id>', methods=['GET', 'POST'])
 def edit_appointment(appointment_id):
@@ -882,11 +885,36 @@ def edit_lab_result(result_id):
         test_data = request.form.to_dict()
         lab_result.results = test_data
         db.session.commit()
-        flash('Test results updated successfully!', 'success')
         return redirect(url_for('doctor.lab_results'))
 
     return render_template('doctors/edit_lab_result.html', lab_result=lab_result)
 
+@bp.route('/delete_lab_result/<int:result_id>', methods=['POST'])
+def delete_lab_result(result_id):
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    # Fetch the lab result by ID
+    lab_result = BloodTest.query.get_or_404(result_id)
+
+    # Ensure that the current doctor has the permission to delete this result
+    firebase_user_id = session.get('user_id')
+    account = Account.query.filter_by(id=firebase_user_id).first()
+
+    if not account or lab_result.doctor_id != account.id:
+        flash('You do not have permission to delete this lab result.', 'error')
+        return redirect(url_for('doctor.lab_results'))
+
+    try:
+        # Delete the lab result
+        db.session.delete(lab_result)
+        db.session.commit()
+        flash('Lab result deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while deleting the lab result: {str(e)}', 'error')
+
+    return redirect(url_for('doctor.lab_results'))
 
 
 

@@ -138,12 +138,18 @@
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex space-x-2">
-                                <a href="{{ url_for('doctor.edit_lab_result', result_id=report.id) }}">
+                                <a href="{{ url_for('doctor.edit_lab_result', result_id=report.id) }}" style="display:inline; margin-top: 2%;">
                                     <span class="hidden md:inline text-sm border border-blue-400 text-blue-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-blue-400 hover:text-white">
                                         Edit
                                     </span>
                                 </a>
-                            </div>
+    
+                                <form action="{{ url_for('doctor.delete_lab_result', result_id=report.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="hidden md:inline text-sm border border-red-400 text-red-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-red-400 hover:text-white">
+                                        Delete
+                                    </button>
+                                </form>                                
+                            </div> 
                         </td>
                     </tr>
                     {% endfor %}

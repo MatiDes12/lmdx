@@ -13,7 +13,7 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
         <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        <!-- {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="mb-4">
                 {% for category, message in messages %}
@@ -28,7 +28,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-    {% endwith %}
+    {% endwith %} -->
 
     <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center">
         <div>
@@ -57,8 +57,11 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">Patient Name</label>
-                    <input type="text" id="patient" name="search" placeholder="Search by patient name" value="{{ search_query }}" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="patient" name="search" placeholder="Search by patient name" 
+                           value="{% if search_query %}{{ search_query }}{% endif %}" 
+                           class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
+                
             </div>
             <div class="flex justify-end">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">Apply Filters</button>
@@ -83,20 +86,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for appointment in appointments %}
+                    {% for appointment, client, patient in appointments %}
                     <tr>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex items-center">
                                 <div class="flex items-center space-x-3">
 
                                     <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-gray-200">
-                                        {% if appointment.client.image_path %}
-                                            <img src="{{ url_for('static', filename=client.image_path) }}" alt="Profile Image" class="w-10 h-10 rounded-full">
-                                        {% else %}
-                                                <img id="profileImage" src="{{ url_for('static', filename='images/default-avatar.png' ~ appointment.client.profile_image) }}" alt="Profile Image" class="object-cover w-full h-full" />
-                                        {% endif %}
+                                    {% if patient.image_path %}
+                                        <img src="{{ url_for('static', filename=patient.image_path) }}" alt="Profile Image" class="w-10 h-10 rounded-full">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Profile Image" class="w-10 h-10 rounded-full">
+                                    {% endif %}
                                     </div>
-                                    <p class="text-gray-900 whitespace-no-wrap">{{ appointment.client.first_name }} {{ appointment.client.last_name }}</p>
+                                    <p class="text-gray-900 whitespace-no-wrap">{{ client.first_name }} {{ client.last_name }}</p>
                                 </div>
                             </div>
                         </td>
