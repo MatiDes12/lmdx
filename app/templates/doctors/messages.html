@@ -22,7 +22,7 @@
         <div class="mb-6">
           <label for="client-select" class="block text-sm font-medium text-gray-700 mb-2">Choose your client:</label>
           <select id="client-select" name="client_id" class="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 text-gray-700" required>
-            <option value="">Select a client</option>
+            <option value="">Select a Patient</option>
             {% for client in all_clients %}
               <option value="{{ client.client_id }}">{{ client.first_name }} {{ client.last_name }}</option>
             {% endfor %}
@@ -74,19 +74,20 @@
     background-color: #f0f0f0;
     text-align: left;
     margin-right: auto;
-    font-size: 1.6rem; 
+    font-size: 1.6rem; /* Increase the font size */
     font-weight: bold; /* Make the text bold */
-    color: rgb(0, 0, 0); /* Make the text white */
+    color: black; /* Keep sender text black for readability */
   }
   .receiver-message {
-    background-color: #0762c4b0;
+    background-color: #8aaad3b0;
     text-align: right;
     margin-left: auto;
     font-size: 1.6rem; /* Increase the font size */
     font-weight: bold; /* Make the text bold */
     color: white; /* Make the text white */
   }
-  </style>
+</style>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

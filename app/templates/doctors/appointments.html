@@ -90,7 +90,11 @@
                                 <div class="flex items-center space-x-3">
 
                                     <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-gray-200">
-                                        <img id="profileImage" src="{{ url_for('static', filename='images/default-avatar.png' ~ appointment.client.profile_image) }}" alt="Profile Image" class="object-cover w-full h-full" />
+                                        {% if appointment.client.image_path %}
+                                            <img src="{{ url_for('static', filename=client.image_path) }}" alt="Profile Image" class="w-10 h-10 rounded-full">
+                                        {% else %}
+                                                <img id="profileImage" src="{{ url_for('static', filename='images/default-avatar.png' ~ appointment.client.profile_image) }}" alt="Profile Image" class="object-cover w-full h-full" />
+                                        {% endif %}
                                     </div>
                                     <p class="text-gray-900 whitespace-no-wrap">{{ appointment.client.first_name }} {{ appointment.client.last_name }}</p>
                                 </div>

@@ -25,30 +25,44 @@
             </svg>
             Filter Reports
         </h2>
-        <form action="" method="GET" class="space-y-4">
+        <form action="{{ url_for('doctor.reports') }}" method="GET" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="patient">
                         Patient Name
                     </label>
-                    <input type="text" id="patient" name="patient" placeholder="Search by patient name" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="patient" name="patient" value="{{ request.args.get('patient', '') }}" placeholder="Search by patient name" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="report_type">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="test_type">
                         Report Type
                     </label>
-                    <select id="report_type" name="report_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">All Types</option>
-                        <option value="lab">Lab Results</option>
-                        <option value="imaging">Imaging</option>
-                        <option value="consultation">Consultation</option>
+                    <select id="test_type" name="test_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="" disabled selected>Select a test type</option>
+                        <option value="blood" {% if request.args.get('test_type') == 'blood' %}selected{% endif %}>Blood Work</option>
+                        <option value="urine" {% if request.args.get('test_type') == 'urine' %}selected{% endif %}>Urine Analysis</option>
+                        <option value="imaging" {% if request.args.get('test_type') == 'imaging' %}selected{% endif %}>Imaging</option>
+                        <option value="biopsy" {% if request.args.get('test_type') == 'biopsy' %}selected{% endif %}>Biopsy</option>
+                        <option value="genetic" {% if request.args.get('test_type') == 'genetic' %}selected{% endif %}>Genetic Testing</option>
+                        <option value="cardiovascular" {% if request.args.get('test_type') == 'cardiovascular' %}selected{% endif %}>Cardiovascular Tests</option>
+                        <option value="pulmonary" {% if request.args.get('test_type') == 'pulmonary' %}selected{% endif %}>Pulmonary Function Tests</option>
+                        <option value="allergy" {% if request.args.get('test_type') == 'allergy' %}selected{% endif %}>Allergy Testing</option>
+                        <option value="hormone" {% if request.args.get('test_type') == 'hormone' %}selected{% endif %}>Hormone Tests</option>
+                        <option value="neurological" {% if request.args.get('test_type') == 'neurological' %}selected{% endif %}>Neurological Tests</option>
+                        <option value="gastrointestinal" {% if request.args.get('test_type') == 'gastrointestinal' %}selected{% endif %}>Gastrointestinal Tests</option>
+                        <option value="dermatological" {% if request.args.get('test_type') == 'dermatological' %}selected{% endif %}>Dermatological Tests</option>
+                        <option value="ophthalmologic" {% if request.args.get('test_type') == 'ophthalmologic' %}selected{% endif %}>Ophthalmologic Tests</option>
+                        <option value="pathology" {% if request.args.get('test_type') == 'pathology' %}selected{% endif %}>Pathology Tests</option>
+                        <option value="toxicology" {% if request.args.get('test_type') == 'toxicology' %}selected{% endif %}>Toxicology Screen</option>
+                        <option value="bone_density" {% if request.args.get('test_type') == 'bone_density' %}selected{% endif %}>Bone Density Scan</option>
+                        <option value="fertility" {% if request.args.get('test_type') == 'fertility' %}selected{% endif %}>Fertility Tests</option>  
                     </select>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="date_range">
                         Date Range
                     </label>
-                    <input type="date" id="date_range" name="date_range" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="date" id="date_range" name="date_range" value="{{ request.args.get('date_range', '') }}" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
             </div>
             <div class="flex justify-end">
@@ -85,21 +99,22 @@
                             Date
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Image
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Notes
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for report, patient, test in reports %}
+                    {% for report, patient in reports %}
                     <tr>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex items-center">
+                                <div class="flex-shrink-0 w-10 h-10">
+                                    {% if report.patient.image_path %}
+                                    <img src="{{ url_for('static', filename=report.patient.image_path) }}" alt="Profile Image" class="w-10 h-10 rounded-full">
+                                    {% else %}
+                                    <span class="text-gray-600">No Image</span>
+                                    {% endif %}
+                                </div>
                                 <div class="ml-3">
                                     <p class="text-gray-900 whitespace-no-wrap">
                                         {{ patient.first_name }} {{ patient.last_name }}
@@ -109,34 +124,77 @@
                             </div>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ test.test_name }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ report.test_type }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ report.result_value }}</p>
+                            <a href="{{ url_for('doctor.view_lab_result', result_id=report.id) }}">
+                                <span class="hidden md:inline text-sm border border-green-400 text-green-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-green-400 hover:text-white">
+                                    View
+                                </span>
+                            </a>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ report.result_date.strftime('%Y-%m-%d') }}</p>
+                            <p class="text-gray-900 whitespace-no-wrap">{{ report.test_date.strftime('%Y-%m-%d') }}</p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {% if report.image_path %}
-                            <a href="{{ url_for('static', filename=report.image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-900">View Image</a>
-                            {% else %}
-                            <span class="text-gray-600">No Image</span>
-                            {% endif %}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p class="text-gray-900 whitespace-no-wrap">{{ report.notes }}</p>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-2">View</a>
-                            <a href="#" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('doctor.edit_lab_result', result_id=report.id) }}">
+                                    <span class="hidden md:inline text-sm border border-blue-400 text-blue-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-blue-400 hover:text-white">
+                                        Edit
+                                    </span>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+            <span class="text-xs xs:text-sm text-gray-900">
+                Showing {{ pagination.page }} to {{ pagination.pages }} of {{ pagination.total }} Entries
+            </span>
+            <div class="inline-flex mt-2 xs:mt-0">
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('doctor.reports', page=pagination.prev_num, patient=request.args.get('patient'), test_type=request.args.get('test_type'), date_range=request.args.get('date_range')) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                    Prev
+                </a>
+                {% else %}
+                <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-l cursor-not-allowed" disabled>
+                    Prev
+                </button>
+                {% endif %}
+                
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != pagination.page %}
+                            <a href="{{ url_for('doctor.reports', page=page_num, patient=request.args.get('patient'), test_type=request.args.get('test_type'), date_range=request.args.get('date_range')) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                                {{ page_num }}
+                            </a>
+                        {% else %}
+                            <span class="text-sm bg-blue-500 text-white font-semibold py-2 px-4">
+                                {{ page_num }}
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4">...</span>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pagination.has_next %}
+                <a href="{{ url_for('doctor.reports', page=pagination.next_num, patient=request.args.get('patient'), test_type=request.args.get('test_type'), date_range=request.args.get('date_range')) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                    Next
+                </a>
+                {% else %}
+                <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-r cursor-not-allowed" disabled>
+                    Next
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
         {% else %}
         <div class="text-center py-8">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

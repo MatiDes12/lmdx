@@ -31,55 +31,55 @@
     </div>
 
     <!-- Patient Dropdown to Add Lab Results -->
-<div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-    <h2 class="text-2xl font-semibold mb-4 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        Add Lab Results
-    </h2>
-    <form action="{{ url_for('doctor.test_form') }}" method="GET" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div>
-                <label for="patient_dropdown" class="block text-sm font-medium text-gray-700 mb-2">Select Patient with Completed Appointment</label>
-                <select id="patient_dropdown" name="patient_id" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-10" required>
-                    <option value="" disabled selected>Select a patient</option>
-                    {% for patient in patients %}
-                    <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
-                    {% endfor %}
-                </select>
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Add Lab Results
+        </h2>
+        <form action="{{ url_for('doctor.test_form') }}" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="patient_dropdown" class="block text-sm font-medium text-gray-700 mb-2">Select Patient with Completed Appointment</label>
+                    <select id="patient_dropdown" name="patient_id" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-10" required>
+                        <option value="" disabled selected>Select a patient</option>
+                        {% for patient in patients %}
+                        <option value="{{ patient.client_id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="test_type" class="block text-sm font-medium text-gray-700 mb-2">Select Test Type</label>
+                    <select id="test_type" name="test_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-10" required>
+                        <option value="" disabled selected>Select a test type</option>
+                        <option value="blood">Blood Work</option>
+                        <option value="urine">Urine Analysis</option>
+                        <option value="imaging">Imaging</option>
+                        <option value="biopsy">Biopsy</option>
+                        <option value="genetic">Genetic Testing</option>
+                        <option value="cardiovascular">Cardiovascular Tests</option>
+                        <option value="pulmonary">Pulmonary Function Tests</option>
+                        <option value="allergy">Allergy Testing</option>
+                        <option value="hormone">Hormone Tests</option>
+                        <option value="neurological">Neurological Tests</option>
+                        <option value="gastrointestinal">Gastrointestinal Tests</option>
+                        <option value="dermatological">Dermatological Tests</option>
+                        <option value="ophthalmologic">Ophthalmologic Tests</option>
+                        <option value="pathology">Pathology Tests</option>
+                        <option value="toxicology">Toxicology Screen</option>
+                        <option value="bone_density">Bone Density Scan</option>
+                        <option value="fertility">Fertility Tests</option>   
+                    </select>
+                </div>
+                <div class="flex justify-end items-end">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
+                        Add Lab Results
+                    </button>
+                </div>
             </div>
-            <div>
-                <label for="test_type" class="block text-sm font-medium text-gray-700 mb-2">Select Test Type</label>
-                <select id="test_type" name="test_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-10" required>
-                    <option value="" disabled selected>Select a test type</option>
-                    <option value="blood">Blood Work</option>
-                    <option value="urine">Urine Analysis</option>
-                    <option value="imaging">Imaging</option>
-                    <option value="biopsy">Biopsy</option>
-                    <option value="genetic">Genetic Testing</option>
-                    <option value="cardiovascular">Cardiovascular Tests</option>
-                    <option value="pulmonary">Pulmonary Function Tests</option>
-                    <option value="allergy">Allergy Testing</option>
-                    <option value="hormone">Hormone Tests</option>
-                    <option value="neurological">Neurological Tests</option>
-                    <option value="gastrointestinal">Gastrointestinal Tests</option>
-                    <option value="dermatological">Dermatological Tests</option>
-                    <option value="ophthalmologic">Ophthalmologic Tests</option>
-                    <option value="pathology">Pathology Tests</option>
-                    <option value="toxicology">Toxicology Screen</option>
-                    <option value="bone_density">Bone Density Scan</option>
-                    <option value="fertility">Fertility Tests</option>   
-                </select>
-            </div>
-            <div class="flex justify-end items-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
-                    Add Lab Results
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
     <!-- Lab Results Filter Section -->
     <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
@@ -89,7 +89,7 @@
             </svg>
             Filter Lab Results
         </h2>
-        <form action="" method="GET" class="space-y-4">
+        <form action="{{ url_for('doctor.lab_results') }}" method="GET" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="patient_name">
@@ -102,12 +102,24 @@
                         Test Type
                     </label>
                     <select id="test_type" name="test_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">All</option>
+                        <option value="" disabled selected>Select a test type</option>
                         <option value="blood">Blood Work</option>
                         <option value="urine">Urine Analysis</option>
                         <option value="imaging">Imaging</option>
                         <option value="biopsy">Biopsy</option>
                         <option value="genetic">Genetic Testing</option>
+                        <option value="cardiovascular">Cardiovascular Tests</option>
+                        <option value="pulmonary">Pulmonary Function Tests</option>
+                        <option value="allergy">Allergy Testing</option>
+                        <option value="hormone">Hormone Tests</option>
+                        <option value="neurological">Neurological Tests</option>
+                        <option value="gastrointestinal">Gastrointestinal Tests</option>
+                        <option value="dermatological">Dermatological Tests</option>
+                        <option value="ophthalmologic">Ophthalmologic Tests</option>
+                        <option value="pathology">Pathology Tests</option>
+                        <option value="toxicology">Toxicology Screen</option>
+                        <option value="bone_density">Bone Density Scan</option>
+                        <option value="fertility">Fertility Tests</option>  
                     </select>
                 </div>
                 <div>
@@ -156,20 +168,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for result in lab_results %}
+                    {% for result, patient, patient_detail in lab_results %}
                     <tr>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div class="flex items-center">
+                                {% if patient_detail.image_path %}
+                                <img src="{{ url_for('static', filename=patient_detail.image_path) }}" alt="Profile Image" class="w-10 h-10 rounded-full">
+                                {% else %}
+                                <span class="text-gray-600">No Image</span>
+                                {% endif %}
                                 <div class="ml-3">
-                                    {% if result.patient.image_path %}
-                                    <img src="{{ url_for('static', filename=result.patient.image_path) }}" alt="Profile Image" class="w-10 h-10 rounded-full">
-                                    {% else %}
-                                    <span class="text-gray-600">No Image</span>
-                                    {% endif %}
                                     <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ result.patient.first_name }} {{ result.patient.last_name }}
+                                        {{ patient.first_name }} {{ patient.last_name }}
                                     </p>
-                                    <p class="text-gray-600 whitespace-no-wrap">{{ result.patient.email }}</p>
+                                    <p class="text-gray-600 whitespace-no-wrap">{{ patient.email }}</p>
                                 </div>
                             </div>
                         </td>
@@ -208,7 +220,7 @@
             </span>
             <div class="inline-flex mt-2 xs:mt-0">
                 {% if pagination.has_prev %}
-                <a href="{{ url_for('doctor.lab_results', page=pagination.prev_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                <a href="{{ url_for('doctor.lab_results', page=pagination.prev_num, patient_name=patient_name, test_type=test_type, date_range=date_range) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
                     Prev
                 </a>
                 {% else %}
@@ -220,7 +232,7 @@
                 {% for page_num in pagination.iter_pages() %}
                     {% if page_num %}
                         {% if page_num != pagination.page %}
-                            <a href="{{ url_for('doctor.lab_results', page=page_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                            <a href="{{ url_for('doctor.lab_results', page=page_num, patient_name=patient_name, test_type=test_type, date_range=date_range) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
                                 {{ page_num }}
                             </a>
                         {% else %}
@@ -234,7 +246,7 @@
                 {% endfor %}
                 
                 {% if pagination.has_next %}
-                <a href="{{ url_for('doctor.lab_results', page=pagination.next_num) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                <a href="{{ url_for('doctor.lab_results', page=pagination.next_num, patient_name=patient_name, test_type=test_type, date_range=date_range) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
                     Next
                 </a>
                 {% else %}
@@ -255,7 +267,6 @@
         {% endif %}
     </div>
 </div>
-
 
 <script>
 function toggleOtherTestInput() {

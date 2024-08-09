@@ -11,137 +11,184 @@
     </div>
 
     <!-- Filters for selecting test category and year -->
-    <div class="flex gap-4 mb-6">
-        <!-- Test Category Dropdown -->
-        <div>
-            <label for="test-category" class="block text-sm font-medium text-gray-700">Choose Test Category:</label>
-            <select id="test-category" class="block w-full pl-3 pr-10 py-2 mt-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow bg-gray-50">
-                <option value="all">All</option>
-                <option value="Blood Work">Blood Work</option>
-                <option value="Urine Analysis">Urine Analysis</option>
-                <option value="Genetic Testing">Genetic Testing</option>
-                <option value="Imaging Results">Imaging Results</option>
-                <option value="Pathology Reports">Pathology Reports</option>
-            </select>
-        </div>
+    <form method="GET" action="{{ url_for('patient.test_results') }}">
+        <div class="flex gap-4 mb-6">
+            <!-- Test Category Dropdown -->
+            <div>
+                <label for="test_type" class="block text-sm font-medium text-gray-700">Choose Test Category:</label>
+                <select id="test_type" name="test_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="" disabled selected>Select a test type</option>
+                    <option value="blood" {% if request.args.get('test_type') == 'blood' %}selected{% endif %}>Blood Work</option>
+                    <option value="urine" {% if request.args.get('test_type') == 'urine' %}selected{% endif %}>Urine Analysis</option>
+                    <option value="imaging" {% if request.args.get('test_type') == 'imaging' %}selected{% endif %}>Imaging</option>
+                    <option value="biopsy" {% if request.args.get('test_type') == 'biopsy' %}selected{% endif %}>Biopsy</option>
+                    <option value="genetic" {% if request.args.get('test_type') == 'genetic' %}selected{% endif %}>Genetic Testing</option>
+                    <option value="cardiovascular" {% if request.args.get('test_type') == 'cardiovascular' %}selected{% endif %}>Cardiovascular Tests</option>
+                    <option value="pulmonary" {% if request.args.get('test_type') == 'pulmonary' %}selected{% endif %}>Pulmonary Function Tests</option>
+                    <option value="allergy" {% if request.args.get('test_type') == 'allergy' %}selected{% endif %}>Allergy Testing</option>
+                    <option value="hormone" {% if request.args.get('test_type') == 'hormone' %}selected{% endif %}>Hormone Tests</option>
+                    <option value="neurological" {% if request.args.get('test_type') == 'neurological' %}selected{% endif %}>Neurological Tests</option>
+                    <option value="gastrointestinal" {% if request.args.get('test_type') == 'gastrointestinal' %}selected{% endif %}>Gastrointestinal Tests</option>
+                    <option value="dermatological" {% if request.args.get('test_type') == 'dermatological' %}selected{% endif %}>Dermatological Tests</option>
+                    <option value="ophthalmologic" {% if request.args.get('test_type') == 'ophthalmologic' %}selected{% endif %}>Ophthalmologic Tests</option>
+                    <option value="pathology" {% if request.args.get('test_type') == 'pathology' %}selected{% endif %}>Pathology Tests</option>
+                    <option value="toxicology" {% if request.args.get('test_type') == 'toxicology' %}selected{% endif %}>Toxicology Screen</option>
+                    <option value="bone_density" {% if request.args.get('test_type') == 'bone_density' %}selected{% endif %}>Bone Density Scan</option>
+                    <option value="fertility" {% if request.args.get('test_type') == 'fertility' %}selected{% endif %}>Fertility Tests</option>  
+                </select>
+            </div>
 
-        <!-- Year Dropdown -->
-        <div>
-            <label for="year" class="block text-sm font-medium text-gray-700">Choose Year:</label>
-            <select id="year" class="block w-full pl-3 pr-10 py-2 mt-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow bg-gray-50">
-                <option value="all">All Years</option>
-                {% for year in range(2025, 2019, -1) %}
-                <option value="{{ year }}">{{ year }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
+            <!-- Year Dropdown -->
+            <div>
+                <label for="year" class="block text-sm font-medium text-gray-700">Choose Year:</label>
+                <select id="year" name="year" class="block w-full pl-3 pr-10 py-2 mt-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow bg-gray-50">
+                    <option value="all" {% if not year or year == 'all' %}selected{% endif %}>All Years</option>
+                    {% for yr in range(2025, 2019, -1) %}
+                    <option value="{{ yr }}" {% if year == yr|string %}selected{% endif %}>{{ yr }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    <!-- Navigation for different test panels -->
+            <div class="flex items-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tab Content -->
+    {% if test_results %}
     <div class="border-b-2 border-gray-200 mb-4">
         <div class="flex space-x-4 -mb-px text-sm" id="tabs">
-            {% for result, test in test_results %}
-            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'tab{{ loop.index }}')">{{ test.test_name }}</button>
+            {% for result, patient, doctor in test_results %}
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'tab{{ loop.index }}')">{{ result.test_type }}</button>
             {% endfor %}
         </div>
     </div>
-    
-        <!-- Navigation for different test panels -->
-        <div class="border-b-2 border-gray-200 mb-4 hidden" id="tabs-container">
-            <div class="flex space-x-4 -mb-px text-sm" id="tabs">
-                {% for result, test in test_results %}
-                <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-600" onclick="openTab(event, 'tab{{ loop.index }}')">{{ test.test_name }}</button>
-                {% endfor %}
-            </div>
-        </div>
 
-    <!-- Tab Content -->
-    {% for result, test in test_results %}
+    <!-- Display the results -->
+    {% for result, patient, doctor in test_results %}
     <div id="tab{{ loop.index }}" class="tab-content hidden">
         <table class="min-w-full divide-y divide-gray-200 mt-4">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result Value</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ test.test_name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ result.result_value }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ result.result_date.strftime('%Y-%m-%d') }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ result.notes }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {% if result.image_path %}
-                        <a href="#" onclick="showImageModal('{{ url_for('static', filename=result.image_path) }}')" class="text-blue-600 hover:text-blue-900">View Image</a>
-                        {% else %}
-                        <span class="text-gray-600">No Image</span>
-                        {% endif %}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ doctor.first_name }} {{ doctor.last_name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ result.test_type }}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <a href="{{ url_for('patient.view_lab_results', result_id=result.id) }}">
+                            <span class="hidden md:inline text-sm border border-green-400 text-green-400 font-semibold rounded-full px-3 py-1 leading-normal transition duration-200 hover:bg-green-400 hover:text-white">
+                                View
+                            </span>
+                        </a>
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ result.test_date.strftime('%Y-%m-%d') }}</td>   
                 </tr>
             </tbody>
         </table>
     </div>
     {% endfor %}
 
-    <!-- Image Modal -->
-    <div id="imageModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="relative bg-white rounded-lg shadow-lg max-w-lg w-full">
-                <div class="flex justify-end p-2">
-                    <button onclick="closeImageModal()" class="text-gray-400 hover:text-gray-500">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="p-6">
-                    <img id="modalImage" src="" alt="Lab Result Image" class="w-full h-auto rounded-lg">
-                </div>
-            </div>
+    <!-- Pagination -->
+    <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+        <span class="text-xs xs:text-sm text-gray-900">
+            Showing {{ pagination.page }} to {{ pagination.pages }} of {{ pagination.total }} Entries
+        </span>
+        <div class="inline-flex mt-2 xs:mt-0">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('patient.test_results', page=pagination.prev_num, test_type=request.args.get('test_type'), year=request.args.get('year')) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
+                Prev
+            </a>
+            {% else %}
+            <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-l cursor-not-allowed" disabled>
+                Prev
+            </button>
+            {% endif %}
+            
+            {% for page_num in pagination.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != pagination.page %}
+                        <a href="{{ url_for('patient.test_results', page=page_num, test_type=request.args.get('test_type'), year=request.args.get('year')) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4">
+                            {{ page_num }}
+                        </a>
+                    {% else %}
+                        <span class="text-sm bg-blue-500 text-white font-semibold py-2 px-4">
+                            {{ page_num }}
+                        </span>
+                    {% endif %}
+                {% else %}
+                    <span class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4">...</span>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <a href="{{ url_for('patient.test_results', page=pagination.next_num, test_type=request.args.get('test_type'), year=request.args.get('year')) }}" class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
+                Next
+            </a>
+            {% else %}
+            <button class="text-sm bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-r cursor-not-allowed" disabled>
+                Next
+            </button>
+            {% endif %}
         </div>
     </div>
 
-    <!-- JavaScript for handling tab functionality and image modal -->
-    <script>
-    function openTab(evt, tabName) {
-        var i, tabcontent, tabs;
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tabs = document.getElementsByClassName("tabs");
-        for (i = 0; i < tabs.length; i++) {
-            tabs[i].className = tabs[i].className.replace(" text-blue-600 border-blue-500", "");
-            tabs[i].className += " border-transparent";
-        }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " text-blue-600 border-blue-500";
-    }
-
-    // Automatically open the first tab
-    document.addEventListener('DOMContentLoaded', function() {
-        if (document.querySelector('.tab-content')) {
-            document.querySelector('.tab-content').style.display = "block";
-            if (document.querySelector('.tabs')) {
-                document.querySelector('.tabs').className += " text-blue-600 border-blue-500";
-            }
-        }
-    });
-
-    // Show image in modal
-    function showImageModal(imageUrl) {
-        document.getElementById('modalImage').src = imageUrl;
-        document.getElementById('imageModal').classList.remove('hidden');
-    }
-
-    // Close image modal
-    function closeImageModal() {
-        document.getElementById('imageModal').classList.add('hidden');
-    }
-    </script>
+    {% else %}
+    <div class="text-center py-8">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Test Results Found</h3>
+        <p class="text-gray-500">There are currently no lab results available. Use the filter above to search for specific results or check back later.</p>
+    </div>
+    {% endif %}
 </div>
+
+<!-- JavaScript for handling tab functionality and image modal -->
+<script>
+function openTab(evt, tabName) {
+    var i, tabcontent, tabs;
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tabs = document.getElementsByClassName("tabs");
+    for (i = 0; i < tabs.length; i++) {
+        tabs[i].className = tabs[i].className.replace(" text-blue-600 border-blue-500", "");
+        tabs[i].className += " border-transparent";
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " text-blue-600 border-blue-500";
+}
+
+// Automatically open the first tab
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.querySelector('.tab-content')) {
+        document.querySelector('.tab-content').style.display = "block";
+        if (document.querySelector('.tabs')) {
+            document.querySelector('.tabs').className += " text-blue-600 border-blue-500";
+        }
+    }
+});
+
+// Show image in modal
+function showImageModal(imageUrl) {
+    document.getElementById('modalImage').src = imageUrl;
+    document.getElementById('imageModal').classList.remove('hidden');
+}
+
+// Close image modal
+function closeImageModal() {
+    document.getElementById('imageModal').classList.add('hidden');
+}
+</script>
+
 {% endblock %}
