@@ -12,10 +12,10 @@
 
 {% block content %}
 <div class="container mx-auto p-6">
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg shadow-lg border-l-4 border-blue-700">
-        <h1 class="text-4xl font-bold text-white mb-2">BMI Calculator</h1>
-        <p class="text-white mb-4">Calculate the Body Mass Index (BMI) for your patients to assess their weight category. Choose your preferred units and enter the required data.</p>
-    </div>
+    <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-3xl font-bold">BMI Calculator</h1>
+        <p>Calculate your Body Mass Index (BMI) using the form below.</p>
+      </div>
 
     <!-- Unit Selection -->
     <div class="mt-6">
@@ -43,26 +43,31 @@
         <button type="button" onclick="calculateBMI()" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Calculate BMI</button>
     </form>
 
-    <!-- BMI Result -->
-    <div id="bmi-result" class="mt-6 hidden">
-        <h2 class="text-2xl font-semibold mb-4">BMI Result</h2>
-        <table class="min-w-full bg-white rounded-lg shadow-lg">
-            <thead>
+<!-- BMI Result -->
+<div id="bmi-result" class="hidden mt-6">
+    <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-3xl font-bold">BMI Result</h2>
+        <p>Your Body Mass Index (BMI) is:</p>
+    </div>
+    
+    <div class="overflow-hidden rounded-lg shadow-lg">
+        <table class="min-w-full bg-gradient-to-r from-blue-100 to-purple-100">
+            <thead class="bg-blue-500 text-white">
                 <tr>
-                    <th class="px-4 py-2">BMI Value</th>
-                    <th class="px-4 py-2">Category</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">BMI Value</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Category</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td id="bmi-value" class="px-4 py-2"></td>
-                    <td id="bmi-category" class="px-4 py-2"></td>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <tr class="hover:bg-blue-50 transition duration-300 ease-in-out">
+                    <td id="bmi-value" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
+                    <td id="bmi-category" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
                 </tr>
             </tbody>
         </table>
-        <div id="bmi-chart" class="mt-6">
-            <canvas id="bmiChart"></canvas>
-        </div>
+    </div>
+    <div id="bmi-chart" class="mt-6">
+        <canvas id="bmiChart"></canvas>
     </div>
 </div>
 

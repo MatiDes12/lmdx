@@ -3,6 +3,99 @@
   {% include 'clients/navbar.html' %}
 {% endblock %}
 {% block content %}
+<style>
+  /* General Container */
+  .containers {
+      background-color: #fffbfb; /* Soft off-white background */
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      font-family: 'Montserrat', sans-serif; /* Modern and clean font */
+      max-width: 800px;
+      margin: auto;
+      transition: box-shadow 0.3s ease-in-out;
+  }
+
+  /* Header Style */
+  h3 {
+      color: #333333; /* Dark gray */
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px; /* Spacing between header and list */
+      position: relative;
+      text-align: center;
+  }
+
+  /* Decorative Line under header */
+  h3::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 3px;
+      background-color: #3498db; /* Blue accent color */
+      margin: 10px auto 0; /* Center the line */
+      border-radius: 3px;
+  }
+
+  /* List Item Style */
+  .containers p {
+      color: #555555; /* Medium gray */
+      font-size: 1.2rem;
+      line-height: 1.8;
+      margin-bottom: 20px; /* Space between list items */
+      padding: 15px;
+      padding-bottom: 10px; /* Space between text and border */
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* Hover effect on list items */
+  .containers p:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Bolded Text */
+  .containers strong {
+      color: #e74c3c; /* Distinct red for emphasis */
+      font-weight: bold;
+  }
+
+  /* List Numbers */
+  .containers p::before {
+      content: counters(item, ".") " ";
+      counter-increment: item;
+      color: #3498db; /* Blue for numbers */
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-right: 10px;
+      padding: 10px;
+  }
+
+  /* Gradient background for container */
+  .containers {
+      background: #ffffff
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+      .containers {
+          padding: 20px;
+      }
+
+      h3 {
+          font-size: 1.8rem;
+      }
+
+      .containers p {
+          font-size: 1rem;
+      }
+  }
+</style>
+
+
 <div class="p-4">
   <!-- Welcome Section -->
   <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
@@ -14,7 +107,7 @@
     <!-- Left Section: Health Metrics and Recent Activity -->
     <div class="col-span-2">
       <!-- Health Metrics -->
-      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
         Health Metrics
       </div>
       <div class="grid grid-cols-3 gap-4 mb-4">
@@ -89,7 +182,7 @@
           </div>
           <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Health Tracker</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300">Monitor your health metrics over time.</p>
-          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 dark:bg-teal-500 dark:hover:bg-teal-600 dark:focus:ring-teal-800">
+          <a href="{{ url_for('patient.health_tips') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 dark:bg-teal-500 dark:hover:bg-teal-600 dark:focus:ring-teal-800">
               Track Health
           </a>
         </div>
@@ -126,49 +219,30 @@
           </div>
           <h3 class="mb-1 text-lg font-bold text-gray-900 dark:text-white">Blood Pressure</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300">Monitor your blood pressure.</p>
-          <a href="" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
+          <a href="{{ url_for('patient.blood_pressure') }}" class="mt-2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
               Monitor BP
           </a>
         </div>
       </div>
 
       <!-- Recent Activity -->
-      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-        Recent Activity
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+        Daily Summary 
       </div>
       <div class="space-y-2 mb-4">
-        {% for activity in recent_activities %}
+     
         <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">{{ activity }}</p>
+          <p class="text-sm text-gray-700 dark:text-gray-300"></p>
         </div>
-        {% endfor %}
+        
       </div>
 
       <!-- Daily Health Tips -->
-      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
         Daily Health Tips
       </div>
-      <div class="space-y-2 mb-4">
-        {% for tip in health_tips %}
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">{{ tip }}</p>
-        </div>
-        {% endfor %}
-      </div>
-
-      <div class="p-2 bg-gradient-to-r from-red-500 to-pink-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-        Billing Information
-      </div>
-      <div class="space-y-2 mb-4">
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">Your last payment was on {{ last_payment_date }}.</p>
-        </div>
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">Your next payment is due on {{ next_payment_date }}.</p>
-        </div>
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">Your current balance is ${{ balance }}.</p>
-        </div>
+      <div class="space-y-2 mb-4" id="health-tips-container">
+        <!-- Tips will be loaded here by JavaScript -->
       </div>
     </div>
 
@@ -201,41 +275,16 @@
 
       </div>
 
-      <!-- Task Reminders -->
-      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-          Task Reminders
-      </div>
-      <div class="space-y-2 h-40 overflow-y-auto">
-          {% for task in tasks %}
-          <div class="flex items-center p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-              <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-              <label for="task" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">{{ task }}</label>
-          </div>
-          {% endfor %}
-      </div>
+    <!-- Health Goals -->
+    <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
+      Health Goals
+    </div>
+    <div class="containers">
+      {% for goal in health_goals %}
+      {{ goal | safe }}
+    {% endfor %}
+    </div>
 
-      <!-- Health Goals -->
-      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-        Health Goals
-      </div>
-      <div class="space-y-2 h-40 overflow-y-auto">
-        {% for goal in health_goals %}
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">{{ goal }}</p>
-        </div>
-        {% endfor %}
-      </div>
-      <!-- Latest Health News -->
-      <div class="p-2 bg-gradient-to-r from-blue-500 to-green-300 text-white text-lg font-semibold rounded-lg shadow-md mb-2">
-        Latest Health News
-      </div>
-      <div class="space-y-2 h-40 overflow-y-auto">
-        {% for news in health_news %}
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300">{{ news }}</p>
-        </div>
-        {% endfor %}
-      </div>
     </div>
   </div>
 </div>
@@ -243,7 +292,65 @@
 <div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
 
 <script>
-  function showFlashMessage(message, category) {
+document.addEventListener('DOMContentLoaded', function() {
+  const url = '{{ url_for("static", filename="health_tips.json") }}';  // Correct path to your JSON file
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const container = document.getElementById('health-tips-container');
+      const tips = data.tips;
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD format
+      let seed = parseInt(today.replace(/-/g, ''), 10); // Convert date to number
+
+      // Shuffle using the seeded random function
+      function seededRandom(max, min) {
+        seed = (seed * 9301 + 49297) % 233280; // Linear Congruential Generator (LCG)
+        const rnd = seed / 233280;
+        return Math.floor(min + rnd * (max - min));
+      }
+
+      for (let i = tips.length - 1; i > 0; i--) {
+        const j = seededRandom(0, i + 1);
+        [tips[i], tips[j]] = [tips[j], tips[i]]; // Swap elements
+      }
+
+      tips.slice(0, 3).forEach(tip => { // Get the first three tips
+        const tipElement = document.createElement('div');
+        tipElement.className = 'p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700';
+        tipElement.innerHTML = `<p class="text-sm text-gray-700 dark:text-gray-300">${tip}</p>`;
+        container.appendChild(tipElement);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading health tips:', error);
+      const container = document.getElementById('health-tips-container');
+      container.innerHTML = '<p class="text-sm text-gray-700 dark:text-gray-300">Failed to load health tips.</p>';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('/api/health-goals')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('health-goals-container');
+      data.forEach(goal => {
+        const goalElement = document.createElement('div');
+        goalElement.className = 'p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700';
+        goalElement.innerHTML = `<p class="text-sm text-gray-700 dark:text-gray-300">${goal}</p>`;
+        container.appendChild(goalElement);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading health goals:', error);
+    });
+});
+  
+function showFlashMessage(message, category) {
       const flashMessageContainer = document.getElementById('flash-message-container');
       const flashMessage = document.createElement('div');
       flashMessage.className = `flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800 mb-2`;

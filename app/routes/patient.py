@@ -19,6 +19,7 @@ from .instructions import advanced_instruction, formatting_instruction, greeting
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
+from bs4 import BeautifulSoup
 
 from sqlalchemy import and_, or_
 
@@ -85,19 +86,9 @@ def patient_dashboard():
                 "Eat a balanced diet rich in fruits and vegetables."
             ]
 
-            # Fetch health news (example)
-            health_news = [
-                "New advances in heart disease treatment.",
-                "How to manage diabetes with diet.",
-                "The benefits of regular physical activity."
-            ]
 
             # Fetch health goals (example)
-            health_goals = [
-                "Lose 5 pounds in the next month.",
-                "Run a 5k marathon.",
-                "Reduce cholesterol levels by 10%."
-            ]
+            health_goals = fetch_health_goals()
             
             # Fetch today's and tomorrow's appointments
             today_date = datetime.datetime.now().date()
@@ -135,8 +126,7 @@ def patient_dashboard():
                                    notifications=notifications, 
                                    unread_messages_count=unread_messages_count,
                                    recent_activities=recent_activities,
-                                   health_tips=health_tips,
-                                   health_news=health_news,
+                                   health_tips=health_tips,                 
                                    health_goals=health_goals,
                                    tasks=tasks)
 
@@ -166,6 +156,45 @@ def get_time_ago(timestamp):
         days = int(seconds / 86400)
         return f"{days} days ago" if days > 1 else "1 day ago"
 
+#<-------------------------- Health Goals -------------------------------->
+def format_health_goals(text):
+    # Convert headers (##) to <h3> tags with a custom class for styling
+    text = re.sub(r'##\s*(.*?)\s*$', r'<h3 class="centered-header">\1</h3>', text, flags=re.MULTILINE)
+
+    # Convert **text** to <strong>text</strong> for bolding
+    text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+
+    # Ensure each numbered item starts on a new line with moderate space between each item
+    text = re.sub(r'(\d+\.\s)', r'<br>\1', text)  # Add <br> before each numbered item
+
+    # Add minimal spacing between header and list items
+    text = text.replace('</h3>', '</h3>')
+
+    return text
+
+def fetch_health_goals():
+    user_id = session.get('user_id')
+    id_token = session.get('user_id_token')
+
+    # Fetch user data from Firebase
+    user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
+    if user_data:
+        first_name = user_data.get('first_name')
+        last_name = user_data.get('last_name')
+    genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    ai_prompt = f"🌟 Suggest three daily health goals based on wellness trends use ther name as will {first_name } {last_name}. Keep tips concise, actionable, and use minimal emojis for clarity. Goals should be easy for daily use. 🍏"
+    
+    try:
+        response = model.generate_content(ai_prompt)
+        if hasattr(response, 'text'):
+            raw_goals = response.text.strip()
+            formatted_goals = format_health_goals(raw_goals)
+            return [formatted_goals]  # Return as a single string within a list
+        else:
+            return ["Error fetching goals - no text found"]
+    except Exception as e:
+        return [f"Exception fetching goals: {str(e)}"]
 
 
 #<-------------------------- payments -------------------------------->
@@ -501,22 +530,26 @@ def get_messages():
 #<-------------------------- BMI Calculator ----------------------------->
 @bp.route('/bmi_calculator')
 def bmi_calculator():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+    
     return render_template('clients/bmi_calculator.html')
 
-@bp.route('/get_bmi_advice', methods=['POST'])
-def get_bmi_advice():
-    data = request.get_json()
-    bmi = float(data['bmi'])
+#<-------------------------- Blood Pressure ----------------------------->
+@bp.route('/blood_pressure')
+def blood_pressure():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
 
-    genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
-    prompt = f"Generate health advice for a patient with a BMI of {bmi:.2f}."
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(prompt)
-    advice = response.text.strip()
-    print(advice)
+    return render_template('clients/blood_pressure.html')
 
-    return jsonify({'advice': advice})
 
+#<-------------------------- Track Health ----------------------------->
+@bp.route('/health_tips')
+def track_health():
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+    return render_template('clients/health_tips.html')
 
 #<-------------------------- AI Chatbot -------------------------------->
 # Fetch user data function
@@ -712,7 +745,82 @@ def chatbot():
 
     return render_template('clients/chatbot.html', first_name=client_account.first_name, greeting_message=greeting_message)
 
+# <-------------------------- Daily Summary -------------------------------->
+def fetch_daily_summary():
+    user_id = session.get('user_id')
+    id_token = session.get('user_id_token')
 
+    # Fetch user data from Firebase
+    user_data = firebase_db.child("ClientAccounts").child(user_id).get(token=id_token).val()
+    if user_data:
+        first_name = user_data.get('first_name')
+        last_name = user_data.get('last_name')
+
+    # Fetch appointment details
+    appointment_details = fetch_user_appointment(user_id)
+    if appointment_details:
+        appointment_info = [
+            f"Appointment with {appt['doctor']} on {appt['date']} at {appt['time']} for {appt['reason']}"
+            for appt in appointment_details
+        ]
+    else:
+        appointment_info = ["No upcoming appointments found."]
+
+    # Fetch medication details
+    medication_details = fetch_user_medication(user_id)
+    if medication_details:
+        medication_info = [
+            f"Medication: {med['medication_name']} - Dosage: {med['dosage']}, Frequency: {med['frequency']}"
+            for med in medication_details
+        ]
+    else:
+        medication_info = ["No active medications found."]
+
+    # Fetch lab results
+    lab_results = fetch_user_lab_results(user_id)
+    if lab_results:
+        lab_results_info = [
+            f"Lab Test: {result['test_name']} - Result: {result['result_value']} {result['unit']} (Reference Range: {result['reference_range']}), Date: {result['date']}"
+            for result in lab_results
+        ]
+    else:
+        lab_results_info = ["No recent lab results found."]
+
+    # Fetch unread messages or notifications
+    unread_messages = Message.query.filter_by(recipient_id=user_id, is_read=False).all()
+    if unread_messages:
+        messages_info = [
+            f"Message from {msg.sender.first_name} {msg.sender.last_name}: {msg.body[:30]}..." for msg in unread_messages
+        ]
+    else:
+        messages_info = ["No new messages."]
+
+    # Combine all information into a daily summary
+    summary = [
+        f"Good day, {first_name} {last_name}!",
+        "Here is your daily health summary:",
+        "Appointments:",
+        *appointment_info,
+        "Medications:",
+        *medication_info,
+        "Lab Results:",
+        *lab_results_info,
+        "Messages:",
+        *messages_info
+    ]
+
+    # Format the summary for HTML rendering
+    formatted_summary = format_summary(summary)
+    return formatted_summary
+
+def format_summary(summary_list):
+    formatted_summary = ""
+    for item in summary_list:
+        if ":" in item:  # If the item is a header, make it bold
+            formatted_summary += f"<strong>{item}</strong><br>"
+        else:  # Regular list items
+            formatted_summary += f"{item}<br>"
+    return formatted_summary
 #<-------------------------- profile -------------------------------->
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

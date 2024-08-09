@@ -1,0 +1,133 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}Blood Pressure{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-3xl font-bold">Blood Pressure</h1>
+        <p>Enter the blood pressure data for the selected patient.</p>
+    </div>
+
+    <!-- Blood Pressure Form -->
+    <form id="blood-pressure-form" class="bg-white p-6 rounded-lg shadow-lg mt-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mb-4">
+                <label for="systolic" class="block text-gray-700"><i class="fas fa-heartbeat mr-2"></i>Systolic Pressure (mm Hg):</label>
+                <input type="number" id="systolic" name="systolic" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter systolic pressure">
+            </div>
+            <div class="mb-4">
+                <label for="diastolic" class="block text-gray-700"><i class="fas fa-heartbeat mr-2"></i>Diastolic Pressure (mm Hg):</label>
+                <input type="number" id="diastolic" name="diastolic" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter diastolic pressure">
+            </div>
+        </div>
+        <button type="button" onclick="calculateBloodPressure()" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Submit</button>
+    </form>
+
+    <!-- Blood Pressure Result -->
+    <div id="blood-pressure-result" class="hidden mt-6">
+        <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
+            <h1 class="text-3xl font-bold">Blood Pressure Result</h1>
+            <p>The patient's blood pressure is:</p>
+        </div>
+        
+        <div class="overflow-hidden rounded-lg shadow-lg">
+            <table class="min-w-full bg-gradient-to-r from-blue-100 to-purple-100">
+                <thead class="bg-blue-500 text-white">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Systolic Pressure</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Diastolic Pressure</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Category</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-blue-50 transition duration-300 ease-in-out">
+                        <td id="systolic-value" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
+                        <td id="diastolic-value" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
+                        <td id="blood-pressure-category" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="blood-pressure-chart" class="mt-6">
+            <canvas id="bloodPressureChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateBloodPressure() {
+    const systolic = parseFloat(document.getElementById('systolic').value);
+    const diastolic = parseFloat(document.getElementById('diastolic').value);
+
+    if (isNaN(systolic) || isNaN(diastolic) || systolic <= 0 || diastolic <= 0) {
+        alert('Please enter valid systolic and diastolic pressure values.');
+        return;
+    }
+
+    let category = '';
+    if (systolic < 120 && diastolic < 80) {
+        category = 'Normal';
+        document.getElementById('blood-pressure-category').className = 'text-green-500';
+    } else if (systolic >= 120 && systolic < 130 && diastolic < 80) {
+        category = 'Elevated';
+        document.getElementById('blood-pressure-category').className = 'text-yellow-500';
+    } else if ((systolic >= 130 && systolic < 140) || (diastolic >= 80 && diastolic < 90)) {
+        category = 'Hypertension Stage 1';
+        document.getElementById('blood-pressure-category').className = 'text-orange-500';
+    } else if (systolic >= 140 || diastolic >= 90) {
+        category = 'Hypertension Stage 2';
+        document.getElementById('blood-pressure-category').className = 'text-red-500';
+    } else if (systolic > 180 || diastolic > 120) {
+        category = 'Hypertensive Crisis';
+        document.getElementById('blood-pressure-category').className = 'text-red-700';
+    }
+
+    document.getElementById('systolic-value').innerText = systolic;
+    document.getElementById('diastolic-value').innerText = diastolic;
+    document.getElementById('blood-pressure-category').innerText = category;
+    document.getElementById('blood-pressure-result').classList.remove('hidden');
+
+    // Update Blood Pressure Chart
+    updateBloodPressureChart(systolic, diastolic, category);
+}
+
+function updateBloodPressureChart(systolic, diastolic, category) {
+    const ctx = document.getElementById('bloodPressureChart').getContext('2d');
+    const bloodPressureChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Systolic', 'Diastolic'],
+            datasets: [{
+                label: 'Blood Pressure',
+                data: [systolic, diastolic],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
