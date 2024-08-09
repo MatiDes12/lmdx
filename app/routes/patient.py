@@ -3,7 +3,7 @@ import os
 import random
 import re
 from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
-from ..models_db import ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Prescription, Reminder, User, Message, Visit
+from ..models_db import BloodTest, ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Prescription, Reminder, User, Message, Visit
 from ..models_db import ClientAccounts, Doctor, Appointment, LabResult, LabTest, Medication, Patient, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
@@ -1082,20 +1082,63 @@ def pretty_date(time=False):
 
 #<-------------------------- test results -------------------------------->
 
-@bp.route('/test_results')
+@bp.route('/test_results', methods=['GET'])
 def test_results():
     # Ensure the user is logged in and is a patient
     if 'user' not in session or session.get('user_type') != 'patient':
         return redirect(url_for('auth.signin'))
-    
-    # Get the logged-in patient's ID
-    patient_id = session.get('user_id')
 
-    # Query to fetch the lab results for the logged-in patient
-    test_results = db.session.query(LabResult, LabTest).join(LabTest, LabResult.test_id == LabTest.test_id)\
-        .filter(LabResult.patient_id == patient_id).order_by(LabResult.result_date.desc()).all()
+    firebase_user_id = session.get('user_id')
+    patient_account = ClientAccounts.query.filter_by(client_id=firebase_user_id).first()
 
-    return render_template('clients/test_results.html', test_results=test_results)
+    if not patient_account:
+        flash('Patient account not found', 'error')
+        return redirect(url_for('auth.signin'))
+
+    # Base query for fetching test results with doctor information
+    test_results_query = db.session.query(
+        BloodTest, 
+        Patient, 
+        Doctor
+    ).join(
+        Patient, BloodTest.patient_id == Patient.patient_id
+    ).join(
+        Account, BloodTest.doctor_id == Account.id
+    ).join(
+        Doctor, Account.doctor_id == Doctor.doctor_id
+    ).filter(BloodTest.patient_id == patient_account.client_id)
+
+    # Apply filters
+    test_type = request.args.get('test_type')
+    if test_type:
+        test_results_query = test_results_query.filter(BloodTest.test_type.ilike(f'%{test_type}%'))
+
+    year = request.args.get('year')
+    if year and year != "all":
+        test_results_query = test_results_query.filter(db.extract('year', BloodTest.test_date) == int(year))
+
+    # Handle pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 5  # Number of results per page
+    pagination = test_results_query.paginate(page=page, per_page=per_page, error_out=False)
+    test_results = pagination.items
+
+    return render_template('clients/test_results.html', test_results=test_results, pagination=pagination, test_type=test_type, year=year)
+
+
+@bp.route('/view_lab_results/<int:result_id>', methods=['GET'])
+def view_lab_results(result_id):
+    # Ensure the user is logged in and is a patient
+    if 'user' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('auth.signin'))
+
+    lab_result = BloodTest.query.get(result_id)
+    if not lab_result or lab_result.patient_id != session.get('user_id'):
+        flash('Lab result not found or access denied.', 'error')
+        return redirect(url_for('patient.test_results'))
+
+    return render_template('clients/view_lab_results.html', lab_result=lab_result)
+
 
 # <-------------------------- medication -------------------------------->
 @bp.route('/medication', methods=['GET', 'POST'])

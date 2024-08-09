@@ -112,7 +112,11 @@ def appointments():
     search_query = request.args.get('search')
 
     # Base query for appointments
-    query = Appointment.query.filter_by(doctor_id=doctor_id)
+    query = db.session.query(Appointment, ClientAccounts, Patient).join(
+        ClientAccounts, Appointment.client_id == ClientAccounts.client_id
+    ).join(
+        Patient, Patient.patient_id == ClientAccounts.client_id
+    ).filter(Appointment.doctor_id == doctor_id)
 
     # Apply filters
     if date_filter:
@@ -120,7 +124,7 @@ def appointments():
     if status_filter:
         query = query.filter(Appointment.status == status_filter)
     if search_query:
-        query = query.join(ClientAccounts).filter(
+        query = query.filter(
             or_(
                 ClientAccounts.first_name.ilike(f"%{search_query}%"),
                 ClientAccounts.last_name.ilike(f"%{search_query}%")
@@ -130,7 +134,6 @@ def appointments():
     appointments = query.all()
 
     return render_template('doctors/appointments.html', appointments=appointments, date_filter=date_filter, status_filter=status_filter, search_query=search_query)
-
 
 @bp.route('/edit_appointment/<int:appointment_id>', methods=['GET', 'POST'])
 def edit_appointment(appointment_id):
@@ -729,88 +732,41 @@ def reports():
         return redirect(url_for('auth.signin'))
 
     doctor_id = account.doctor_id
-    completed_appointments = Appointment.query.filter_by(doctor_id=doctor_id, status='Completed').all()
 
-    # Fetch existing reports with patient and test details
-    reports = db.session.query(LabResult, ClientAccounts, LabTest).join(ClientAccounts, LabResult.patient_id == ClientAccounts.client_id).join(LabTest, LabResult.test_id == LabTest.test_id).filter(LabResult.doctor_id == doctor_id).all()
+    # Build the base query for reports
+    reports_query = db.session.query(BloodTest, ClientAccounts).join(
+        ClientAccounts, BloodTest.patient_id == ClientAccounts.client_id
+    ).filter(
+        BloodTest.doctor_id == account.id
+    )
 
-    if request.method == 'POST':
-        patient_id = request.form.get('patient_id')
-        test_id = request.form.get('test_id')
-        result_value = request.form.get('result_value')
-        result_date = datetime.strptime(request.form.get('result_date'), '%Y-%m-%d')
-        notes = request.form.get('notes')
-        report_type = request.form.get('report_type')
-
-        # Handle image upload
-        image_path = None
-        if report_type == 'imaging' and 'image' in request.files:
-            image_file = request.files['image']
-            if image_file and allowed_file(image_file.filename):
-                filename = secure_filename(image_file.filename)
-                image_path = os.path.join(UPLOAD_FOLDER, filename)
-                image_file.save(image_path)
-                
-                # Update path to use forward slashes and make it relative to 'static'
-                image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
-                print(f"Image saved to: {image_path}")  # Debugging log
-
-        # Add new report to the database
-        new_report = LabResult(
-            patient_id=patient_id,
-            doctor_id=doctor_id,
-            test_id=test_id,
-            result_value=result_value,
-            result_date=result_date,
-            notes=notes,
-            image_path=image_path  # Store the image path if applicable
+    # Apply search filters
+    patient_name = request.args.get('patient')
+    if patient_name:
+        reports_query = reports_query.filter(
+            (ClientAccounts.first_name.ilike(f'%{patient_name}%')) | 
+            (ClientAccounts.last_name.ilike(f'%{patient_name}%'))
         )
-        db.session.add(new_report)
-        db.session.commit()
-        flash('Medical report added successfully!', 'success')
-        return redirect(url_for('doctor.reports'))
 
-    return render_template('doctors/reports.html', completed_appointments=completed_appointments, reports=reports)
+    test_type = request.args.get('test_type')
+    if test_type:
+        reports_query = reports_query.filter(BloodTest.test_type.ilike(f'%{test_type}%'))
+
+    date_range = request.args.get('date_range')
+    if date_range:
+        reports_query = reports_query.filter(BloodTest.test_date == date_range)
+
+    # Handle pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 5  # Number of results per page
+    pagination = reports_query.paginate(page=page, per_page=per_page, error_out=False)
+    reports = pagination.items
+
+    return render_template('doctors/reports.html', reports=reports, pagination=pagination, patient_name=patient_name, test_type=test_type, date_range=date_range)
+
 
 
 #<----------------------Lab Results----------------------->
-
-
-# @bp.route('/lab_results', methods=['GET', 'POST'])
-# def lab_results():
-#     if 'user' not in session or session.get('user_type') != 'doctors':
-#         return redirect(url_for('auth.signin'))
-
-#     firebase_user_id = session.get('user_id')
-#     account = Account.query.filter_by(id=firebase_user_id).first()
-#     print("account", account)
-#     if not account:
-#         flash('Doctor account not found', 'error')
-#         return redirect(url_for('auth.signin'))
-
-#     doctor_id = account.doctor_id
-#     print("doctor_id", doctor_id)
-
-#     # Fetch lab results for the doctor based on lab_doctor_id (from Account.id)
-#     lab_doctor_id = account.id
-#     print("lab_doctor_id: ", lab_doctor_id)
-
-#     # Fetch lab results where the doctor_id matches and patient_id corresponds to client_id
-#     lab_results = db.session.query(BloodTest).join(ClientAccounts, BloodTest.patient_id == ClientAccounts.client_id).filter(
-#         BloodTest.doctor_id == lab_doctor_id
-#     ).all()
-
-#     # For debugging, print out the patient information
-#     # for result in lab_results:
-#     #     print("Patient Info:", result.patient.first_name, result.patient.last_name)
-
-#     # Pagination parameters
-#     page = request.args.get('page', 1, type=int)
-#     per_page = 5
-#     # pagination = db.paginate(page=page, per_page=per_page, error_out=False, items=lab_results)
-#     # patients = pagination.items
-
-#     return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results)
 
 @bp.route('/lab_results', methods=['GET', 'POST'])
 def lab_results():
@@ -819,32 +775,53 @@ def lab_results():
 
     firebase_user_id = session.get('user_id')
     account = Account.query.filter_by(id=firebase_user_id).first()
-    print("account", account)
     if not account:
         flash('Doctor account not found', 'error')
         return redirect(url_for('auth.signin'))
 
     doctor_id = account.doctor_id
-    print("doctor_id", doctor_id)
+
     # Fetch patients with completed appointments
-    patients_query = db.session.query(ClientAccounts).join(Appointment).filter(
+    patients = db.session.query(ClientAccounts).join(Appointment).filter(
         Appointment.doctor_id == doctor_id,
         Appointment.status == 'Completed'
-    )
-    
-    # Pagination parameters
+    ).all()
+
+    # Handle pagination
     page = request.args.get('page', 1, type=int)
-    per_page = 5
-    pagination = patients_query.paginate(page=page, per_page=per_page, error_out=False)
-    patients = pagination.items
+    per_page = 5  # Number of results per page
 
-    # Fetch lab results for the doctor
+    # Build the base query for lab results
     lab_doctor_id = account.id
-    print("lab_doctor_id: ", lab_doctor_id)
-    lab_results = BloodTest.query.filter_by(doctor_id=lab_doctor_id).all()
-    
-    return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
+    lab_results_query = db.session.query(BloodTest, ClientAccounts, Patient).join(
+        ClientAccounts, BloodTest.patient_id == ClientAccounts.client_id
+    ).join(
+        Patient, BloodTest.patient_id == Patient.patient_id
+    ).filter(
+        BloodTest.doctor_id == lab_doctor_id
+    )
 
+    # Apply search filters
+    patient_name = request.args.get('patient_name')
+    if patient_name:
+        lab_results_query = lab_results_query.filter(
+            (ClientAccounts.first_name.ilike(f'%{patient_name}%')) | 
+            (ClientAccounts.last_name.ilike(f'%{patient_name}%'))
+        )
+
+    test_type = request.args.get('test_type')
+    if test_type:
+        lab_results_query = lab_results_query.filter(BloodTest.test_type.ilike(f'%{test_type}%'))
+
+    date_range = request.args.get('date_range')
+    if date_range:
+        lab_results_query = lab_results_query.filter(BloodTest.test_date == date_range)
+
+    # Pagination
+    pagination = lab_results_query.paginate(page=page, per_page=per_page, error_out=False)
+    lab_results = pagination.items
+
+    return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
 
 
 @bp.route('/test_form', methods=['GET', 'POST'])
@@ -908,11 +885,36 @@ def edit_lab_result(result_id):
         test_data = request.form.to_dict()
         lab_result.results = test_data
         db.session.commit()
-        flash('Test results updated successfully!', 'success')
         return redirect(url_for('doctor.lab_results'))
 
     return render_template('doctors/edit_lab_result.html', lab_result=lab_result)
 
+@bp.route('/delete_lab_result/<int:result_id>', methods=['POST'])
+def delete_lab_result(result_id):
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    # Fetch the lab result by ID
+    lab_result = BloodTest.query.get_or_404(result_id)
+
+    # Ensure that the current doctor has the permission to delete this result
+    firebase_user_id = session.get('user_id')
+    account = Account.query.filter_by(id=firebase_user_id).first()
+
+    if not account or lab_result.doctor_id != account.id:
+        flash('You do not have permission to delete this lab result.', 'error')
+        return redirect(url_for('doctor.lab_results'))
+
+    try:
+        # Delete the lab result
+        db.session.delete(lab_result)
+        db.session.commit()
+        flash('Lab result deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while deleting the lab result: {str(e)}', 'error')
+
+    return redirect(url_for('doctor.lab_results'))
 
 
 
