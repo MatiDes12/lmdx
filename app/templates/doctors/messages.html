@@ -64,29 +64,90 @@
 </div>
 
 <style>
-  .message {
-    max-width: 75%;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-  }
-  .sender-message {
-    background-color: #f0f0f0;
-    text-align: left;
-    margin-right: auto;
-    font-size: 1.6rem; 
-    font-weight: bold; /* Make the text bold */
-    color: rgb(0, 0, 0); /* Make the text white */
-  }
-  .receiver-message {
-    background-color: #0762c4b0;
-    text-align: right;
-    margin-left: auto;
-    font-size: 1.6rem; /* Increase the font size */
-    font-weight: bold; /* Make the text bold */
-    color: white; /* Make the text white */
-  }
-  </style>
+ .message {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  max-width: 75%;
+  padding: 10px;
+  border-radius: 15px;
+  position: relative;
+  background-color: #f0f0f0;
+}
+
+.profile-container {
+  flex-shrink: 0;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #4F46E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.profile-icon-you {
+  background-color: #1E3A8A;
+}
+
+.profile-icon-client {
+  background-color: #059669;
+}
+
+.message-content {
+  padding: 10px 15px;
+  background-color: inherit;
+  border-radius: 15px;
+  max-width: calc(100% - 60px); /* Adjusting for profile icon */
+  word-wrap: break-word;
+}
+
+.sender-message {
+  background-color: #1E3A8A;
+  color: white;
+  text-align: left;
+  margin-right: auto;
+  border: 2px solid #4F46E5;
+}
+
+.receiver-message {
+  background-color: #10B981;
+  color: white;
+  text-align: left;
+  margin-left: auto;
+  border: 2px solid #059669;
+}
+
+.message-timestamp {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  bottom: -20px;
+  right: 15px;
+  white-space: nowrap;
+}
+
+.profile-icon-doc::after {
+  content: "Doc";
+}
+
+.profile-icon-pat::after {
+  content: "Pat";
+}
+
+</style>
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -98,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const clientId = targetElement.getAttribute('data-client-id');
             if (clientId) {
                 loadConversation(clientId);
-                selectClientInDropdown(clientId); // Function to select the client in the dropdown
+                selectClientInDropdown(clientId);
             } else {
                 alert("Client ID is undefined!");
             }
@@ -114,8 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageContainer.innerHTML = '';
                     data.conversation.forEach(msg => {
                         const messageElement = document.createElement('div');
+                        const profileIcon = document.createElement('div');
+                        const timestamp = new Date(msg.timestamp).toLocaleString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            month: 'short',
+                            day: 'numeric'
+                        });
+
+                        // Set the profile icon text to "Doc" for the doctor and "Pat" for the patient
+                        profileIcon.className = `profile-icon ${msg.sender === 'You' ? 'profile-icon-you' : 'receiver-profile-icon profile-icon-client'}`;
+                        profileIcon.textContent = msg.sender === 'You' ? 'Doc' : 'Pat';
+
                         messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
-                        messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
+                        messageElement.innerHTML = `
+                            <div class="message-content">
+                                <p class="text-lg font-medium">${msg.message}</p>
+                                <p class="message-timestamp">${timestamp}</p>
+                            </div>`;
+                        messageElement.prepend(profileIcon);
                         messageContainer.appendChild(messageElement);
                     });
                 } else {
@@ -135,8 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const sender = '{{ session["user_id"] }}';
-
     document.getElementById('client-select').addEventListener('change', function() {
         const receiver = this.value;
         fetch(`/doctor/get_messages?client_id=${receiver}`)
@@ -147,8 +224,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageContainer.innerHTML = '';
                     data.conversation.forEach(msg => {
                         const messageElement = document.createElement('div');
+                        const profileIcon = document.createElement('div');
+                        const timestamp = new Date(msg.timestamp).toLocaleString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            month: 'short',
+                            day: 'numeric'
+                        });
+
+                        // Set the profile icon text to "Doc" for the doctor and "Pat" for the patient
+                        profileIcon.className = `profile-icon ${msg.sender === 'You' ? 'profile-icon-you' : 'receiver-profile-icon profile-icon-client'}`;
+                        profileIcon.textContent = msg.sender === 'You' ? 'Doc' : 'Pat';
+
                         messageElement.className = `message ${msg.sender === 'You' ? 'receiver-message' : 'sender-message'}`;
-                        messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">${msg.sender}</p><p class="text-sm text-gray-600">${msg.message}</p><p class="text-xs text-gray-400">${msg.timestamp}</p>`;
+                        messageElement.innerHTML = `
+                            <div class="message-content">
+                                <p class="text-lg font-medium">${msg.message}</p>
+                                <p class="message-timestamp">${timestamp}</p>
+                            </div>`;
+                        messageElement.prepend(profileIcon);
                         messageContainer.appendChild(messageElement);
                     });
                 } else {
@@ -163,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const receiver = document.getElementById('client-select').value;
         const message = messageInput.value;
         if (message.trim() !== '') {
-          fetch('/doctor/send_message', {
+            fetch('/doctor/send_message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -177,9 +272,22 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 if (data.success) {
                     const messageContainer = document.getElementById('message-display');
+                    const profileIcon = document.createElement('div');
+                    profileIcon.className = 'profile-icon profile-icon-you';
+                    profileIcon.textContent = 'Doc';
+
                     const messageElement = document.createElement('div');
                     messageElement.className = 'message receiver-message';
-                    messageElement.innerHTML = `<p class="text-lg font-medium text-gray-800">You</p><p class="text-sm text-gray-600">${message}</p>`;
+                    const timestamp = new Date().toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true,
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    messageElement.innerHTML = `<div class="message-content"><p class="text-lg font-medium">${message}</p><p class="message-timestamp">${timestamp}</p></div>`;
+                    messageElement.prepend(profileIcon);
+
                     messageContainer.appendChild(messageElement);
                     messageInput.value = '';
                 } else {
@@ -207,5 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
 </script>
 {% endblock %}

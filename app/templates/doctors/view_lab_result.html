@@ -1,4 +1,3 @@
-<!-- app/templates/doctors/view_lab_result.html -->
 {% extends 'doctors/base.html' %}
 
 {% block title %}View Lab Result{% endblock %}
@@ -18,20 +17,485 @@
             <h1 class="text-3xl font-bold">View Lab Result</h1>
             <p>Details of the lab result for {{ lab_result.patient.first_name }} {{ lab_result.patient.last_name }}</p>
         </div>
+        <div class="flex items-center">
+            <div class="text-right">
+                <p class="text-2xl font-extrabold">{{ lab_result.test_date.strftime('%A') }}</p>
+                <p class="text-lg">{{ lab_result.test_date.strftime('%B %Y') }}</p>
+            </div>
+            <div class="border-l-4 border-gray-300 h-12 mx-4"></div>
+            <p class="text-4xl font-bold">{{ lab_result.test_date.strftime('%d') }}</p>
+        </div>
+    </div>
+     
+
+    <!-- Navigation Bar -->
+    <div class="border-b-2 border-gray-300 mb-8 text-center">
+        <div class="flex space-x-4 -mb-px text-sm font-semibold text-gray-600 mt-4">
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-blue-500 text-blue-600 hover:text-blue-800" onclick="openTab(event, 'comprehensive_metabolic_panel')">Comprehensive Metabolic Panel</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-800" onclick="openTab(event, 'lipid_panel')">Lipid Panel</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-800" onclick="openTab(event, 'cbc_auto_differential')">CBC Auto Differential</button>
+            <button class="tabs focus:outline-none py-4 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-800" onclick="openTab(event, 'thyroid_stimulating_hormone')">Thyroid Stimulating Hormone</button>
+        </div>
     </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-semibold mb-4">Test Type: {{ lab_result.test_type }}</h2>
-        <p class="text-gray-700 mb-4"><strong>Date:</strong> {{ lab_result.test_date.strftime('%Y-%m-%d') }}</p>
-        <div class="mb-4">
-            <h3 class="text-xl font-semibold mb-2">Results</h3>
-            <ul class="list-disc list-inside">
-                {% for key, value in lab_result.results.items() %}
-                <li><strong>{{ key.replace('_', ' ').capitalize() }}:</strong> {{ value }}</li>
-                {% endfor %}
-            </ul>
+    <!-- Comprehensive Metabolic Panel -->
+    <div id="comprehensive_metabolic_panel" class="tab-content">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">Comprehensive Metabolic Panel</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Test Parameter</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Result</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Range</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Status</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                        {% for key, value in lab_result.results.items() %}
+                        {% if key in ['sodium', 'potassium', 'chloride', 'carbon_dioxide', 'glucose', 'calcium', 'total_protein', 'albumin', 'total_bilirubin', 'alkaline_phosphatase', 'anion_gap', 'bun', 'creatinine', 'egfr', 'bun_creatinine_ratio', 'alt', 'ast'] %}
+                            {% set lower_bound = 0 %}
+                            {% set upper_bound = 0 %}
+                            {% set unit = '' %}
+                            {% set status_text = 'Normal' %}
+                            {% set status_color = 'bg-green-500' %}
+                            {% set bar_width = '50%' %}  <!-- Default to 50% for normal range -->
+                    
+                            {% set value = value | float %} <!-- Convert value to float -->
+                    
+                            <!-- Define normal ranges for each parameter -->
+                            {% if key == 'sodium' %}
+                                {% set lower_bound = 135 %}
+                                {% set upper_bound = 145 %}
+                                {% set unit = 'mmol/L' %}
+                            {% elif key == 'potassium' %}
+                                {% set lower_bound = 3.6 %}
+                                {% set upper_bound = 5.1 %}
+                                {% set unit = 'mmol/L' %}
+                            {% elif key == 'chloride' %}
+                                {% set lower_bound = 98 %}
+                                {% set upper_bound = 107 %}
+                                {% set unit = 'mmol/L' %}
+                            {% elif key == 'carbon_dioxide' %}
+                                {% set lower_bound = 22 %}
+                                {% set upper_bound = 32 %}
+                                {% set unit = 'mmol/L' %}
+                            {% elif key == 'glucose' %}
+                                {% set lower_bound = 70 %}
+                                {% set upper_bound = 99 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'calcium' %}
+                                {% set lower_bound = 8.6 %}
+                                {% set upper_bound = 10.3 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'total_protein' %}
+                                {% set lower_bound = 6.1 %}
+                                {% set upper_bound = 7.9 %}
+                                {% set unit = 'g/dL' %}
+                            {% elif key == 'albumin' %}
+                                {% set lower_bound = 3.5 %}
+                                {% set upper_bound = 4.8 %}
+                                {% set unit = 'g/dL' %}
+                            {% elif key == 'total_bilirubin' %}
+                                {% set lower_bound = 0.3 %}
+                                {% set upper_bound = 1.2 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'alkaline_phosphatase' %}
+                                {% set lower_bound = 44 %}
+                                {% set upper_bound = 147 %}
+                                {% set unit = 'IU/L' %}
+                            {% elif key == 'anion_gap' %}
+                                {% set lower_bound = 6 %}
+                                {% set upper_bound = 18 %}
+                                {% set unit = 'mmol/L' %}
+                            {% elif key == 'bun' %}
+                                {% set lower_bound = 8 %}
+                                {% set upper_bound = 20 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'creatinine' %}
+                                {% set lower_bound = 0.60 %}
+                                {% set upper_bound = 1.30 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'egfr' %}
+                                {% set lower_bound = 60 %}
+                                {% set upper_bound = None %} <!-- No upper bound for eGFR -->
+                                {% set unit = 'mL/min/1.73m2' %}
+                            {% elif key == 'bun_creatinine_ratio' %}
+                                {% set lower_bound = 12.0 %}
+                                {% set upper_bound = 20.0 %}
+                                {% set unit = '' %}
+                            {% elif key == 'alt' %}
+                                {% set lower_bound = 7 %}
+                                {% set upper_bound = 52 %}
+                                {% set unit = 'unit/L' %}
+                            {% elif key == 'ast' %}
+                                {% set lower_bound = 15 %}
+                                {% set upper_bound = 40 %}
+                                {% set unit = 'unit/L' %}
+                            {% endif %}
+                    
+                            {% if key == 'egfr' %}
+                                {% if value < lower_bound %}
+                                    {% set status_text = 'Low' %}
+                                    {% set status_color = 'bg-yellow-500' %}
+                                    {% set bar_width = '25%' %}
+                                {% else %}
+                                    {% set status_text = 'Normal' %}
+                                    {% set status_color = 'bg-green-500' %}
+                                    {% set bar_width = '100%' %}
+                                {% endif %}
+                            {% else %}
+                                {% if value < lower_bound %}
+                                    {% set status_text = 'Low' %}
+                                    {% set status_color = 'bg-yellow-500' %}
+                                    {% set bar_width = '25%' %}
+                                {% elif value > upper_bound %}
+                                    {% set status_text = 'High' %}
+                                    {% set status_color = 'bg-red-500' %}
+                                    {% set bar_width = '100%' %}
+                                {% endif %}
+                            {% endif %}
+                    
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">{{ key.replace('_', ' ').capitalize() }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ value }} {{ unit }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ lower_bound }}{% if upper_bound %} - {{ upper_bound }}{% endif %} {{ unit }}</td>
+                                <td class="px-6 py-4 w-1/4">
+                                    <div class="relative pt-1">
+                                        <div class="overflow-hidden h-1.5 w-20 text-xs flex rounded bg-gray-200">
+                                            <div class="h-full {{ status_color }}" style="width: {{ bar_width }};"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">
+                                    <span class="inline-block w-20 h-7 text-center text-sm font-semibold {{ status_color }} text-white py-1 px-4 rounded-lg">{{ status_text }}</span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}                    
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
+
+    <!-- Lipid Panel -->
+    <div id="lipid_panel" class="tab-content hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">Lipid Panel</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Test Parameter</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Result</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Range</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Status</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                        {% for key, value in lab_result.results.items() %}
+                        {% if key in ['total_cholesterol', 'hdl', 'ldl', 'triglycerides', 'vldl'] %}
+                            {% set lower_bound = 0 %}
+                            {% set upper_bound = 0 %}
+                            {% set unit = '' %}
+                            {% set status_text = 'Normal' %}
+                            {% set status_color = 'bg-green-500' %}
+                            {% set bar_width = '50%' %}  <!-- Default to 50% for normal range -->
+
+                            {% set value = value | float %} <!-- Convert value to float -->
+
+                            <!-- Define normal ranges for each parameter -->
+                            {% if key == 'total_cholesterol' %}
+                                {% set lower_bound = 0 %}
+                                {% set upper_bound = 200 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'hdl' %}
+                                {% set lower_bound = 40 %}
+                                {% set upper_bound = 60 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'ldl' %}
+                                {% set lower_bound = 0 %}
+                                {% set upper_bound = 100 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'triglycerides' %}
+                                {% set lower_bound = 0 %}
+                                {% set upper_bound = 150 %}
+                                {% set unit = 'mg/dL' %}
+                            {% elif key == 'vldl' %}
+                                {% set lower_bound = 2 %}
+                                {% set upper_bound = 38 %}
+                                {% set unit = 'mg/dL' %}
+                            {% endif %}
+
+                            {% if value < lower_bound %}
+                                {% set status_text = 'Low' %}
+                                {% set status_color = 'bg-yellow-500' %}
+                                {% set bar_width = '25%' %}
+                            {% elif value > upper_bound %}
+                                {% set status_text = 'High' %}
+                                {% set status_color = 'bg-red-500' %}
+                                {% set bar_width = '100%' %}
+                            {% endif %}
+
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">{{ key.replace('_', ' ').capitalize() }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ value }} {{ unit }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ lower_bound }} - {{ upper_bound }} {{ unit }}</td>
+                                <td class="px-6 py-4 w-1/4">
+                                    <div class="relative pt-1">
+                                        <div class="overflow-hidden h-1.5 w-20 text-xs flex rounded bg-gray-200">
+                                            <div class="h-full {{ status_color }}" style="width: {{ bar_width }};"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">
+                                    <span class="inline-block w-20 h-7 text-center text-sm font-semibold {{ status_color }} text-white py-1 px-4 rounded-lg">{{ status_text }}</span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CBC Auto Differential -->
+    <div id="cbc_auto_differential" class="tab-content hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">CBC Auto Differential</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Test Parameter</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Result</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Range</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Status</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                        {% for key, value in lab_result.results.items() %}
+                        {% if key in ['wbc', 'rbc', 'hemoglobin', 'hematocrit', 'mcv', 'mch', 'mchc', 'rdw', 'platelets', 'mpv', 'neutrophils_relative', 'lymphocytes_relative', 'monocytes_relative', 'eosinophils_relative', 'basophils_relative', 'neutrophils_absolute', 'lymphocytes_absolute', 'monocytes_absolute', 'eosinophils_absolute', 'basophils_absolute', 'immature_granulocytes_relative', 'immature_granulocytes_absolute'] %}
+                            {% set lower_bound = 0 %}
+                            {% set upper_bound = 0 %}
+                            {% set unit = '' %}
+                            {% set status_text = 'Normal' %}
+                            {% set status_color = 'bg-green-500' %}
+                            {% set bar_width = '50%' %}  <!-- Default to 50% for normal range -->
+
+                            {% set value = value | float %} <!-- Convert value to float -->
+
+                            <!-- Define normal ranges for each parameter -->
+                            {% if key == 'wbc' %}
+                                {% set lower_bound = 4.6 %}
+                                {% set upper_bound = 10.2 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'rbc' %}
+                                {% set lower_bound = 4.30 %}
+                                {% set upper_bound = 5.70 %}
+                                {% set unit = 'M/mcl' %}
+                            {% elif key == 'hemoglobin' %}
+                                {% set lower_bound = 13.5 %}
+                                {% set upper_bound = 17.5 %}
+                                {% set unit = 'g/dL' %}
+                            {% elif key == 'hematocrit' %}
+                                {% set lower_bound = 39.5 %}
+                                {% set upper_bound = 50.0 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'mcv' %}
+                                {% set lower_bound = 80.0 %}
+                                {% set upper_bound = 97.0 %}
+                                {% set unit = 'fL' %}
+                            {% elif key == 'mch' %}
+                                {% set lower_bound = 27.0 %}
+                                {% set upper_bound = 34.0 %}
+                                {% set unit = 'pg' %}
+                            {% elif key == 'mchc' %}
+                                {% set lower_bound = 30.8 %}
+                                {% set upper_bound = 35.3 %}
+                                {% set unit = 'g/dL' %}
+                            {% elif key == 'rdw' %}
+                                {% set lower_bound = 11.0 %}
+                                {% set upper_bound = 14.8 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'platelets' %}
+                                {% set lower_bound = 142 %}
+                                {% set upper_bound = 424 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'mpv' %}
+                                {% set lower_bound = 6.2 %}
+                                {% set upper_bound = 12.1 %}
+                                {% set unit = 'fL' %}
+                            {% elif key == 'neutrophils_relative' %}
+                                {% set lower_bound = 38.1 %}
+                                {% set upper_bound = 75.5 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'lymphocytes_relative' %}
+                                {% set lower_bound = 15.4 %}
+                                {% set upper_bound = 48.3 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'monocytes_relative' %}
+                                {% set lower_bound = 0.0 %}
+                                {% set upper_bound = 12.0 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'eosinophils_relative' %}
+                                {% set lower_bound = 0.0 %}
+                                {% set upper_bound = 7.0 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'basophils_relative' %}
+                                {% set lower_bound = 0.0 %}
+                                {% set upper_bound = 2.0 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'neutrophils_absolute' %}
+                                {% set lower_bound = 1.80 %}
+                                {% set upper_bound = 7.70 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'lymphocytes_absolute' %}
+                                {% set lower_bound = 1.00 %}
+                                {% set upper_bound = 4.80 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'monocytes_absolute' %}
+                                {% set lower_bound = 0.00 %}
+                                {% set upper_bound = 0.80 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'eosinophils_absolute' %}
+                                {% set lower_bound = 0.00 %}
+                                {% set upper_bound = 0.70 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'basophils_absolute' %}
+                                {% set lower_bound = 0.00 %}
+                                {% set upper_bound = 0.20 %}
+                                {% set unit = 'K/mcl' %}
+                            {% elif key == 'immature_granulocytes_relative' %}
+                                {% set lower_bound = 0.0 %}
+                                {% set upper_bound = 1.2 %}
+                                {% set unit = '%' %}
+                            {% elif key == 'immature_granulocytes_absolute' %}
+                                {% set lower_bound = 0.00 %}
+                                {% set upper_bound = 0.10 %}
+                                {% set unit = 'K/mcl' %}
+                            {% endif %}
+
+                            {% if value < lower_bound %}
+                                {% set status_text = 'Low' %}
+                                {% set status_color = 'bg-yellow-500' %}
+                                {% set bar_width = '25%' %}
+                            {% elif value > upper_bound %}
+                                {% set status_text = 'High' %}
+                                {% set status_color = 'bg-red-500' %}
+                                {% set bar_width = '100%' %}
+                            {% endif %}
+
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">{{ key.replace('_', ' ').capitalize() }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ value }} {{ unit }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ lower_bound }} - {{ upper_bound }} {{ unit }}</td>
+                                <td class="px-6 py-4 w-1/4">
+                                    <div class="relative pt-1">
+                                        <div class="overflow-hidden h-1.5 w-20 text-xs flex rounded bg-gray-200">
+                                            <div class="h-full {{ status_color }}" style="width: {{ bar_width }};"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">
+                                    <span class="inline-block w-20 h-7 text-center text-sm font-semibold {{ status_color }} text-white py-1 px-4 rounded-lg">{{ status_text }}</span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thyroid Stimulating Hormone -->
+    <div id="thyroid_stimulating_hormone" class="tab-content hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">Thyroid Stimulating Hormone</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Test Parameter</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Result</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Range</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Status</th>
+                            <th class="px-6 py-3 text-sm font-medium text-left text-gray-500 dark:text-gray-400 w-1/4">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
+                        {% for key, value in lab_result.results.items() %}
+                        {% if key == 'tsh' %}
+                            {% set lower_bound = 0.45 %}
+                            {% set upper_bound = 5.33 %}
+                            {% set unit = 'mIU/L' %}
+                            {% set status_text = 'Normal' %}
+                            {% set status_color = 'bg-green-500' %}
+                            {% set bar_width = '50%' %}  <!-- Default to 50% for normal range -->
+
+                            {% set value = value | float %} <!-- Convert value to float -->
+
+                            {% if value < lower_bound %}
+                                {% set status_text = 'Low' %}
+                                {% set status_color = 'bg-yellow-500' %}
+                                {% set bar_width = '25%' %}
+                            {% elif value > upper_bound %}
+                                {% set status_text = 'High' %}
+                                {% set status_color = 'bg-red-500' %}
+                                {% set bar_width = '100%' %}
+                            {% endif %}
+
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">Thyroid Stimulating Hormone (TSH)</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ value }} {{ unit }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 w-1/4">{{ lower_bound }} - {{ upper_bound }} {{ unit }}</td>
+                                <td class="px-6 py-4 w-1/4">
+                                    <div class="relative pt-1">
+                                        <div class="overflow-hidden h-1.5 w-20 text-xs flex rounded bg-gray-200">
+                                            <div class="h-full {{ status_color }}" style="width: {{ bar_width }};"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white w-1/4">
+                                    <span class="inline-block w-20 h-7 text-center text-sm font-semibold {{ status_color }} text-white py-1 px-4 rounded-lg">{{ status_text }}</span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6">
         <a href="{{ url_for('doctor.lab_results') }}" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Back to Lab Results</a>
     </div>
 </div>
+
+<script>
+function openTab(evt, tabName) {
+    var i, tabContent, tabLinks;
+    tabContent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+    tabLinks = document.getElementsByClassName("tabs");
+    for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" text-blue-600 border-blue-500", " text-gray-600 border-transparent");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " text-blue-600 border-blue-500";
+}
+// Initial tab to show
+document.getElementById('comprehensive_metabolic_panel').style.display = "block";
+document.getElementsByClassName("tabs")[0].className += " text-blue-600 border-blue-500";
+</script>
 {% endblock %}

@@ -776,42 +776,6 @@ def reports():
 #<----------------------Lab Results----------------------->
 
 
-@bp.route('/lab_results', methods=['GET', 'POST'])
-def lab_results():
-    if 'user' not in session or session.get('user_type') != 'doctors':
-        return redirect(url_for('auth.signin'))
-
-    firebase_user_id = session.get('user_id')
-    account = Account.query.filter_by(id=firebase_user_id).first()
-    print("account", account)
-    if not account:
-        flash('Doctor account not found', 'error')
-        return redirect(url_for('auth.signin'))
-
-    doctor_id = account.doctor_id
-    print("doctor_id", doctor_id)
-
-    # Fetch lab results for the doctor based on lab_doctor_id (from Account.id)
-    lab_doctor_id = account.id
-    print("lab_doctor_id: ", lab_doctor_id)
-
-    # Fetch lab results where the doctor_id matches and patient_id corresponds to client_id
-    lab_results = db.session.query(BloodTest).join(ClientAccounts, BloodTest.patient_id == ClientAccounts.client_id).filter(
-        BloodTest.doctor_id == lab_doctor_id
-    ).all()
-
-    # For debugging, print out the patient information
-    for result in lab_results:
-        print("Patient Info:", result.patient.first_name, result.patient.last_name)
-
-    # Pagination parameters
-    page = request.args.get('page', 1, type=int)
-    per_page = 5
-    pagination = db.paginate(page=page, per_page=per_page, error_out=False, items=lab_results)
-    patients = pagination.items
-
-    return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
-
 # @bp.route('/lab_results', methods=['GET', 'POST'])
 # def lab_results():
 #     if 'user' not in session or session.get('user_type') != 'doctors':
@@ -826,24 +790,60 @@ def lab_results():
 
 #     doctor_id = account.doctor_id
 #     print("doctor_id", doctor_id)
-#     # Fetch patients with completed appointments
-#     patients_query = db.session.query(ClientAccounts).join(Appointment).filter(
-#         Appointment.doctor_id == doctor_id,
-#         Appointment.status == 'Completed'
-#     )
-    
+
+#     # Fetch lab results for the doctor based on lab_doctor_id (from Account.id)
+#     lab_doctor_id = account.id
+#     print("lab_doctor_id: ", lab_doctor_id)
+
+#     # Fetch lab results where the doctor_id matches and patient_id corresponds to client_id
+#     lab_results = db.session.query(BloodTest).join(ClientAccounts, BloodTest.patient_id == ClientAccounts.client_id).filter(
+#         BloodTest.doctor_id == lab_doctor_id
+#     ).all()
+
+#     # For debugging, print out the patient information
+#     # for result in lab_results:
+#     #     print("Patient Info:", result.patient.first_name, result.patient.last_name)
+
 #     # Pagination parameters
 #     page = request.args.get('page', 1, type=int)
 #     per_page = 5
-#     pagination = patients_query.paginate(page=page, per_page=per_page, error_out=False)
-#     patients = pagination.items
+#     # pagination = db.paginate(page=page, per_page=per_page, error_out=False, items=lab_results)
+#     # patients = pagination.items
 
-#     # Fetch lab results for the doctor
-#     lab_doctor_id = account.id
-#     print("lab_doctor_id: ", lab_doctor_id)
-#     lab_results = BloodTest.query.filter_by(doctor_id=lab_doctor_id).all()
+#     return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results)
+
+@bp.route('/lab_results', methods=['GET', 'POST'])
+def lab_results():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    firebase_user_id = session.get('user_id')
+    account = Account.query.filter_by(id=firebase_user_id).first()
+    print("account", account)
+    if not account:
+        flash('Doctor account not found', 'error')
+        return redirect(url_for('auth.signin'))
+
+    doctor_id = account.doctor_id
+    print("doctor_id", doctor_id)
+    # Fetch patients with completed appointments
+    patients_query = db.session.query(ClientAccounts).join(Appointment).filter(
+        Appointment.doctor_id == doctor_id,
+        Appointment.status == 'Completed'
+    )
     
-#     return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
+    # Pagination parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    pagination = patients_query.paginate(page=page, per_page=per_page, error_out=False)
+    patients = pagination.items
+
+    # Fetch lab results for the doctor
+    lab_doctor_id = account.id
+    print("lab_doctor_id: ", lab_doctor_id)
+    lab_results = BloodTest.query.filter_by(doctor_id=lab_doctor_id).all()
+    
+    return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
 
 
 
