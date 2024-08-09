@@ -1,0 +1,39 @@
+<!-- app/templates/doctors/edit_lab_result.html -->
+{% extends 'doctors/base.html' %}
+
+{% block title %}Edit Lab Result{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg mb-6 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold">Edit Lab Result</h1>
+            <p>Edit the details of the lab result for {{ lab_result.patient.first_name }} {{ lab_result.patient.last_name }}</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('doctor.edit_lab_result', result_id=lab_result.id) }}" method="POST" class="space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">Test Type: {{ lab_result.test_type }}</h2>
+            <p class="text-gray-700 mb-4"><strong>Date:</strong> {{ lab_result.test_date.strftime('%Y-%m-%d') }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for key, value in lab_result.results.items() %}
+                <div class="mb-4">
+                    <label for="{{ key }}" class="block text-gray-700 mb-2 font-semibold">{{ key.replace('_', ' ').capitalize() }}</label>
+                    <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Update</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

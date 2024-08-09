@@ -49,6 +49,7 @@ def create_app():
     app.register_blueprint(patient.bp, url_prefix='/patient')
     app.register_blueprint(contact.bp, url_prefix='/contact')
     app.context_processor(inject_unread_messages_count)
+    app.context_processor(inject_doctor_info)
 
     return app
 
@@ -61,6 +62,21 @@ def inject_unread_messages_count():
         user_id = session.get('user_id')
         unread_messages_count = Message.query.filter_by(recipient_id=user_id, is_read=False).count()
     return dict(unread_messages_count=unread_messages_count)
+
+
+def inject_doctor_info():
+    from flask import session
+    from app.models_db import Doctor, Account
+    
+    doctor_info = None
+    if 'user_id' in session:
+        user_id = session['user_id']
+        account = Account.query.get(user_id)
+        if account:
+            doctor_info = Doctor.query.get(account.doctor_id)
+    return dict(doctor_info=doctor_info)
+
+
 
 def initialize_firebase():
     # Retrieve JSON string from environment variable

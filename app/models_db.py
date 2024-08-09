@@ -92,6 +92,7 @@ class Patient(db.Model):
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    blood_id = db.Column(db.String(255), db.ForeignKey('account.id'))
     visits = db.relationship('Visit', back_populates='patient')
     follow_up_actions = db.relationship('FollowUpAction', back_populates='patient')
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
@@ -115,12 +116,20 @@ class Account(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     status = db.Column(db.String(20), nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    plain_password = db.Column(db.String(255), nullable=True)
+    password = db.Column(db.String(255), nullable=False)  # Hashed password
+    plain_password = db.Column(db.String(255), nullable=True)  # Store hashed password initially, and update with new hashed password
     last_login = db.Column(db.DateTime, nullable=True)
-
+    
     doctor = db.relationship('Doctor', backref=db.backref('accounts', lazy=True))
 
+    def set_password(self, password):
+        """Generate a hash for the password."""
+        self.password = generate_password_hash(password).decode('utf-8')
+        self.plain_password = self.password
+
+    def check_password(self, password):
+        """Check if the provided password matches the stored hash."""
+        return check_password_hash(self.password, password)
 
 class Doctor(db.Model):
     __tablename__ = 'doctors'
@@ -130,9 +139,14 @@ class Doctor(db.Model):
     specialization = db.Column(db.String(100), nullable=False)
     license_number = db.Column(db.String(50), unique=True, nullable=False)
     phone_number = db.Column(db.String(20))
+    dob = db.Column(db.Date, nullable=True)  # Date of birth, requires a Date type
+    address = db.Column(db.String(255), nullable=True)  # Address of the doctor
+    gender = db.Column(db.String(20), nullable=True)  # Gender of the doctor
     status = db.Column(db.String(20), default='Inactive', nullable=False)
     schedule = db.Column(db.String(100))
     time = db.Column(db.String(100))
+    image_path = db.Column(db.String(255))
+
 
 class Staff(db.Model):
     staff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -270,12 +284,15 @@ class PatientRoom(db.Model):
 class BloodTest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    client_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    blood_id = db.Column(db.String(255), db.ForeignKey('account.id'))
     test_type = db.Column(db.String(255))  # e.g., "Comprehensive Metabolic Panel"
     test_date = db.Column(db.Date, default=datetime.utcnow)
     results = db.Column(db.JSON)  # Storing results as a JSON object
 
     patient = db.relationship('Patient', backref='blood_tests')
+    client = db.relationship('ClientAccounts', backref='blood_tests')
     doctor = db.relationship('Doctor', backref='ordered_tests')
 
 
