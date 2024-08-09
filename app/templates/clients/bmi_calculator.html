@@ -1,0 +1,159 @@
+{% extends 'doctors/base.html' %}
+
+{% block title %}BMI Calculator{% endblock %}
+
+{% block sidebar %}
+{% include 'doctors/sidebar.html' %}
+{% endblock %}
+
+{% block navbar %}
+{% include 'doctors/dashboard_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg shadow-lg border-l-4 border-blue-700">
+        <h1 class="text-4xl font-bold text-white mb-2">BMI Calculator</h1>
+        <p class="text-white mb-4">Calculate the Body Mass Index (BMI) for your patients to assess their weight category. Choose your preferred units and enter the required data.</p>
+    </div>
+
+    <!-- Unit Selection -->
+    <div class="mt-6">
+        <label for="unit" class="block text-gray-700 font-bold mb-2">Select Unit:</label>
+        <select id="unit" name="unit" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" onchange="toggleUnits()">
+            <option value="metric">Metric (cm, kg)</option>
+            <option value="imperial">Imperial (in, lbs)</option>
+        </select>
+    </div>
+
+    <!-- BMI Form -->
+    <form id="bmi-form" class="bg-white p-6 rounded-lg shadow-lg mt-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mb-4">
+                <label for="height" class="block text-gray-700"><i class="fas fa-ruler-vertical mr-2"></i>Height:</label>
+                <input type="number" id="height" name="height" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter height">
+                <span id="height-unit" class="text-gray-500">cm</span>
+            </div>
+            <div class="mb-4">
+                <label for="weight" class="block text-gray-700"><i class="fas fa-weight mr-2"></i>Weight:</label>
+                <input type="number" id="weight" name="weight" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter weight">
+                <span id="weight-unit" class="text-gray-500">kg</span>
+            </div>
+        </div>
+        <button type="button" onclick="calculateBMI()" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Calculate BMI</button>
+    </form>
+
+    <!-- BMI Result -->
+    <div id="bmi-result" class="mt-6 hidden">
+        <h2 class="text-2xl font-semibold mb-4">BMI Result</h2>
+        <table class="min-w-full bg-white rounded-lg shadow-lg">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">BMI Value</th>
+                    <th class="px-4 py-2">Category</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="bmi-value" class="px-4 py-2"></td>
+                    <td id="bmi-category" class="px-4 py-2"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="bmi-chart" class="mt-6">
+            <canvas id="bmiChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleUnits() {
+    const unit = document.getElementById('unit').value;
+    const heightUnit = document.getElementById('height-unit');
+    const weightUnit = document.getElementById('weight-unit');
+
+    if (unit === 'metric') {
+        heightUnit.innerText = 'cm';
+        weightUnit.innerText = 'kg';
+    } else {
+        heightUnit.innerText = 'in';
+        weightUnit.innerText = 'lbs';
+    }
+}
+
+function calculateBMI() {
+    const unit = document.getElementById('unit').value;
+    let height = parseFloat(document.getElementById('height').value);
+    let weight = parseFloat(document.getElementById('weight').value);
+
+    if (isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
+        alert('Please enter valid height and weight values.');
+        return;
+    }
+
+    if (unit === 'imperial') {
+        height = height * 2.54; // Convert inches to cm
+        weight = weight * 0.453592; // Convert lbs to kg
+    }
+
+    const bmi = weight / ((height / 100) ** 2);
+    const bmiValue = bmi.toFixed(2);
+
+    let category = '';
+    if (bmi < 18.5) {
+        category = 'Underweight';
+        document.getElementById('bmi-category').className = 'text-blue-500';
+    } else if (bmi >= 18.5 && bmi < 24.9) {
+        category = 'Normal weight';
+        document.getElementById('bmi-category').className = 'text-green-500';
+    } else if (bmi >= 25 && bmi < 29.9) {
+        category = 'Overweight';
+        document.getElementById('bmi-category').className = 'text-yellow-500';
+    } else {
+        category = 'Obesity';
+        document.getElementById('bmi-category').className = 'text-red-500';
+    }
+
+    document.getElementById('bmi-value').innerText = bmiValue;
+    document.getElementById('bmi-category').innerText = category;
+    document.getElementById('bmi-result').classList.remove('hidden');
+
+    // Update BMI Chart
+    updateBMIChart(bmiValue, category);
+}
+
+function updateBMIChart(bmiValue, category) {
+    const ctx = document.getElementById('bmiChart').getContext('2d');
+    const bmiChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Underweight', 'Normal weight', 'Overweight', 'Obesity'],
+            datasets: [{
+                label: 'BMI',
+                data: [18.5, 24.9, 29.9, parseFloat(bmiValue)],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

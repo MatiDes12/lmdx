@@ -498,6 +498,26 @@ def get_messages():
 
     return jsonify({'success': True, 'conversation': conversation}), 200
 
+#<-------------------------- BMI Calculator ----------------------------->
+@bp.route('/bmi_calculator')
+def bmi_calculator():
+    return render_template('clients/bmi_calculator.html')
+
+@bp.route('/get_bmi_advice', methods=['POST'])
+def get_bmi_advice():
+    data = request.get_json()
+    bmi = float(data['bmi'])
+
+    genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+    prompt = f"Generate health advice for a patient with a BMI of {bmi:.2f}."
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    response = model.generate_content(prompt)
+    advice = response.text.strip()
+    print(advice)
+
+    return jsonify({'advice': advice})
+
+
 #<-------------------------- AI Chatbot -------------------------------->
 # Fetch user data function
 def fetch_user_data(user_id):
