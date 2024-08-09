@@ -983,6 +983,65 @@ def prescription():
 
     return render_template('doctors/prescription.html', completed_appointments=completed_appointments, prescriptions=prescriptions)
 
+@bp.route('/delete_prescription', methods=['POST'])
+def delete_prescription():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    prescription_id = request.form.get('prescription_id')
+
+    # Fetch the prescription from the database
+    prescription = Prescription.query.filter_by(prescription_id=prescription_id).first()
+
+    if not prescription:
+        flash('Prescription not found', 'danger')
+        return redirect(url_for('doctor.prescription'))
+
+    try:
+        # Delete the prescription from the database
+        db.session.delete(prescription)
+        db.session.commit()
+        flash('Prescription deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting prescription: {str(e)}', 'danger')
+
+    return redirect(url_for('doctor.prescription'))
+
+@bp.route('/edit_prescription', methods=['POST'])
+def edit_prescription():
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    prescription_id = request.form.get('prescription_id')
+    medication_id = request.form.get('medication')
+    dosage = request.form.get('dosage')
+    frequency = request.form.get('frequency')
+    duration = request.form.get('duration')
+
+    # Validate the inputs here if needed
+
+    try:
+        # Fetch the prescription by ID
+        prescription = Prescription.query.get(prescription_id)
+        if not prescription:
+            flash('Prescription not found', 'danger')
+            return redirect(url_for('doctor.prescription'))
+
+        # Update the prescription details
+        prescription.medication_id = medication_id
+        prescription.dosage = dosage
+        prescription.frequency = frequency
+        prescription.duration = duration
+
+        # Commit the changes
+        db.session.commit()
+        flash('Prescription updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating prescription: {str(e)}', 'danger')
+
+    return redirect(url_for('doctor.prescription'))
 
 #<----------------------monitor----------------------->
 
