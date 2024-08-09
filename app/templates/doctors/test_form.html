@@ -36,10 +36,11 @@
     </div>
 
     <!-- Forms for Each Section (Content hidden/shown based on selected tab) -->
-    <form action="" method="POST" class="space-y-6">
+    <form action="{{ url_for('doctor.test_form') }}" method="POST" class="space-y-6">
         <input type="hidden" name="patient_id" value="{{ patient_id }}">
         <input type="hidden" name="test_type" value="{{ test_type }}">
 
+        {% if test_type == 'blood' %}
         <!-- Dynamic sections for each test type -->
         <div id="comprehensive_metabolic_panel" class="tab-content hidden">
             <!-- Fields for Comprehensive Metabolic Panel -->
@@ -349,6 +350,8 @@
                 </div>
             </div>
         </div>
+
+        {% endif %}
 
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full focus:outline-none focus:shadow-outline">Submit</button>
     </form>

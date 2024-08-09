@@ -1,7 +1,7 @@
 import os
-from flask import Blueprint, flash, jsonify, render_template, request, send_from_directory, session, redirect, url_for
-import pytz
-from ..models_db import LabResult, LabTest, Patient, Doctor, Appointment, Message, Prescription, Settings, User, Account, ClientAccounts, Notification
+from flask import Blueprint, flash, json, jsonify, render_template, request, send_from_directory, session, redirect, url_for
+import json
+from ..models_db import BloodTest, LabResult, LabTest, Patient, Doctor, Appointment, Message, Prescription, Settings, User, Account, ClientAccounts, Notification
 from .. import sqlalchemy_db as db
 from datetime import datetime
 from functools import wraps
@@ -519,15 +519,6 @@ def get_doctor(doctor_id):
     return jsonify(doctor_data)
 
 
-@bp.route('/test_form', methods=['GET', 'POST'])
-def test_form():
-    if request.method == 'POST':
-        patient_id = request.form['patient_id']
-        test_type = request.form['test_type']
-        return render_template('test_form.html', patient_id=patient_id, test_type=test_type)
-    return render_template('doctors/test_form.html', patients=patients)
-
-
 @bp.route('/urine_test')
 def urine_test():
     return render_template('doctors/urine_test.html')
@@ -783,15 +774,7 @@ def reports():
 
 
 #<----------------------Lab Results----------------------->
-# Predefined lab tests
-PREDEFINED_TESTS = [
-    {"name": "Blood Test", "description": "A test to assess general health or detect specific conditions."},
-    {"name": "Urine Test", "description": "A test to detect substances in the urine and assess health."},
-    {"name": "Thyroid Function Tests", "description": "A test to evaluate thyroid gland function."},
-    {"name": "Liver Function Test", "description": "A test to check the health of the liver."},
-    {"name": "Complete Blood Count (CBC)", "description": "A test that provides information about red and white blood cells."},
-    # Add more predefined tests as needed
-]
+
 
 @bp.route('/lab_results', methods=['GET', 'POST'])
 def lab_results():
@@ -800,159 +783,139 @@ def lab_results():
 
     firebase_user_id = session.get('user_id')
     account = Account.query.filter_by(id=firebase_user_id).first()
-
+    print("account", account)
     if not account:
         flash('Doctor account not found', 'error')
         return redirect(url_for('auth.signin'))
 
     doctor_id = account.doctor_id
+    print("doctor_id", doctor_id)
 
-    if request.method == 'POST':
-        patient_id = request.form.get('patient_id')
-        test_id = request.form.get('test_id')
-        other_test_name = request.form.get('other_test_name')
-        result_value = request.form.get('result_value')
-        result_date = request.form.get('result_date')
-        notes = request.form.get('notes')
-        upload_file = request.files.get('upload_file')
+    # Fetch lab results for the doctor based on lab_doctor_id (from Account.id)
+    lab_doctor_id = account.id
+    print("lab_doctor_id: ", lab_doctor_id)
 
-        try:
-            # Handle file upload
-            image_path = None
-            if upload_file and allowed_file(upload_file.filename):
-                filename = secure_filename(upload_file.filename)
-                upload_folder = os.path.join('app', 'static', 'uploads', 'lab_results')
-                os.makedirs(upload_folder, exist_ok=True)
-                image_path = os.path.join(upload_folder, filename)
-                upload_file.save(image_path)
+    # Fetch lab results where the doctor_id matches and patient_id corresponds to client_id
+    lab_results = db.session.query(BloodTest).join(ClientAccounts, BloodTest.patient_id == ClientAccounts.client_id).filter(
+        BloodTest.doctor_id == lab_doctor_id
+    ).all()
 
-                # Ensure correct path formatting
-                image_path = os.path.relpath(image_path, start='app/static').replace("\\", "/")
-                print(f"Image saved to: {image_path}")  # Debugging log
+    # For debugging, print out the patient information
+    for result in lab_results:
+        print("Patient Info:", result.patient.first_name, result.patient.last_name)
 
-            # Determine the test description and ID
-            if test_id == 'other' and other_test_name:
-                # Use the AI model to generate the description for the new test
-                test_description = get_ai_generated_description(other_test_name)
-
-                # Create a new LabTest entry
-                new_test = LabTest(
-                    test_name=other_test_name,
-                    description=test_description
-                )
-                db.session.add(new_test)
-                db.session.commit()
-                test_id = new_test.test_id
-            else:
-                # Use the predefined test description
-                predefined_test = LabTest.query.filter_by(test_id=test_id).first()
-                if not predefined_test:
-                    # Create a new entry if it doesn't exist in the database
-                    for test in PREDEFINED_TESTS:
-                        if test['name'] == test_id:
-                            new_test = LabTest(
-                                test_name=test['name'],
-                                description=test['description']
-                            )
-                            db.session.add(new_test)
-                            db.session.commit()
-                            test_id = new_test.test_id
-                            break
-
-            # Add Lab Result
-            lab_result = LabResult(
-                patient_id=patient_id,
-                doctor_id=doctor_id,
-                test_id=test_id,
-                result_value=result_value,
-                result_date=datetime.strptime(result_date, '%Y-%m-%d').date(),
-                notes=notes,
-                image_path=image_path
-            )
-            db.session.add(lab_result)
-            db.session.commit()
-
-            flash('Lab result added successfully!', 'success')
-            return redirect(url_for('doctor.lab_results'))
-        except Exception as e:
-            db.session.rollback()  # Rollback the session in case of an error
-            flash(f"An error occurred: {str(e)}", 'error')
-            return redirect(url_for('doctor.lab_results'))
-
-    # Fetch all tests and patients for the dropdown
-    tests = LabTest.query.all() + [LabTest(test_id=test['name'], test_name=test['name'], description=test['description']) for test in PREDEFINED_TESTS]
-
-    # Get patients with completed appointments who do not have lab results yet
-    patients_with_results = db.session.query(LabResult.patient_id).filter_by(doctor_id=doctor_id).distinct()
-    patients = ClientAccounts.query.join(Appointment, ClientAccounts.client_id == Appointment.client_id)\
-        .filter(Appointment.status == 'Completed', Appointment.doctor_id == doctor_id)\
-        .filter(~ClientAccounts.client_id.in_(patients_with_results)).all()
-
-    # Pagination setup
+    # Pagination parameters
     page = request.args.get('page', 1, type=int)
-    lab_results_pagination = LabResult.query.filter_by(doctor_id=doctor_id).order_by(LabResult.result_date.desc()).paginate(page=page, per_page=10)
-    lab_results = lab_results_pagination.items
+    per_page = 5
+    pagination = db.paginate(page=page, per_page=per_page, error_out=False, items=lab_results)
+    patients = pagination.items
 
-    return render_template('doctors/lab_results.html', tests=tests, patients=patients, lab_results=lab_results, pagination=lab_results_pagination)
+    return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
 
-def get_ai_generated_description(test_name):
-    # Ensure test_name is provided
-    if test_name:
-        try:
-            # Configure the genai client with the API key from environment variables
-            genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
-            
-            # Initialize the GenerativeModel
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            # Construct the AI prompt
-            ai_prompt = f"Give me a short description of the medical defination called {test_name}."
-            
-            # Generate the description
-            response = model.generate_content(ai_prompt)
-            
-            # Extract and clean up the response text
-            enhanced_notes = response.text.strip() if response.text else "No description available."
-        
-        except Exception as e:
-            # Handle any errors that occur during the API call
-            enhanced_notes = f"Error generating description: {str(e)}"
-    else:
-        enhanced_notes = "No description available."
+# @bp.route('/lab_results', methods=['GET', 'POST'])
+# def lab_results():
+#     if 'user' not in session or session.get('user_type') != 'doctors':
+#         return redirect(url_for('auth.signin'))
+
+#     firebase_user_id = session.get('user_id')
+#     account = Account.query.filter_by(id=firebase_user_id).first()
+#     print("account", account)
+#     if not account:
+#         flash('Doctor account not found', 'error')
+#         return redirect(url_for('auth.signin'))
+
+#     doctor_id = account.doctor_id
+#     print("doctor_id", doctor_id)
+#     # Fetch patients with completed appointments
+#     patients_query = db.session.query(ClientAccounts).join(Appointment).filter(
+#         Appointment.doctor_id == doctor_id,
+#         Appointment.status == 'Completed'
+#     )
     
-    return enhanced_notes
+#     # Pagination parameters
+#     page = request.args.get('page', 1, type=int)
+#     per_page = 5
+#     pagination = patients_query.paginate(page=page, per_page=per_page, error_out=False)
+#     patients = pagination.items
 
-@bp.route('/add_lab_test', methods=['POST'])
-def add_lab_test():
-    if 'user' not in session:
+#     # Fetch lab results for the doctor
+#     lab_doctor_id = account.id
+#     print("lab_doctor_id: ", lab_doctor_id)
+#     lab_results = BloodTest.query.filter_by(doctor_id=lab_doctor_id).all()
+    
+#     return render_template('doctors/lab_results.html', patients=patients, lab_results=lab_results, pagination=pagination)
+
+
+
+@bp.route('/test_form', methods=['GET', 'POST'])
+def test_form():
+    if 'user' not in session or session.get('user_type') != 'doctors':
         return redirect(url_for('auth.signin'))
 
-    # Get form data
-    test_name = request.form.get('test_name')
-    description = request.form.get('description')
+    if request.method == 'POST':
+        doctor_id = session['user_id']
+        patient_id = request.form['patient_id']
+        test_type = request.form['test_type']
 
-    # Check if the test name is not empty
-    if not test_name:
-        flash('Test name is required.', 'error')
-        return redirect(url_for('doctor.lab_results'))
+        # Get the form data as JSON
+        test_data = request.form.to_dict()
+        test_data.pop('patient_id')
+        test_data.pop('test_type')
 
-    try:
-        # Create a new LabTest object
-        new_lab_test = LabTest(
-            test_name=test_name,
-            description=description
+        # Save the test data in the database
+        new_test = BloodTest(
+            patient_id=patient_id,
+            doctor_id=doctor_id,
+            test_type=test_type,
+            results=test_data
         )
-
-        # Add and commit the new lab test to the database
-        db.session.add(new_lab_test)
+        db.session.add(new_test)
         db.session.commit()
 
-        flash('Lab test type added successfully!', 'success')
-    except Exception as e:
-        db.session.rollback()  # Rollback the session in case of an error
-        flash(f"An error occurred: {str(e)}", 'error')
+        flash('Test results saved successfully!', 'success')
+        return redirect(url_for('doctor.lab_results'))
 
-    return redirect(url_for('doctor.lab_results'))
+    patient_id = request.args.get('patient_id')
+    test_type = request.args.get('test_type')
+
+    return render_template('doctors/test_form.html', patient_id=patient_id, test_type=test_type)
+
+
+@bp.route('/view_lab_result/<int:result_id>', methods=['GET'])
+def view_lab_result(result_id):
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    lab_result = BloodTest.query.get(result_id)
+    if not lab_result:
+        flash('Lab result not found', 'error')
+        return redirect(url_for('doctor.lab_results'))
+
+    return render_template('doctors/view_lab_result.html', lab_result=lab_result)
+
+
+@bp.route('/edit_lab_result/<int:result_id>', methods=['GET', 'POST'])
+def edit_lab_result(result_id):
+    if 'user' not in session or session.get('user_type') != 'doctors':
+        return redirect(url_for('auth.signin'))
+
+    lab_result = BloodTest.query.get(result_id)
+    if not lab_result:
+        flash('Lab result not found', 'error')
+        return redirect(url_for('doctor.lab_results'))
+
+    if request.method == 'POST':
+        test_data = request.form.to_dict()
+        lab_result.results = test_data
+        db.session.commit()
+        flash('Test results updated successfully!', 'success')
+        return redirect(url_for('doctor.lab_results'))
+
+    return render_template('doctors/edit_lab_result.html', lab_result=lab_result)
+
+
+
+
 
 #<----------------------prescription and medical history----------------------->
 @bp.route('/prescription', methods=['GET', 'POST'])

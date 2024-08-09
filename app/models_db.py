@@ -92,6 +92,7 @@ class Patient(db.Model):
     insurance_number = db.Column(db.String(100))
     gender = db.Column(db.Enum('Male', 'Female', 'Other', name='gender_enum'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    blood_id = db.Column(db.String(255), db.ForeignKey('account.id'))
     visits = db.relationship('Visit', back_populates='patient')
     follow_up_actions = db.relationship('FollowUpAction', back_populates='patient')
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))  # Foreign key to reference a Doctor
@@ -283,12 +284,15 @@ class PatientRoom(db.Model):
 class BloodTest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.String(255), db.ForeignKey('patients.patient_id'))
+    client_id = db.Column(db.String(255), db.ForeignKey('client_accounts.client_id'))
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.doctor_id'))
+    blood_id = db.Column(db.String(255), db.ForeignKey('account.id'))
     test_type = db.Column(db.String(255))  # e.g., "Comprehensive Metabolic Panel"
     test_date = db.Column(db.Date, default=datetime.utcnow)
     results = db.Column(db.JSON)  # Storing results as a JSON object
 
     patient = db.relationship('Patient', backref='blood_tests')
+    client = db.relationship('ClientAccounts', backref='blood_tests')
     doctor = db.relationship('Doctor', backref='ordered_tests')
 
 
