@@ -1,17 +1,11 @@
-{% extends 'doctors/base.html' %}
-
-{% block title %}Blood Pressure{% endblock %}
-
-{% block sidebar %}
-{% include 'doctors/sidebar.html' %}
-{% endblock %}
+{% extends 'clients/base.html' %}
 
 {% block navbar %}
-{% include 'doctors/dashboard_navbar.html' %}
+    {% include 'clients/navbar.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6">
+<div class="p-4">
     <div class="bg-gradient-to-r from-blue-600 to-green-200 p-6 rounded-lg shadow-lg mb-6 text-white">
         <h1 class="text-3xl font-bold">Blood Pressure</h1>
         <p>Enter the blood pressure data for the selected patient.</p>

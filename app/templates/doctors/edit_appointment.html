@@ -13,7 +13,7 @@
 <section class="container px-4 mx-auto">
     <div class="mb-8">
         <div class="flex items-center gap-x-3">
-            <img src="https://i.pravatar.cc/150?u={{ appointment.client.first_name }}.{{ appointment.client.last_name }}" alt="{{ appointment.client.first_name }} {{ appointment.client.last_name }}" class="w-16 h-16 rounded-full">
+            <img src="{{ url_for('static', filename=doctor_info.image_path if doctor_info and doctor_info.image_path else 'images/profilePic.jpg') }}" class="w-16 h-16 rounded-full">
             <div>
                 <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ appointment.client.first_name }} {{ appointment.client.last_name }}</h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400">Patient ID: {{ appointment.client.client_id }}</p>
