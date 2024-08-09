@@ -39,6 +39,7 @@
 
   /* List Item Style */
   .containers p {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #555555; /* Medium gray */
       font-size: 1.2rem;
       line-height: 1.8;
@@ -59,7 +60,13 @@
 
   /* Bolded Text */
   .containers strong {
-      color: #e74c3c; /* Distinct red for emphasis */
+      color: #3c72e7; /* Distinct red for emphasis */
+      font-weight: bold;
+  }
+
+  .containers strong .highlight {
+      color: #3498db; /* Blue for links */
+      text-decoration: none;
       font-weight: bold;
   }
 
@@ -232,7 +239,9 @@
       <div class="space-y-2 mb-4">
      
         <div class="p-2 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <p class="text-sm text-gray-700 dark:text-gray-300"></p>
+          <p class="text-sm text-gray-700 dark:text-gray-300" id="summary-content">
+            <strong>Today's Summary:</strong><br>{{ daily_summary | safe }}
+          </p>
         </div>
         
       </div>
@@ -290,7 +299,11 @@
 </div>
 
 <div id="flash-message-container" class="fixed top-10 right-5 z-50"></div>
-
+<style>
+  .highlight {
+      color: #ADD8E6; /* Light blue color */
+  }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const url = '{{ url_for("static", filename="health_tips.json") }}';  // Correct path to your JSON file
@@ -373,6 +386,26 @@ function showFlashMessage(message, category) {
           flashMessage.remove();
       }, 5000);
   }
+
+  document.addEventListener("DOMContentLoaded", function() {
+            // Function to format text
+            function formatText() {
+                let content = document.getElementById("summary-content");
+                let text = content.innerHTML;
+
+                // Bold formatting and adding "our one"
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlight">$1</strong>');
+
+                // Convert markdown headers to HTML headers
+                text = text.replace(/##\s*(.*?)\s*##/g, '<h2>$1</h2>');
+
+                // Update the content
+                content.innerHTML = text;
+            }
+
+            // Call the formatting function
+            formatText();
+        });
 </script>
 
 {% endblock %}

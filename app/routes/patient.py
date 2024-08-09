@@ -120,6 +120,8 @@ def patient_dashboard():
                 "Review health tips"
             ]
 
+            daily_summary = fetch_daily_summary()
+
             return render_template('clients/dashboard.html', 
                                    first_name=first_name, 
                                    last_name=last_name, 
@@ -128,6 +130,7 @@ def patient_dashboard():
                                    recent_activities=recent_activities,
                                    health_tips=health_tips,                 
                                    health_goals=health_goals,
+                                   daily_summary=daily_summary,
                                    tasks=tasks)
 
         else:
@@ -626,6 +629,23 @@ def fetch_user_doctors(user_id):
             }
             for doctor in doctors
         ]
+    
+    return None
+
+def fetch_user_blood_tests(user_id):
+    blood_tests = BloodTest.query.filter_by(patient_id=user_id).all()
+    if blood_tests:
+        return [
+            {
+                'test_type': test.test_type,
+                'result_value': test.results,
+                'doctor': test.doctor_id
+                
+            }
+            for test in blood_tests
+        ]
+    return None
+
 
 @bp.route('/chatbot', methods=['GET', 'POST'])
 def chatbot():
@@ -647,6 +667,16 @@ def chatbot():
     else:
         appointment_info = "No upcoming appointments found."
 
+    blood_test = fetch_user_blood_tests(user_id)
+    if blood_test:
+        blood_test_info = [
+            f"{test['test_type']} - Result: {test['result_value']} by {test['doctor']}"
+            for test in blood_test
+        ]
+       
+    else:
+        blood_test_info = "No blood test results found."
+
     
 
     medication_details = fetch_user_medication(user_id)
@@ -655,17 +685,17 @@ def chatbot():
             f"{med['medication_name']} - Dosage: {med['dosage']}, Frequency: {med['frequency']}"
             for med in medication_details
         ]
-        print(medication_info)
+     
     else:
         medication_info = "No active medications found."
 
-    lab_results = fetch_user_lab_results(user_id)
+    lab_results = fetch_user_blood_tests(user_id)
     if lab_results:
         lab_results_info = [
-            f"{result['test_name']} - Result: {result['result_value']} {result['unit']} (Reference Range: {result['reference_range']}), Date: {result['date']}, Notes: {result['notes']}"
-            for result in lab_results
+            f"{test['test_type']} - Result: {test['result_value']} by {test['doctor']}"
+            for test in blood_test
         ]
-        print(lab_results_info)
+     
     else:
         lab_results_info = "No lab results found."
 
@@ -675,7 +705,7 @@ def chatbot():
             f"{doctor['doctor_name']} - Specialization: {doctor['specialization']}, Schedule: {doctor['schedule']}"
             for doctor in doctors
         ]
-        print(doctor_info)
+
     else:
         doctor_info = "No doctor appointments found."
 
@@ -686,9 +716,11 @@ def chatbot():
             f"{medication['medication_name']} - Dosage: {medication['dosage']}, Frequency: {medication['frequency']}"
             for medication in Prescription
         ]
-        print(Prescription_info)
+ 
     else:
         Prescription_info = "No active medications found."
+
+    
 
     # Select a random greeting message
     greeting_message = random.choice(greetings).format(first_name=client_account.first_name)
@@ -709,7 +741,7 @@ def chatbot():
             )
 
 
-            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info} \n Current time: {formatted_time} \n Prescription Information: {Prescription_info}"
+            prompt = f"{user_context}\n\n{advanced_instruction}\n\n{formatting_instruction}\n\nUser: {message}\nLanguage: {language}\n Appointment Information: {appointment_info} \n Medication Information: {medication_info} \n Lab Results: {lab_results_info} \n Doctor Information: {doctor_info} \n Current time: {formatted_time} \n Prescription Information: {Prescription_info} \n Blood Test Information: {blood_test_info}"
 
             try:
                 genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
@@ -796,31 +828,45 @@ def fetch_daily_summary():
         messages_info = ["No new messages."]
 
     # Combine all information into a daily summary
-    summary = [
-        f"Good day, {first_name} {last_name}!",
-        "Here is your daily health summary:",
-        "Appointments:",
-        *appointment_info,
-        "Medications:",
-        *medication_info,
-        "Lab Results:",
-        *lab_results_info,
-        "Messages:",
-        *messages_info
-    ]
+    summary = f"Good day, {first_name} {last_name}! Here's your daily summary:\n\n 📅 Appointments:\n{', '.join(appointment_info)}\n\n 💊 Medications:\n{', '.join(medication_info)}\n\n 🩺 Lab Results:\n{', '.join(lab_results_info)}\n\n 📩 Messages:\n{', '.join(messages_info)}"
+    
 
-    # Format the summary for HTML rendering
-    formatted_summary = format_summary(summary)
-    return formatted_summary
+    # generate AI-enhanced notes if the reason is provided
+    ai_prompt = (
+        "Summarize the following medical consultation reason and integrate any existing notes into a personal narrative. start with 'You have....' use ther name as will {first_name } {last_name}. Keep the summary concise, within 30 words."
+    )
 
-def format_summary(summary_list):
-    formatted_summary = ""
-    for item in summary_list:
-        if ":" in item:  # If the item is a header, make it bold
-            formatted_summary += f"<strong>{item}</strong><br>"
-        else:  # Regular list items
-            formatted_summary += f"{item}<br>"
-    return formatted_summary
+    
+
+    try:
+        genai.configure(api_key=os.environ['GOOGLE_API_KEY1'])
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content(summary+ai_prompt+formatting_instruction+advanced_instruction)
+        enhanced_notes = response.text.strip()
+        return format_text(enhanced_notes)
+    except Exception as e:
+        return f"Exception fetching daily summary: {str(e)}"
+    
+
+def format_text(text):
+    # Replace double asterisks with bold tags and include "our one" inside the strong tag
+    formatted_text = re.sub(r"\*\*(.*?)\*\*", r"<strong style='color: #fb5609 ;>\1</strong>", text)
+    
+    # Replace double hashtags with header tags
+    formatted_text = re.sub(r"##\s*(.*?)\s*##", r"<h2>\1</h2>", formatted_text)
+
+    # Replace single asterisks with bullet points
+    formatted_text = re.sub(r"\*\s(.*?)\n", r"<li>\1</li>", formatted_text)
+
+    # Replace double asterisks with bold tags and include "our one" inside the strong tag
+    formatted_text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", formatted_text)
+
+
+    return formatted_text
+        
+
+
+
 #<-------------------------- profile -------------------------------->
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
