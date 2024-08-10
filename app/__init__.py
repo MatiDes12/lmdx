@@ -2,20 +2,16 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore
 import json
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from flask_session import Session
-from flask_mail import Mail
-from flask_bcrypt import Bcrypt  # Import Flask-Bcrypt
+from .extensions import sqlalchemy_db, migrate, mail, bcrypt
 from .config import Config
 from dotenv import load_dotenv
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
+from app.routes.patient import check_and_send_reminders, move_taken_reminders_to_tomorrow
 
 # Initialize extensions
-sqlalchemy_db = SQLAlchemy()
-migrate = Migrate()
-mail = Mail()
-bcrypt = Bcrypt()  # Initialize Bcrypt here
+scheduler = BackgroundScheduler()  # Initialize the scheduler
 
 # Load environment variables from .env file
 load_dotenv()
@@ -51,6 +47,16 @@ def create_app():
     app.context_processor(inject_unread_messages_count)
     app.context_processor(inject_doctor_info)
 
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(check_and_send_reminders, 'interval', args=[app], minutes=1)
+    scheduler.add_job(move_taken_reminders_to_tomorrow, 'cron', args=[app], hour=0)
+    scheduler.start()
+
+    # @app.teardown_appcontext
+    # def shutdown_scheduler(exception=None):
+    #     scheduler.shutdown(wait=False)
+
     return app
 
 def inject_unread_messages_count():
@@ -75,8 +81,6 @@ def inject_doctor_info():
         if account:
             doctor_info = Doctor.query.get(account.doctor_id)
     return dict(doctor_info=doctor_info)
-
-
 
 def initialize_firebase():
     # Retrieve JSON string from environment variable

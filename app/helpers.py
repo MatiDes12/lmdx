@@ -1,8 +1,25 @@
 import smtplib
 from email.mime.text import MIMEText
 from twilio.rest import Client
+import os
 import logging
+from twilio.base.exceptions import TwilioRestException
 
+def send_sms_reminder(phone_number, message):
+    account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+    auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+    client = Client(account_sid, auth_token)
+
+    try:
+        message = client.messages.create(
+            body=message,
+            from_='+18669554686',
+            to=phone_number
+        )
+        logging.info(f"SMS sent to {phone_number}: {message.sid}")
+    except TwilioRestException as e:
+        logging.error(f"Failed to send SMS to {phone_number}: {e}")
+        
 def send_email(to_email, subject, message):
     from_email = ""
     password = ""
