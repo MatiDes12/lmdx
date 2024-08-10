@@ -15,8 +15,8 @@
         <div class="flex gap-4 mb-6">
             <!-- Test Category Dropdown -->
             <div>
-                <label for="test_type" class="block text-sm font-medium text-gray-700">Choose Test Category:</label>
-                <select id="test_type" name="test_type" class="appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <label for="test_type"  class="block text-sm font-medium text-gray-700">Choose Test Category:</label>
+                <select id="test_type" class="block w-full pl-3 pr-10 py-2 mt-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow bg-gray-50">
                     <option value="" disabled selected>Select a test type</option>
                     <option value="blood" {% if request.args.get('test_type') == 'blood' %}selected{% endif %}>Blood Work</option>
                     <option value="urine" {% if request.args.get('test_type') == 'urine' %}selected{% endif %}>Urine Analysis</option>
@@ -50,7 +50,7 @@
             </div>
 
             <div class="flex items-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline">
                     Apply Filters
                 </button>
             </div>

@@ -92,6 +92,12 @@ advanced_instruction = (
 
     "5. **Lab Results Interpretation**: Provide clear explanations of lab results, including what the results mean and the normal ranges. "
     "   Example: <table><tr><th>Test</th><th>Result</th><th>Normal Range</th></tr><tr><td>Sodium</td><td>139 mEq/L</td><td>135-145 mEq/L</td></tr></table> "
+    "   Example: <p>Your blood sugar level is 120 mg/dL, which falls within the normal range of 70-140 mg/dL.</p> "
+    "   Example: <p>The white blood cell count is 8,000 cells/mm3, indicating a normal immune response.</p> "
+    "   Example: <p>The cholesterol level is 200 mg/dL, which is within the recommended range of 150-200 mg/dL.</p> "
+    "   Example: <p>The hemoglobin level is 12 g/dL, which is within the normal range of 12-16 g/dL.</p> "
+    "   Example: <p>The platelet count is 250,000 cells/mm3, which is within the normal range of 150,000-450,000 cells/mm3.</p> "
+    "   Example: <p>The liver enzyme levels are within the normal range, indicating healthy liver function.</p> "
 
     "6. **Appointment Management**: Give clear instructions for managing appointments, including how to reschedule, edit, and cancel appointments. "
     "   Example: <p>To reschedule your appointment, click the 'Reschedule' button next to the appointment details.</p> "
