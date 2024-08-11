@@ -2,12 +2,13 @@ from mailbox import Message
 import os
 import random
 import re
-from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash
+from flask import Blueprint, json, jsonify, render_template, redirect, url_for, session, request, flash, current_app, Flask
 from ..models_db import BloodTest, ClientAccounts, Doctor, Appointment, FollowUpAction, Medication, Patient, Prescription, Reminder, User, Message, Visit
 from ..models_db import ClientAccounts, Doctor, Appointment, LabResult, LabTest, Medication, Patient, Reminder, User, Message
 from flask import Blueprint, jsonify, render_template, redirect, url_for, session, request, flash
 from ..models_db import Doctor, Account, Appointment, Medication, Reminder, User, Message, Notification
 from .. import sqlalchemy_db as db
+from app.extensions import sqlalchemy_db as db
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from app.routes.auth import firebase_db
@@ -20,6 +21,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from bs4 import BeautifulSoup
+from app.helpers import send_sms_reminder
 
 from sqlalchemy import and_, or_
 
@@ -1234,11 +1236,15 @@ def medication():
         today_reminders=today_reminders,
         tomorrow_reminders=tomorrow_reminders
     )
+    
 @bp.route('/set_reminder', methods=['POST'])
 def set_reminder():
     prescription_id = request.form.get('prescription_id')
     reminder_time = request.form.get('reminder_time')
-    print("medication_id: ", prescription_id)
+    
+    if not reminder_time:
+        flash('Please enter a time for the reminder.', 'error')
+        return redirect(url_for('patient.medication'))
     
     new_reminder = Reminder(
         prescription_id=prescription_id,
@@ -1248,8 +1254,61 @@ def set_reminder():
     db.session.add(new_reminder)
     db.session.commit()
     
-    flash('Reminder set successfully!', 'success')
     return redirect(url_for('patient.medication'))
+
+import logging
+logging.basicConfig(level=logging.INFO)
+
+def check_and_send_reminders(app: Flask):
+    with app.app_context():  # Use the passed app to create the context
+        now = datetime.datetime.now()
+        current_time = now.time()
+        today = now.date()
+        current_time_minus_one_minute = (datetime.datetime.combine(datetime.date(1,1,1), current_time) - timedelta(minutes=1)).time()
+
+        logging.info(f"Checking for reminders at {current_time}")
+        
+        # Fetch all reminders that are due now and have not been taken
+        reminders = Reminder.query.filter(
+            Reminder.date == today,
+            Reminder.time >= current_time_minus_one_minute,
+            Reminder.time <= current_time,
+            Reminder.taken == False
+        ).all()
+        
+        logging.info(f"Current time window: {current_time_minus_one_minute} to {current_time}")
+        logging.info(f"Found {len(reminders)} reminders due to be sent.")
+        logging.info(f"Checking for reminders at {reminders}")
+
+        for reminder in reminders:
+            prescription = reminder.prescription
+            patient = prescription.patient  # Assuming you have a relationship between Prescription and ClientAccounts
+            logging.info(f"Reminder due for {reminder.prescription.patient.phone_number} at {reminder.time}")
+
+            # Fetch the patient's phone number from the ClientAccounts model
+            phone_number = patient.phone_number
+
+            if phone_number:  # Ensure phone number exists
+                message = f"Reminder: It's time to take your medication {prescription.medication_id}."
+                send_sms_reminder(phone_number, message)
+
+                # Optionally, mark the reminder as sent or handled to avoid duplicate SMS
+                reminder.taken = True
+                db.session.commit()
+        if reminders:
+            logging.info(f"Sending reminders to {len(reminders)} patients")
+        else:
+            logging.info("No reminders to send")
+
+def move_taken_reminders_to_tomorrow(app: Flask):
+    with app.app_context():  # Use the passed app to create the context
+        today = datetime.datetime.now().date()
+        tomorrow = today + datetime.timedelta(days=1)
+        taken_reminders = Reminder.query.filter_by(date=today, taken=True).all()
+        for reminder in taken_reminders:
+            reminder.date = tomorrow
+            reminder.taken = False  # Reset for tomorrow
+        db.session.commit()
 
 
 @bp.route('/mark_as_taken/<int:reminder_id>', methods=['POST'])
@@ -1261,25 +1320,10 @@ def mark_as_taken(reminder_id):
         return jsonify({'success': True}), 200
     return jsonify({'error': 'Reminder not found'}), 404
 
-def move_taken_reminders_to_tomorrow():
-    today = datetime.datetime.now().date()
-    tomorrow = today + datetime.timedelta(days=1)
-    taken_reminders = Reminder.query.filter_by(date=today, taken=True).all()
-    for reminder in taken_reminders:
-        reminder.date = tomorrow
-        reminder.taken = False  # Reset for tomorrow
-    db.session.commit()
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(move_taken_reminders_to_tomorrow, 'cron', hour=0)
-scheduler.start()
-
-
 @bp.route('/repeat_reminder/<int:reminder_id>', methods=['POST'])
 def repeat_reminder(reminder_id):
     reminder = Reminder.query.get(reminder_id)
     if reminder:
-        # Create a new reminder for tomorrow
         new_reminder = Reminder(
             prescription_id=reminder.prescription_id,
             date=reminder.date + datetime.timedelta(days=1),  # Schedule for tomorrow
@@ -1288,9 +1332,8 @@ def repeat_reminder(reminder_id):
             repeat=True  # Mark as repeated
         )
         db.session.add(new_reminder)
-        db.session.commit()     
+        db.session.commit()
 
-        # Redirect to the medication page to trigger a page reload
         return redirect(url_for('patient.medication'))
     
     flash('Failed to repeat reminder.', 'danger')

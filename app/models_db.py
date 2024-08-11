@@ -1,4 +1,4 @@
-from app import sqlalchemy_db as db
+from app.extensions import sqlalchemy_db as db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bcrypt import generate_password_hash, check_password_hash
