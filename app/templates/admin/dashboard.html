@@ -1,12 +1,55 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard Overview{% endblock %}
 
 {% block sidebar %}
 {% include 'admin/sidebar.html' %}
 {% endblock %}
 
 {% block content %}
-<h1>ADMIN</h1>
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6 text-white">
+        <h1 class="text-4xl font-bold">Dashboard Overview</h1>
+        <p>Welcome to the admin dashboard. Here you can find a summary of key metrics and recent activities.</p>
+    </div>
 
+    <!-- Financial Summary Section -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-2xl font-semibold mb-4"><i class="fas fa-chart-line mr-2"></i>Financial Summary</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-green-100 p-4 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">Total Revenue</h3>
+                <p class="text-3xl font-bold text-green-500">$1,200,000</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">Total Expenses</h3>
+                <p class="text-3xl font-bold text-red-500">$800,000</p>
+            </div>
+            <div class="bg-blue-100 p-4 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">Net Profit</h3>
+                <p class="text-3xl font-bold text-blue-500">$400,000</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Section -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-2xl font-semibold mb-4"><i class="fas fa-clock mr-2"></i>Recent Activities</h2>
+        <ul class="list-disc list-inside text-gray-700">
+            <li>New user registration: John Doe</li>
+            <li>Order #3066 processed successfully</li>
+            <li>Monthly report generated</li>
+        </ul>
+    </div>
+
+    <!-- Quick Access Links Section -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-2xl font-semibold mb-4"><i class="fas fa-link mr-2"></i>Quick Access</h2>
+        <div class="flex space-x-4">
+            <a href="/admin/financials" class="bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition duration-300">Financials</a>
+            <a href="/admin/users" class="bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition duration-300">Users</a>
+            <a href="/admin/reports" class="bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition duration-300">Reports</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

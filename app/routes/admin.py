@@ -40,8 +40,28 @@ def index():
 def admin_dashboard():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
+    page = request.args.get('page', 1, type=int)
+    per_page = 7
+    doctors_pagination = Doctor.query.paginate(page=page, per_page=per_page, error_out=False)
+    doctors = doctors_pagination.items
 
-    return render_template('admin/dashboard.html')
+    # Get total counts
+    total_doctors = Doctor.query.count()
+    total_accounts = Account.query.count()
+    
+    # Generate time slots
+    time_slots = [(datetime(2000, 1, 1, hour, 0).strftime('%I:%M %p')) for hour in range(24)]
+
+    # Days of the week
+    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    
+    return render_template('admin/doctors.html', 
+                           doctors=doctors, 
+                           doctors_pagination=doctors_pagination, 
+                           time_slots=time_slots, 
+                           days_of_week=days_of_week, 
+                           total_doctors=total_doctors, 
+                           total_accounts=total_accounts)
 
 #<---------------------- doctor Dashboard Routes----------------------->
 @bp.route('/doctor')
@@ -49,7 +69,7 @@ def doctor_dashboard():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
 
-    return render_template('doctors/dashboard.html')
+    return render_template('doctors/doctors.html')
 
 #<---------------------- Patient Dashboard Routes----------------------->
 
@@ -751,29 +771,21 @@ def export_audit_logs():
 def admin_reports():
     if 'user' not in session:
         return redirect(url_for('auth.signin'))
-    
-    # Fetch reports from the database
-    reports = Report.query.order_by(Report.generated_at.desc()).limit(10).all()
-    total_reports = Report.query.count()
-    today_reports = Report.query.filter(Report.generated_at >= datetime.utcnow().date()).count()
 
-    return render_template('admin/reports.html', 
-                           reports=reports,
-                           total_reports=total_reports,
-                           today_reports=today_reports)
+    return render_template('admin/reports.html')
 
-@bp.route('/api/report/<int:report_id>')
-def get_report_details(report_id):
-    report = Report.query.get_or_404(report_id)
-    return jsonify({
-        'report_id': report.report_id,
-        'type': report.type,
-        'user': {
-            'username': report.user.username
-        },
-        'generated_at': report.generated_at.strftime('%Y-%m-%d %H:%M:%S'),
-        'details': report.details
-    })
+# @bp.route('/api/report/<int:report_id>')
+# def get_report_details(report_id):
+#     report = Report.query.get_or_404(report_id)
+#     return jsonify({
+#         'report_id': report.report_id,
+#         'type': report.type,
+#         'user': {
+#             'username': report.user.username
+#         },
+#         'generated_at': report.generated_at.strftime('%Y-%m-%d %H:%M:%S'),
+#         'details': report.details
+#     })
 
 @bp.route('/admin/reports/generate', methods=['POST'])
 def generate_report():
